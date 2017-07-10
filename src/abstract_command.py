@@ -1,0 +1,127 @@
+import os
+from subprocess import Popen, call, check_call, PIPE
+from .services.config_handler import ConfigHandler
+from .services.catalog_handler import CatalogHandler
+from .services.compose_handler import ComposeHandler
+from .services.console_logger import ColorPrint
+from .services.project_utils import ProjectUtils
+from .services.git_repository import GitRepository
+from .services.file_utils import FileUtils
+
+
+class AbstractCommand(object):
+
+    config_handler = None
+    catalog_handler = None
+    project_utils = None
+    compose_handler = None
+
+    '''project name'''
+    name = None
+
+    def __init__(self, home_dir):
+            self.home_dir = home_dir
+
+    def parse_config(self):
+        self.config_handler = ConfigHandler(home_dir=self.home_dir)
+        if not self.config_handler.exists():
+            ColorPrint.print_error(message="Local config doesnt exists: %s" % self.config_handler.get_file())
+            ColorPrint.exit_after_print_messages(message="Please use project-catalog init for generate environment",
+                                                 msg_type="warn")
+
+    def parse_catalog(self):
+        self.catalog_handler = CatalogHandler(home_dir=self.home_dir,
+                                              repo_type=self.config_handler.get_repository_type(),
+                                              file=self.config_handler.get_catalog_file(),
+                                              url=self.config_handler.get_url(),
+                                              branch=self.config_handler.get_branch(),
+                                              ssh=self.get_node(self.config_handler.get_actual_config(),
+                                                                ["default", "ssh-key"]))
+
+    def init_project_utils(self):
+        self.project_utils = ProjectUtils(home_dir=self.home_dir, work_dir=self.config_handler.get_work_dir())
+
+    def get_project_repository(self):
+        catalog = self.get_catalog(self.name)
+        return self.project_utils.get_project_repository(name=self.name, project_element=catalog,
+                                                         ssh=self.get_node(catalog, ["ssh-key"]))
+
+    def get_compose_file(self, silent=False):
+        catalog = self.get_catalog(self.name)
+        return self.project_utils.get_compose_file(name=self.name, project_element=catalog,
+                                                   ssh=self.get_node(catalog, ["ssh-key"]), silent=silent)
+
+    def init_compose_handler(self, arguments):
+        compose_file = self.get_compose_file()
+        repo_dir = self.project_utils.get_target_dir(self.config_handler.get_work_dir(), self.name,
+                                                     self.catalog_handler.get(name=self.name))
+        self.compose_handler = ComposeHandler(compose_file=compose_file,
+                                              mode=arguments.get('<mode>'),
+                                              repo_dir=repo_dir)
+
+    def run_before(self):
+        self.run_scripts(script_type="before_script")
+        self.run_checkouts()
+        self.save_docker_config()
+
+    def run_after(self):
+        call(["docker", "ps"])
+        self.run_scripts(script_type="after_script")
+
+    def run_scripts(self, script_type):
+        for script in self.compose_handler.get_scripts(script_type=script_type):
+            check_call(script.split(' '), cwd=self.compose_handler.get_working_directory())
+
+    def run_docker_command(self, commands):
+        cmd = self.compose_handler.get_command(name=self.name, commands=commands, get_file=self.project_utils.get_file)
+        ColorPrint.print_with_lvl(message="Docker command: " + str(cmd), lvl=1)
+        call(cmd,
+             cwd=self.compose_handler.get_working_directory(),
+             env=self.compose_handler.get_environment_variables(name=self.name, get_file=self.project_utils.get_file))
+
+    def run_checkouts(self):
+        for checkout in self.compose_handler.get_checkouts():
+            if " " not in checkout:
+                ColorPrint.exit_after_print_messages(message="Wrong checkout command: " + checkout)
+            directory, repository = checkout.split(" ")
+            target_dir = os.path.join(self.compose_handler.get_working_directory(), directory)
+            GitRepository(target_dir=target_dir, url=repository, branch="master")
+
+    def save_docker_config(self):
+        p = Popen(self.compose_handler.get_command(name=self.name, commands="config",
+                  get_file=self.project_utils.get_file),
+                  cwd=self.compose_handler.get_working_directory(),
+                  env=self.compose_handler.get_environment_variables(name=self.name,
+                                                                     get_file=self.project_utils.get_file),
+                  stdout=PIPE, stderr=PIPE)
+        out, err = p.communicate()
+        FileUtils.write_compose_log(directory=self.config_handler.log_dir, project=self.name,
+                                    data=err if len(err) > 0 else out)
+
+    def get_catalog_list(self):
+        # TODO group parse here!
+        return self.catalog_handler.get_catalog()
+
+    def get_catalog(self, name):
+        return self.catalog_handler.get(name=name)
+
+    @staticmethod
+    def get_node(structure, paths, default=None):
+        node = paths[0]
+        paths = paths[1:]
+
+        while node in structure and len(paths) > 0:
+            structure = structure[node]
+            node = paths[0]
+            paths = paths[1:]
+
+        return structure[node] if node in structure else default
+
+    def print_branches(self, repo):
+        """Get available branches"""
+        actual_branch = repo.get_actual_branch()
+        ColorPrint.print_with_lvl(message="----------------------------------------------------------", lvl=-1)
+        ColorPrint.print_with_lvl(message="Available branches in " + repo.target_dir, lvl=-1)
+        ColorPrint.print_with_lvl(message="----------------------------------------------------------", lvl=-1)
+        for key in repo.get_branches():
+            ColorPrint.print_with_lvl(message=str(key) + "(*)" if str(key) == actual_branch else key, lvl=-1)

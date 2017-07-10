@@ -1,0 +1,7 @@
+version: '2.0'
+maintainer: "operation@shiwaforce.com"
+containers:
+    sample: docker-compose.yml
+
+mode:
+    default: sample
