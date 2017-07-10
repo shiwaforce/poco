@@ -4,6 +4,8 @@ python:
 - '3.4'
 - '3.5'
 - '3.6'
+script:
+- "python setup.py test"
 deploy:
   provider: pypi
   user: operations@shiwaforce.com
