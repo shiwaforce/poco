@@ -4,6 +4,8 @@ python:
 - '3.4'
 - '3.5'
 - '3.6'
+install:
+- "pip install pytest-cov"
 script:
 - "python setup.py test"
 deploy:
