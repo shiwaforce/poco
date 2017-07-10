@@ -7,7 +7,10 @@ python:
 install:
 - "pip install pyaml==16.12.2"
 - "pip install gitpython==2.1.3"
+- "pip install svn==0.3.44"
+- "pip install docopt==0.6.2"
 - "pip install pytest-cov"
+- "pip install docker-compose>=1.11.2"
 script:
 - "python setup.py test"
 deploy:
