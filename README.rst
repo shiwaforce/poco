@@ -1,6 +1,9 @@
 Docker Project Manager
 ======================
 
+.. image:: https://travis-ci.org/shiwaforce/project-compose.svg?branch=master
+    :target: https://travis-ci.org/shiwaforce/project-compose
+
 Docker Project Manager helps you manage Docker projects using a YAML based configuration file.
 
 [Shiwaforce.com](http://www.shiwaforce.com)
