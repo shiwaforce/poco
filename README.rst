@@ -74,12 +74,12 @@ Configuration:
  - repository-dir (optional): the base directory name where the project will be checked out. - Default: name of the project
  - ssh-key (optional): ssh file location for the Git repository - default: ~/.ssh/id_rsa
 
-    If you don't define the repository it will be relative to the config file's location
+If you don't define the repository it will be relative to the config file's location
 
-    If the path ends with a name of a directory it will be extended with the default filename : project-compose.yml
+If the path ends with a name of a directory it will be extended with the default filename : project-compose.yml
 
 For example:
-
+::
     test1:
         git: https://github.com/shiwaforce/project-compose-example.git
         branch: master
@@ -107,7 +107,7 @@ Each row in the checkout section will check out a Git repository to the target d
 which is relative to the compose file or the working directory if it is set.
 
 For example:
-
+::
     version: '2.0'
     maintainer: "operations@shiwaforce.com"
     containers:
@@ -231,5 +231,6 @@ Local uninstall
 
 Delete the egg file from the current Python site-packages (for example: sf_project_compose-0.3-py2.7)
 
-### OSX
+OSX
+"""
 remove scripts from /usr/local/bin (project-catalog, project-compose, project-servive)
