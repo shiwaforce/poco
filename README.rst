@@ -26,11 +26,11 @@ Installation steps
 ------------------
 
 Use pip:
-::
+
 pip install sf-project-compose
 
 or
-::
+
 python setup.py install
 
 Home directory
