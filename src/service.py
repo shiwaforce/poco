@@ -29,7 +29,7 @@ class ProjectService(AbstractCommand):
         super(ProjectService, self).__init__(home_dir=home_dir)
 
     def run(self, argv):
-        arguments = docopt(__doc__, version="0.7", argv=argv)
+        arguments = docopt(__doc__, version="0.7.1", argv=argv)
         ColorPrint.set_log_level(arguments)
 
         #try:

@@ -4,6 +4,9 @@ Project Compose
 .. image:: https://travis-ci.org/shiwaforce/project-compose.svg?branch=master
     :target: https://travis-ci.org/shiwaforce/project-compose
 
+.. image:: https://img.shields.io/pypi/v/sf-project-compose.svg
+    :target: https://pypi.python.org/pypi/sf-project-compose
+
 Project Compose helps you manage Docker projects using a YAML based configuration file.
 
 `Shiwaforce.com <https://www.shiwaforce.com>`_
@@ -22,6 +25,12 @@ On OSX / MacOS with Python version > 3 you need the following dependencies to be
 Installation steps
 ------------------
 
+Use pip:
+::
+pip install sf-project-compose
+
+or
+::
 python setup.py install
 
 Home directory
