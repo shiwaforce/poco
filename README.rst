@@ -6,8 +6,7 @@ Project Compose
 
 Project Compose helps you manage Docker projects using a YAML based configuration file.
 
-Shiwaforce.com_
-.. _Shiwaforce.com: https://www.shiwaforce.com
+`Shiwaforce.com <https://www.shiwaforce.com>`_
 
 Working examples can be found here: https://github.com/shiwaforce/project-compose-example
 
@@ -50,11 +49,11 @@ Parameters:
  - workspace (optional): the base directory, where the project will be checked out - default : ~/workspace
 
 Example 1 (empty):
-
+::
     default:
 
 Example 2 (Git):
-
+::
     default:
         repositoryType: git
         url: https://github.com/shiwaforce/project-compose-example.git
