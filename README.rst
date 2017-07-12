@@ -1,12 +1,13 @@
-Docker Project Manager
-======================
+Project Compose
+===============
 
 .. image:: https://travis-ci.org/shiwaforce/project-compose.svg?branch=master
     :target: https://travis-ci.org/shiwaforce/project-compose
 
-Docker Project Manager helps you manage Docker projects using a YAML based configuration file.
+Project Compose helps you manage Docker projects using a YAML based configuration file.
 
-[Shiwaforce.com](http://www.shiwaforce.com)
+Shiwaforce.com_
+.. _Shiwaforce.com: https://www.shiwaforce.com
 
 Working examples can be found here: https://github.com/shiwaforce/project-compose-example
 
@@ -109,7 +110,7 @@ which is relative to the compose file or the working directory if it is set.
 For example:
 
     version: '2.0'
-    maintainer: "operation@shiwaforce.com"
+    maintainer: "operations@shiwaforce.com"
     containers:
         sample: dc-sample.yml
         mysql: dc-mysql.yml
