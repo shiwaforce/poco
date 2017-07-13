@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import src
 import sys
+import platform
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
@@ -9,6 +10,10 @@ test_requires = ['pytest==3.1.2', 'pytest-cov==2.5.1']
 
 if sys.version_info[0] < 3:
     test_requires.append('SystemIO>=1.1')
+
+if platform.system() == "Darwin" and sys.version_info[0] == 3:
+    requires.append("certifi>=2017.4.17")
+    requires.append("Scrapy >= 1.4.0")
 
 class PyTestCommand(TestCommand):
     """ Command to run unit py.test unit tests
@@ -24,7 +29,7 @@ class PyTestCommand(TestCommand):
         sys.exit(rcode)
 
 setup_options = dict(
-    name='sf-project-compose',
+    name='project-compose',
     version=src.__version__,
     description='SF program compose.',
     long_description=open('README.rst').read(),

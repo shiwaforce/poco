@@ -4,8 +4,8 @@ Project Compose
 .. image:: https://travis-ci.org/shiwaforce/project-compose.svg?branch=master
     :target: https://travis-ci.org/shiwaforce/project-compose
 
-.. image:: https://img.shields.io/pypi/v/sf-project-compose.svg
-    :target: https://pypi.python.org/pypi/sf-project-compose
+.. image:: https://img.shields.io/pypi/v/project-compose.svg
+    :target: https://pypi.python.org/pypi/project-compose
 
 Project Compose helps you manage Docker projects using a YAML based configuration file.
 
@@ -16,11 +16,7 @@ Working examples can be found here: https://github.com/shiwaforce/project-compos
 Requirements
 ------------
 
-Docker, version > 17
-
-On OSX / MacOS with Python version > 3 you need the following dependencies to be installed first:
- - pip install certifi
- - pip install Scrapy
+ - Docker, version > 17
 
 Installation steps
 ------------------
