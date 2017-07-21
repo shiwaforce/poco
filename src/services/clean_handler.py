@@ -46,12 +46,13 @@ class CleanHandler:
     def checkout(self, *args):
         command_array = list()
         for cnt, command in enumerate(args):
-            if hasattr(command, '__iter__'):
+            if type(command) is list:
                 for comm in command:
                     command_array.append(comm)
             else:
                 command_array.append(command)
         try:
+            print(command_array)
             check_output(command_array)
         except CalledProcessError as grepexc:
             self.print_error(grepexc)
