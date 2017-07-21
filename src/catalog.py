@@ -18,6 +18,7 @@ Options:
   -h --help     Show this screen.
   -v --verbose  Print more text.
   -q --quiet    Print less text.
+  --offline     Offline mode
 
 """
 import os
@@ -55,7 +56,7 @@ class ProjectCatalog(AbstractCommand):
                 lvl=-1)
 
         if not arguments.get('init') and not arguments.get('config'):
-            self.parse_catalog()
+            self.parse_catalog(offline=arguments.get("--offline"))
 
             if arguments.get('ls'):
                 self.print_ls()
@@ -114,7 +115,7 @@ class ProjectCatalog(AbstractCommand):
         self.name = arguments.get('<project>')
         if self.name in self.catalog_handler.get_catalog():
             '''Init project utils'''
-            self.init_project_utils()
+            self.init_project_utils(offline=arguments.get("--offline"))
             if self.get_compose_file(silent=True) is not None:
                 self.run_scripts(script_type="remove_script")
         self.catalog_handler.remove_from_list(name=self.name)

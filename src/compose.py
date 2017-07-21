@@ -26,6 +26,7 @@ Options:
   -h --help     Show this screen.
   -v --verbose  Print more text.
   -q --quiet    Print less text.
+  --offline     Offline mode
 
 """
 import os
@@ -50,7 +51,7 @@ class ProjectCompose(AbstractCommand):
         #try:
         '''Parse config and catalog'''
         self.parse_config()
-        self.parse_catalog()
+        self.parse_catalog(offline=arguments.get("--offline"))
 
         if arguments.get('<project>') is None:
             arguments['<project>'] = FileUtils.get_directory_name()
@@ -61,7 +62,7 @@ class ProjectCompose(AbstractCommand):
             ColorPrint.exit_after_print_messages(message="Clean complete", msg_type="info")
 
         '''Init project utils'''
-        self.init_project_utils()
+        self.init_project_utils(offline=arguments.get("--offline"))
 
         '''Get project name'''
         self.name = arguments.get('<project>')
@@ -99,12 +100,12 @@ class ProjectCompose(AbstractCommand):
             self.run_docker_command(commands="config")
 
         if arguments.get('build'):
-            self.run_before()
+            self.run_before(offline=arguments.get("--offline"))
             self.run_docker_command(commands="build")
             ColorPrint.print_info("Project built")
 
         if arguments.get('up') or arguments.get('start'):
-            self.run_before()
+            self.run_before(offline=arguments.get("--offline"))
             self.run_docker_command(commands="build")
             self.run_docker_command(commands="config")
             self.run_docker_command(commands=["up", "-d"])
@@ -117,12 +118,12 @@ class ProjectCompose(AbstractCommand):
             ColorPrint.print_info("Project stopped")
 
         if arguments.get('ps'):
-            self.run_before()
+            self.run_before(offline=arguments.get("--offline"))
             self.run_docker_command(commands="ps")
             self.run_after()
 
         if arguments.get('pull'):
-            self.run_before()
+            self.run_before(offline=arguments.get("--offline"))
             self.run_docker_command(commands="pull")
             ColorPrint.print_info("Project pull complete")
 

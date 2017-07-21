@@ -8,9 +8,13 @@ from .svn_repository import SvnRepository
 
 class CatalogHandler:
 
-    def __init__(self, home_dir, repo_type, file=None, url=None, branch=None, ssh=None):
+    def __init__(self, home_dir, repo_type, offline, file=None, url=None, branch=None, ssh=None):
         self.catalog_file = file
-        if 'git' == repo_type:
+
+        self.offline_mode = offline
+        if self.offline_mode and repo_type in ('git', 'svn'):
+            self.catalog_repository = FileRepository(target_dir=path.join(home_dir, 'catalogHome'))
+        elif 'git' == repo_type:
             self.catalog_repository = GitRepository(target_dir=path.join(home_dir, 'catalogHome'), url=url,
                                                     branch=branch, git_ssh_identity_file=ssh)
         elif 'svn' == repo_type:
@@ -27,7 +31,6 @@ class CatalogHandler:
         if not isinstance(lst, dict):
             ColorPrint.exit_after_print_messages(message="file not valid : " + str(self.catalog_file),
                                                  doc=Doc.CONFIG)
-        # TODO
         return lst
 
     def write_catalog(self, lst):

@@ -13,6 +13,7 @@ Options:
   -h --help     Show this screen.
   -v --verbose  Print more text.
   -q --quiet    Print less text.
+  --offline     Offline mode
 
 """
 import os
@@ -43,21 +44,21 @@ class ProjectService(AbstractCommand):
         '''Get project name'''
         self.name = arguments.get('<project>')
         '''Init project utils'''
-        self.init_project_utils()
+        self.init_project_utils(offline=arguments.get("--offline"))
         '''Init compose handler'''
         self.init_compose_handler(arguments=arguments)
 
         '''Handling top level commands'''
         if arguments.get('start'):
-            self.run_before()
+            self.run_before(offline=arguments.get("--offline"))
             self.run_docker_command(commands="start")
             self.run_after()
         if arguments.get('stop'):
-            self.run_before()
+            self.run_before(offline=arguments.get("--offline"))
             self.run_docker_command(commands="stop")
             self.run_after()
         if arguments.get('restart'):
-            self.run_before()
+            self.run_before(offline=arguments.get("--offline"))
             self.run_docker_command(commands="restart")
             self.run_after()
         # except Exception as ex:

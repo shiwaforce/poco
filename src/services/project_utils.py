@@ -7,14 +7,18 @@ from .console_logger import *
 
 class ProjectUtils:
 
-    def __init__(self, home_dir, work_dir):
+    def __init__(self, home_dir, work_dir, offline):
         self.home_dir = home_dir
         self.work_dir = work_dir
+        self.offline = offline
         self.repositories = {}
 
     def get_project_repository(self, name, project_element, ssh):
         """Get and store repository handler for named project"""
-        if 'git' in project_element:
+        if self.offline:
+            repo_handler = FileRepository(target_dir=self.get_target_dir(work_dir=self.work_dir, name=name,
+                                                                         project_element=project_element))
+        elif 'git' in project_element:
             branch = project_element.get('branch', 'master')
             repo_handler = GitRepository(target_dir=self.get_target_dir(work_dir=self.work_dir, name=name,
                                          project_element=project_element),
@@ -25,7 +29,8 @@ class ProjectUtils:
                                          project_element=project_element),
                                          url=project_element.get('svn'))
         else:
-            repo_handler = FileRepository(target_dir=self.home_dir)
+            repo_handler = FileRepository(target_dir=self.get_target_dir(work_dir=self.work_dir, name=name,
+                                          project_element=project_element))
         self.repositories[name] = repo_handler
         return repo_handler
 

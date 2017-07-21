@@ -4,6 +4,7 @@ import shutil
 from .abstract_repository import AbstractRepository
 from .console_logger import ColorPrint
 
+
 class GitRepository(AbstractRepository):
 
     def __init__(self, target_dir, url, branch, git_ssh_identity_file=None, force=False):

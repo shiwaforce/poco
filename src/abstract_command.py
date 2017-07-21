@@ -29,17 +29,19 @@ class AbstractCommand(object):
             ColorPrint.exit_after_print_messages(message="Please use project-catalog init for generate environment",
                                                  msg_type="warn")
 
-    def parse_catalog(self):
+    def parse_catalog(self, offline):
         self.catalog_handler = CatalogHandler(home_dir=self.home_dir,
                                               repo_type=self.config_handler.get_repository_type(),
                                               file=self.config_handler.get_catalog_file(),
+                                              offline=offline,
                                               url=self.config_handler.get_url(),
                                               branch=self.config_handler.get_branch(),
                                               ssh=self.get_node(self.config_handler.get_actual_config(),
                                                                 ["default", "ssh-key"]))
 
-    def init_project_utils(self):
-        self.project_utils = ProjectUtils(home_dir=self.home_dir, work_dir=self.config_handler.get_work_dir())
+    def init_project_utils(self, offline):
+        self.project_utils = ProjectUtils(home_dir=self.home_dir, work_dir=self.config_handler.get_work_dir(),
+                                          offline=offline)
 
     def get_project_repository(self):
         catalog = self.get_catalog(self.name)
@@ -59,9 +61,9 @@ class AbstractCommand(object):
                                               mode=arguments.get('<mode>'),
                                               repo_dir=repo_dir)
 
-    def run_before(self):
+    def run_before(self, offline):
         self.run_scripts(script_type="before_script")
-        self.run_checkouts()
+        self.run_checkouts(offline=offline)
         self.save_docker_config()
 
     def run_after(self):
@@ -79,13 +81,16 @@ class AbstractCommand(object):
              cwd=self.compose_handler.get_working_directory(),
              env=self.compose_handler.get_environment_variables(name=self.name, get_file=self.project_utils.get_file))
 
-    def run_checkouts(self):
+    def run_checkouts(self, offline):
         for checkout in self.compose_handler.get_checkouts():
             if " " not in checkout:
                 ColorPrint.exit_after_print_messages(message="Wrong checkout command: " + checkout)
             directory, repository = checkout.split(" ")
             target_dir = os.path.join(self.compose_handler.get_working_directory(), directory)
-            GitRepository(target_dir=target_dir, url=repository, branch="master")
+            if not offline:
+                GitRepository(target_dir=target_dir, url=repository, branch="master")
+            if not os.path.exists(target_dir):
+                ColorPrint.exit_after_print_messages("checkout directory is empty: " + str(directory))
 
     def save_docker_config(self):
         p = Popen(self.compose_handler.get_command(name=self.name, commands="config",
