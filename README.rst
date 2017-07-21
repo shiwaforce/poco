@@ -23,7 +23,7 @@ Installation steps
 
 Use pip:
 
-pip install sf-project-compose
+pip install project-compose
 
 or
 
