@@ -52,7 +52,6 @@ class CleanHandler:
             else:
                 command_array.append(command)
         try:
-            print(command_array)
             check_output(command_array)
         except CalledProcessError as grepexc:
             self.print_error(grepexc)
