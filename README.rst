@@ -1,4 +1,4 @@
-Project Compose
+project-compose
 ===============
 
 .. image:: https://travis-ci.org/shiwaforce/project-compose.svg?branch=master
@@ -10,7 +10,7 @@ Project Compose
 About
 -----
 
-Project Compose lets you catalogue and manage your Docker projects using simple YAML files to shorten the route from finding your project to initialising it in your local environment.
+project-compose lets you catalogue and manage your Docker projects using simple YAML files to shorten the route from finding your project to initialising it in your local environment.
 
 This helps you set up your local development environment and to run demos.
 
