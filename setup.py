@@ -31,7 +31,7 @@ class PyTestCommand(TestCommand):
 setup_options = dict(
     name='project-compose',
     version=src.__version__,
-    description='SF program compose.',
+    description='SF Project Compose.',
     long_description=open('README.rst').read(),
     author='Shiwaforce.com',
     url='https://www.shiwaforce.com',
