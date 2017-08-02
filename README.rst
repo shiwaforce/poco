@@ -312,4 +312,4 @@ MIT
 Contributors
 ------------
 
-ShiwaForce.com Inc.
+`ShiwaForce.com Inc.  <https://www.shiwaforce.com/en/>`_
