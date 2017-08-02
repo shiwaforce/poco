@@ -1,4 +1,4 @@
-project-compose
+Project Compose
 ===============
 
 .. image:: https://travis-ci.org/shiwaforce/project-compose.svg?branch=master
@@ -10,11 +10,9 @@ project-compose
 About
 -----
 
-project-compose lets you catalogue and manage your Docker projects using simple YAML files to shorten the route from finding your project to initialising it in your local environment.
+Project Compose lets you catalogue and manage your Docker projects using simple YAML files to shorten the route from finding your project to initialising it in your local environment.
 
 This helps you set up your local development environment and to run demos.
-
-`Shiwaforce.com <https://www.shiwaforce.com>`_
 
 Working examples can be found here: https://github.com/shiwaforce/project-compose-example
 
@@ -27,58 +25,71 @@ Requirements
 Quick start
 ===========
 
-Install the latest project-compose:
+Install the latest project-compose and initialise the sample catalogue:
 
 ``$ pip install project-compose``
-
-Initialise sample catalogue:
-
 ``$ project-catalog init https://github.com/shiwaforce/project-compose-example.git``
 
-List all projects in the catalogue:
+List all projects in the catalogue and list all available modes of the example-voting-app:
 
 ``$ project-catalog ls``
-
-List all available modes of the ex:mple voting app:
+``example-voting-app``
 
 ``$ project-compose mode ls example-voting-app``
+``default``
+``javaworker``
+``simple``
+
+Make sure your local Docker engine is up and running.
 
 Start the Docker example voting app in javaworker mode:
 
 ``$ project-compose start example-voting-app javaworker``
 
+This will download all the required Docker images and start them. The last step of the process will issue a "docker ps" command listing all the running containers.
+
+Visit http://localhost:5000 to see the application's main page.
+
+The application was started in javaworker mode, so the examplevotingapp_worker container contains OpenJDK 1.8 to run the worker node.
+
 Stop the example voting app:
 
 ``$ project-compose down example-voting-app javaworker``
+``Project stopped``
 
 Start the Docker example voting app in default mode:
 
 ``$ project-compose start example-voting-app default``
 
+Visit http://localhost:5000 to see the application's main page.
+
+The application was started in default mode, so the examplevotingapp_worker container runs .Net in the worker node.
+
 Stop the example voting app:
 
 ``$ project-compose down example-voting-app default``
-
+``Project stopped``
 
 Custom installation and configuration
 =====================================
 
+To be added later.
 
-Installation steps
-------------------
+Detailed installation steps
+---------------------------
 
 Use pip:
 
-pip install project-compose
+``$ pip install project-compose``
 
 or
 
-python setup.py install
+``$ python setup.py install``
 
 Home directory
 --------------
 
-The home directory must exists in the user's local home directory with name: .project-compose
+The home directory must exist in the user's local home directory with the name: .project-compose
 
 For example (OSX):
     /Users/john.doe/.project-compose
@@ -285,3 +296,13 @@ Delete the egg file from the current Python site-packages (for example: sf_proje
 OSX
 """
 remove scripts from /usr/local/bin (project-catalog, project-compose, project-servive)
+
+License
+-------
+
+MIT
+
+Contributors
+------------
+
+ShiwaForce.com Inc.
