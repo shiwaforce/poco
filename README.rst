@@ -28,16 +28,21 @@ Quick start
 Install the latest project-compose and initialise the sample catalogue:
 
 ``$ pip install project-compose``
+
 ``$ project-catalog init https://github.com/shiwaforce/project-compose-example.git``
 
 List all projects in the catalogue and list all available modes of the example-voting-app:
 
 ``$ project-catalog ls``
+
 ``example-voting-app``
 
 ``$ project-compose mode ls example-voting-app``
+
 ``default``
+
 ``javaworker``
+
 ``simple``
 
 Make sure your local Docker engine is up and running.
@@ -55,6 +60,7 @@ The application was started in javaworker mode, so the examplevotingapp_worker c
 Stop the example voting app:
 
 ``$ project-compose down example-voting-app javaworker``
+
 ``Project stopped``
 
 Start the Docker example voting app in default mode:
@@ -68,6 +74,7 @@ The application was started in default mode, so the examplevotingapp_worker cont
 Stop the example voting app:
 
 ``$ project-compose down example-voting-app default``
+
 ``Project stopped``
 
 Custom installation and configuration
