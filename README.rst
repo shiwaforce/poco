@@ -119,10 +119,12 @@ Parameters:
 
 Example 1 (empty):
 ::
+
     default:
 
 Example 2 (Git):
 ::
+
     default:
         repositoryType: git
         url: https://github.com/shiwaforce/project-compose-example.git
@@ -149,6 +151,7 @@ If the path ends with a name of a directory it will be extended with the default
 
 For example:
 ::
+
     test1:
         git: https://github.com/shiwaforce/project-compose-example.git
         branch: master
@@ -177,6 +180,7 @@ which is relative to the compose file or the working directory if it is set.
 
 For example:
 ::
+
     version: '2.0'
     maintainer: "operations@shiwaforce.com"
     containers:
@@ -210,89 +214,116 @@ For example:
 Commands
 --------
 
-    project-catalog add [<target-dir>]
+    **project-catalog add [<target-dir>]**
+
 adds the current directory (or target directory) to the project-catalog (if it is a Git repository)
 
-    project-catalog ls
+    **project-catalog ls**
+
 lists the available projects (from the project catalog file)
 
-    project-catalog config
+    **project-catalog config**
+
 prints the local config
 
-    project-catalog init [<repository-url>] [<repository-type>] [<file>]
+    **project-catalog init [<repository-url>] [<repository-type>] [<file>]**
+
 creates the config and project-catalog files if they do not exist. if the repository-url, type, and file references are not empty it will write to the local config
 
-    project-catalog branch <branch> [-f]
+    **project-catalog branch <branch> [-f]**
+
 switches branch in the project-catalog repository, use -f to force
 
-    project-catalog branches
+    **project-catalog branches**
+
 lists the available project-catalog repository branches
 
-    project-catalog push
+    **project-catalog push**
+
 pushes project-catalog changes to the repository (if it is not a local file)
 
-    project-catalog remove <project>
+    **project-catalog remove <project>**
+
 removes selected project form the project-catalog
 
-    project-compose config <project> [mode]
+    **project-compose config <project> [mode]**
+
 prints the full config for selected project with mode (docker-compose file with environment variables)
 
-    project-compose clean
+    **project-compose clean**
+
 cleans up all docker images, volumes and pulled repositories and data
 
-    project-compose init <project>
+    **project-compose init <project>**
+
 initialises selected project with the following steps:
 creates the project-compose file if it does not exist
 creates the docker-compose sample file if it does not exist
 
-    project-compose install <project> [mode]
+    **project-compose install <project> [mode]**
+
 installs selected project with selected mode
 gets project descriptors from repository
 
-    project-compose up <project> [mode]
+    **project-compose up <project> [mode]**
+
 starts the project with selected mode (if exists)
 installs if it isn't installed yet
 
-    project-compose down <project> [mode]
+    **project-compose down <project> [mode]**
+
 stops docker containers belonging the given project with selected mode
 
-    project-compose build <project> [mode]
+    **project-compose build <project> [mode]**
+
 builds docker images for the selected project with the specified mode
 
-    project-compose ps <project> [mode]
+    **project-compose ps <project> [mode]**
+
 lists the state of docker images in selected project
 
-    project-compose mode ls <project>
+    **project-compose mode ls <project>**
+
 lists available modes in selected projects
 
-    project-compose pull <project> [mode]
+    **project-compose pull <project> [mode]**
+
 pulls docker images for the specified project with the selected mode
 
-    project-compose start <project> [mode]
+    **project-compose start <project> [mode]**
+
 alternative for up
 
-    project-compose stop <project> [mode]
+    **project-compose stop <project> [mode]**
+
 stops docker containers which belongs to the specified project with selected mode
 
-    project-compose log <project> [mode]
+    **project-compose log <project> [mode]**
+
 prints log from docker containers which belongs to the specified project with selected mode
 
-    project-compose logs <project> [mode]
+    **project-compose logs <project> [mode]**
+
 prints log from docker containers which belongs to the specified project with selected mode
 
-    project-compose branch <project> <branch>
+    **project-compose branch <project> <branch>**
+
 switches branch in the specified project repository
 
-    project-compose branches <project>
+    **project-compose branches <project>**
+
 lists the available project-catalog repository branches
 
-    project-service start <project>
+    **project-service start <project>**
+
 starts docker containers which belong to the selected project
 
-    project-service stop <project>
+    **project-service stop <project>**
+
 stops docker containers which belong to the selected project
 
-    project-service restart <project>
+    **project-service restart <project>**
+
 restarts docker containers which belong to the selected project
 
 Local uninstall
