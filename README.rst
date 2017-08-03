@@ -25,6 +25,8 @@ Requirements
 Quick start
 ===========
 
+[![asciicast](https://asciinema.org/a/131956.png)](https://asciinema.org/a/131956)
+
 Install the latest project-compose and initialise the sample catalogue:
 
 ``$ pip install project-compose``
