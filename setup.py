@@ -31,7 +31,7 @@ class PyTestCommand(TestCommand):
 setup_options = dict(
     name='project-compose',
     version=src.__version__,
-    description='SF Project Compose.',
+    description='project-compose project-compose lets you catalogue and manage your Docker projects using simple YAML files to shorten the route from finding your project to initialising it in your environment.',
     long_description=open('README.rst').read(),
     author='Shiwaforce.com',
     url='https://www.shiwaforce.com',

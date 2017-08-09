@@ -3,5 +3,5 @@ maintainer: "operation@shiwaforce.com"
 containers:
     sample: docker-compose.yml
 
-mode:
+plan:
     default: sample

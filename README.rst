@@ -33,13 +33,13 @@ Install the latest project-compose and initialise the sample catalogue:
 
 ``$ project-catalog init https://github.com/shiwaforce/project-compose-example.git``
 
-List all projects in the catalogue and list all available modes of the example-voting-app:
+List all projects in the catalogue and list all available plans of the example-voting-app:
 
 ``$ project-catalog ls``
 
 ``example-voting-app``
 
-``$ project-compose mode ls example-voting-app``
+``$ project-compose plan ls example-voting-app``
 
 ``default``
 
@@ -49,7 +49,7 @@ List all projects in the catalogue and list all available modes of the example-v
 
 Make sure your local Docker engine is up and running.
 
-Start the Docker example voting app in javaworker mode:
+Start the Docker example voting app in javaworker plan:
 
 ``$ project-compose start example-voting-app javaworker``
 
@@ -57,7 +57,7 @@ This will download all the required Docker images and start them. The last step 
 
 Visit http://localhost:5000 to see the application's main page.
 
-The application was started in javaworker mode, so the examplevotingapp_worker container contains OpenJDK 1.8 to run the worker node.
+The application was started in javaworker plan, so the examplevotingapp_worker container contains OpenJDK 1.8 to run the worker node.
 
 Stop the example voting app:
 
@@ -65,13 +65,13 @@ Stop the example voting app:
 
 ``Project stopped``
 
-Start the Docker example voting app in default mode:
+Start the Docker example voting app in default plan:
 
 ``$ project-compose start example-voting-app default``
 
 Visit http://localhost:5000 to see the application's main page.
 
-The application was started in default mode, so the examplevotingapp_worker container runs .Net in the worker node.
+The application was started in default plan, so the examplevotingapp_worker container runs .Net in the worker node.
 
 Stop the example voting app:
 
@@ -168,9 +168,9 @@ For example:
 Project-compose file
 --------------------
 
-It describes the project's hierarchy divided into several 'modes' in YAML format.
+It describes the project's hierarchy divided into several 'plans' in YAML format.
 
-If you don't declare a section under a mode it will take the compose-files into account.
+If you don't declare a section under a plan it will take the compose-files into account.
 
 Steps defined in the before_scripts section will run before the compose command (build, config, up, start)
 
@@ -196,7 +196,7 @@ For example:
     working-directory: microservice-all-war
     enviroment:
         include: conf/default.env
-    mode:
+    plan:
         demo:
             enviroment:
                 include: conf/dev/dev.env
@@ -248,9 +248,9 @@ pushes project-catalog changes to the repository (if it is not a local file)
 
 removes selected project form the project-catalog
 
-    **project-compose config <project> [mode]**
+    **project-compose config <project> [plan]**
 
-prints the full config for selected project with mode (docker-compose file with environment variables)
+prints the full config for selected project with plan (docker-compose file with environment variables)
 
     **project-compose clean**
 
@@ -262,51 +262,51 @@ initialises selected project with the following steps:
 creates the project-compose file if it does not exist
 creates the docker-compose sample file if it does not exist
 
-    **project-compose install <project> [mode]**
+    **project-compose install <project> [plan]**
 
-installs selected project with selected mode
+installs selected project with selected plan
 gets project descriptors from repository
 
-    **project-compose up <project> [mode]**
+    **project-compose up <project> [plan]**
 
-starts the project with selected mode (if exists)
+starts the project with selected plan (if exists)
 installs if it isn't installed yet
 
-    **project-compose down <project> [mode]**
+    **project-compose down <project> [plan]**
 
-stops docker containers belonging the given project with selected mode
+stops docker containers belonging the given project with selected plan
 
-    **project-compose build <project> [mode]**
+    **project-compose build <project> [plan]**
 
-builds docker images for the selected project with the specified mode
+builds docker images for the selected project with the specified plan
 
-    **project-compose ps <project> [mode]**
+    **project-compose ps <project> [plan]**
 
 lists the state of docker images in selected project
 
-    **project-compose mode ls <project>**
+    **project-compose plan ls <project>**
 
-lists available modes in selected projects
+lists available plans in selected projects
 
-    **project-compose pull <project> [mode]**
+    **project-compose pull <project> [plan]**
 
-pulls docker images for the specified project with the selected mode
+pulls docker images for the specified project with the selected plan
 
-    **project-compose start <project> [mode]**
+    **project-compose start <project> [plan]**
 
 alternative for up
 
-    **project-compose stop <project> [mode]**
+    **project-compose stop <project> [plan]**
 
-stops docker containers which belongs to the specified project with selected mode
+stops docker containers which belongs to the specified project with selected plan
 
-    **project-compose log <project> [mode]**
+    **project-compose log <project> [plan]**
 
-prints log from docker containers which belongs to the specified project with selected mode
+prints log from docker containers which belongs to the specified project with selected plan
 
-    **project-compose logs <project> [mode]**
+    **project-compose logs <project> [plan]**
 
-prints log from docker containers which belongs to the specified project with selected mode
+prints log from docker containers which belongs to the specified project with selected plan
 
     **project-compose branch <project> <branch>**
 

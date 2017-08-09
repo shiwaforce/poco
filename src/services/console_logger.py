@@ -80,7 +80,7 @@ class Doc:
                 mysql: dc-mysql.yml
             enviroment:
                 include: conf/default.env
-            mode:
+            plan:
                 default:
                     enviroment:
                         include:
