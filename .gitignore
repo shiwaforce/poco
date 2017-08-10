@@ -91,3 +91,6 @@ ENV/
 
 # Idea
 .idea/
+
+# Code history file
+.history

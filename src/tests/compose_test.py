@@ -14,11 +14,11 @@ class ComposeTestSuite(AbstractTestSuite):
             compose.run([""])
         self.assertIsNotNone(context.exception)
 
-    def test_mode_list(self):
+    def test_plan_list(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
             compose = ProjectCompose(home_dir=self.tmpdir)
-            compose.run(["mode", "ls", "mysql"])
+            compose.run(["plan", "ls", "mysql"])
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn("default", out.getvalue())
 

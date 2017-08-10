@@ -6,10 +6,10 @@ from .file_utils import FileUtils
 
 class ComposeHandler:
 
-    def __init__(self, compose_file, mode, repo_dir):
+    def __init__(self, compose_file, plan, repo_dir):
         self.compose_file = compose_file
         self.compose_project = None
-        self.mode = mode
+        self.plan = plan
         self.repo_dir = repo_dir
 
     def get_compose_file_name(self, service):
@@ -51,31 +51,31 @@ class ComposeHandler:
             try:
                 self.compose_project = yaml.load(stream=stream)
 
-                if 'mode' not in self.compose_project:
+                if 'plan' not in self.compose_project:
                     ColorPrint.exit_after_print_messages(
-                        message="'mode' section must exists in compose file (project-compose.yml) ",
+                        message="'plan' section must exists in compose file (project-compose.yml) ",
                         doc=Doc.COMPOSE_DOC)
-                if not isinstance(self.compose_project['mode'], dict):
+                if not isinstance(self.compose_project['plan'], dict):
                     ColorPrint.exit_after_print_messages(
-                        message="'mode' section must be a list", doc=Doc.PROJECT_COMPOSE)
-                if len(self.compose_project['mode'].keys()) < 1:
+                        message="'plan' section must be a list", doc=Doc.PROJECT_COMPOSE)
+                if len(self.compose_project['plan'].keys()) < 1:
                     ColorPrint.exit_after_print_messages(
-                        message="'mode' section must be one child element", doc=Doc.PROJECT_COMPOSE)
-                if self.mode is None:
-                    if "demo" in self.compose_project['mode']:
-                        self.mode = "demo"
-                    elif "default" in self.compose_project['mode']:
-                        self.mode = "default"
+                        message="'plan' section must be one child element", doc=Doc.PROJECT_COMPOSE)
+                if self.plan is None:
+                    if "demo" in self.compose_project['plan']:
+                        self.plan = "demo"
+                    elif "default" in self.compose_project['plan']:
+                        self.plan = "default"
                     else:
-                        self.mode = self.compose_project['mode'].keys()[0]
-                if self.mode not in self.compose_project['mode']:
+                        self.plan = self.compose_project['plan'].keys()[0]
+                if self.plan not in self.compose_project['plan']:
                     ColorPrint.exit_after_print_messages(
-                        message="stages section must contains the selected stage: " + str(self.mode), doc=Doc.PROJECT_COMPOSE)
+                        message="stages section must contains the selected stage: " + str(self.plan), doc=Doc.PROJECT_COMPOSE)
 
-                actual_mode = self.compose_project['mode'].get(self.mode)
-                if actual_mode is None:
+                actual_plan = self.compose_project['plan'].get(self.plan)
+                if actual_plan is None:
                     ColorPrint.exit_after_print_messages(
-                        message="selected mode %s is empty" % str(self.mode), msg_type="warn", doc=Doc.PROJECT_COMPOSE)
+                        message="selected plan %s is empty" % str(self.plan), msg_type="warn", doc=Doc.PROJECT_COMPOSE)
             except yaml.YAMLError as exc:
                 ColorPrint.exit_after_print_messages(message="Error: Wrong YAML format:\n " + str(exc),
                                                      doc=Doc.PROJECT_COMPOSE)
@@ -96,7 +96,7 @@ class ComposeHandler:
                         env[data[0].strip()] = data[1].strip()
 
     def get_environment_dict(self, envs, name, get_file):
-        """Process environment files. Environment for selected mode will be override the defaults"""
+        """Process environment files. Environment for selected plan will be override the defaults"""
         environment = dict()
         '''First the default, if exists'''
         if "environment" in self.compose_project:
@@ -110,8 +110,8 @@ class ComposeHandler:
         return environment
 
     def get_environment_variables(self, name, get_file):
-        """Get all environment variables depends on selected mode"""
-        selected_type = self.compose_project['mode'].get(self.mode)
+        """Get all environment variables depends on selected plan"""
+        selected_type = self.compose_project['plan'].get(self.plan)
         envs = None
         if isinstance(selected_type, dict):
             if 'environment' in selected_type:
@@ -124,9 +124,9 @@ class ComposeHandler:
         return env_copy
 
     def get_compose_files(self, name, get_file):
-        """Get compose file(s) from config depends on selected mode"""
+        """Get compose file(s) from config depends on selected plan"""
         self.get_compose_project()
-        selected_type = self.compose_project['mode'].get(self.mode)
+        selected_type = self.compose_project['plan'].get(self.plan)
         docker_files = list()
         if isinstance(selected_type, dict) and 'docker-compose-file' in selected_type:
             for service in self.get_list_value(selected_type['docker-compose-file']):
@@ -192,19 +192,19 @@ class ComposeHandler:
             checkouts = self.get_list_value(self.compose_project['checkout'])
         return checkouts
 
-    def get_mode_list(self, name):
-        """Print all available mode from project compose file"""
+    def get_plan_list(self, name):
+        """Print all available plan from project compose file"""
         self.get_compose_project()
         ColorPrint.print_with_lvl(message="---------------------------------------------------------------", lvl=-1)
-        ColorPrint.print_with_lvl(message="Available modes for project: " + str(name), lvl=-1)
+        ColorPrint.print_with_lvl(message="Available plans for project: " + str(name), lvl=-1)
         ColorPrint.print_with_lvl(message="---------------------------------------------------------------", lvl=-1)
 
-        for key in self.compose_project['mode'].keys():
+        for key in self.compose_project['plan'].keys():
             ColorPrint.print_with_lvl(message=key, lvl=-1)
 
     @staticmethod
     def get_list_value(value):
-        """Get list format, doesn't matter the config use one or list mode"""
+        """Get list format, doesn't matter the config use one or list plan"""
         lst = list()
         if (type(value) is list):
             lst.extend(value)

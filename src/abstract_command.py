@@ -58,7 +58,7 @@ class AbstractCommand(object):
         repo_dir = self.project_utils.get_target_dir(self.config_handler.get_work_dir(), self.name,
                                                      self.catalog_handler.get(name=self.name))
         self.compose_handler = ComposeHandler(compose_file=compose_file,
-                                              mode=arguments.get('<mode>'),
+                                              plan=arguments.get('<plan>'),
                                               repo_dir=repo_dir)
 
     def run_before(self, offline):

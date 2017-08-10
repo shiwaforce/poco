@@ -2,20 +2,20 @@
 """SF Program compose.
 
 Usage:
-  project-compose [options] config [<project>] [<mode>]
+  project-compose [options] config [<project>] [<plan>]
   project-compose [options] clean
   project-compose [options] init [<project>]
-  project-compose [options] install [<project>] [<mode>]
-  project-compose [options] up [<project>] [<mode>]
-  project-compose [options] down [<project>] [<mode>]
-  project-compose [options] build [<project>] [<mode>]
-  project-compose [options] ps [<project>] [<mode>]
-  project-compose [options] mode ls [<project>]
-  project-compose [options] pull [<project>] [<mode>]
-  project-compose [options] start [<project>] [<mode>]
-  project-compose [options] stop [<project>] [<mode>]
-  project-compose [options] log [<project>] [<mode>]
-  project-compose [options] logs [<project>] [<mode>]
+  project-compose [options] install [<project>] [<plan>]
+  project-compose [options] up [<project>] [<plan>]
+  project-compose [options] down [<project>] [<plan>]
+  project-compose [options] build [<project>] [<plan>]
+  project-compose [options] ps [<project>] [<plan>]
+  project-compose [options] plan ls [<project>]
+  project-compose [options] pull [<project>] [<plan>]
+  project-compose [options] start [<project>] [<plan>]
+  project-compose [options] stop [<project>] [<plan>]
+  project-compose [options] log [<project>] [<plan>]
+  project-compose [options] logs [<project>] [<plan>]
   project-compose [options] branch <project> <branch> [-f]
   project-compose [options] branches [<project>]
 
@@ -92,8 +92,8 @@ class ProjectCompose(AbstractCommand):
         '''Init compose handler'''
         self.init_compose_handler(arguments=arguments)
 
-        if arguments.get('mode') and arguments.get('ls'):
-            self.compose_handler.get_mode_list(name=self.name)
+        if arguments.get('plan') and arguments.get('ls'):
+            self.compose_handler.get_plan_list(name=self.name)
 
         if arguments.get('config'):
             self.run_scripts(script_type="before_script")
