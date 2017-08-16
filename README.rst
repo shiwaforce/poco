@@ -28,7 +28,8 @@ Requirements
 Quick start
 ===========
 
-[![asciicast](https://asciinema.org/a/131956.png)](https://asciinema.org/a/131956)
+.. image:: https://asciinema.org/a/131956.png
+    :target: https://asciinema.org/a/131956
 
 Install the latest project-compose:
 
