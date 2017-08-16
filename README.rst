@@ -7,6 +7,9 @@ project-compose
 .. image:: https://img.shields.io/pypi/v/project-compose.svg
     :target: https://pypi.python.org/pypi/project-compose
 
+.. image:: https://img.shields.io/pypi/pyversions/project-compose.svg
+    :target: https://pypi.python.org/pypi/project-compose
+
 About
 -----
 
