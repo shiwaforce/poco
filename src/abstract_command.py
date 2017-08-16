@@ -22,6 +22,15 @@ class AbstractCommand(object):
     def __init__(self, home_dir):
             self.home_dir = home_dir
 
+    def check_docker(self):
+        p = Popen(["docker", "version", "-f", "'{{split (.Server.Version) \".\"}}"],
+                  stdout=PIPE, stderr=PIPE)
+        out, err = p.communicate()
+        if not len(err) == 0 or len(out) == 0:
+            ColorPrint.exit_after_print_messages(message='Docker not running.')
+        if out[0] < 17:
+            ColorPrint.exit_after_print_messages(message='Please upgrade Docker to version 17 or above')
+
     def parse_config(self):
         self.config_handler = ConfigHandler(home_dir=self.home_dir)
         if not self.config_handler.exists():

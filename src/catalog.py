@@ -36,6 +36,7 @@ class ProjectCatalog(AbstractCommand):
 
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.project-compose')):
         super(ProjectCatalog, self).__init__(home_dir=home_dir)
+        self.check_docker()
 
     def run(self, argv):
         arguments = docopt(__doc__, version="0.8.0", argv=argv)
