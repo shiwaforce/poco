@@ -10,14 +10,14 @@ class ComposeTestSuite(AbstractTestSuite):
 
     def test_without_command(self):
         with self.assertRaises(DocoptExit) as context:
-            compose = ProjectCompose(home_dir=self.tmpdir)
+            compose = ProjectCompose(home_dir=self.tmpdir, skip_docker=True)
             compose.run([""])
         self.assertIsNotNone(context.exception)
 
     def test_plan_list(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
-            compose = ProjectCompose(home_dir=self.tmpdir)
+            compose = ProjectCompose(home_dir=self.tmpdir, skip_docker=True)
             compose.run(["plan", "ls", "mysql"])
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn("default", out.getvalue())
@@ -25,7 +25,7 @@ class ComposeTestSuite(AbstractTestSuite):
     def test_branches(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
-            compose = ProjectCompose(home_dir=self.tmpdir)
+            compose = ProjectCompose(home_dir=self.tmpdir, skip_docker=True)
             compose.run(["branches", "mysql"])
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn("master", out.getvalue())
@@ -33,7 +33,7 @@ class ComposeTestSuite(AbstractTestSuite):
     def test_branch_without_change_branch(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
-            compose = ProjectCompose(home_dir=self.tmpdir)
+            compose = ProjectCompose(home_dir=self.tmpdir, skip_docker=True)
             compose.run(["branch", "mysql", "master"])
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn("Branch changed", out.getvalue())
@@ -43,7 +43,7 @@ class ComposeTestSuite(AbstractTestSuite):
         test_dir = os.path.join(self.tmpdir, "test-directory")
         os.makedirs(test_dir)
         git.Repo.clone_from(url=AbstractTestSuite.STACK_LIST_SAMPLE['nginx']['git'], to_path=test_dir)
-        catalog = ProjectCatalog(home_dir=self.tmpdir)
+        catalog = ProjectCatalog(home_dir=self.tmpdir, skip_docker=True)
         with self.captured_output() as (out, err):
             catalog.run(["add", test_dir])
         self.assertIn("Project added", out.getvalue())
@@ -51,7 +51,7 @@ class ComposeTestSuite(AbstractTestSuite):
             catalog.run(["ls"])
             self.assertEqual(0, len(err.getvalue().strip()))
         with self.captured_output() as (out, err):
-            compose = ProjectCompose(home_dir=self.tmpdir)
+            compose = ProjectCompose(home_dir=self.tmpdir, skip_docker=True)
             compose.run(["init", "test-directory"])
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn("Project init completed", out.getvalue())
@@ -63,7 +63,7 @@ class ComposeTestSuite(AbstractTestSuite):
     def test_install(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
-            compose = ProjectCompose(home_dir=self.tmpdir)
+            compose = ProjectCompose(home_dir=self.tmpdir, skip_docker=True)
             compose.run(["install", "mysql"])
         self.assertEqual(0, len(err.getvalue()))
         self.assertTrue(os.path.exists(self.ws_dir))

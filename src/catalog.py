@@ -5,7 +5,6 @@ Usage:
   project-catalog [options] add [<target-dir>]
   project-catalog [options] ls
   project-catalog [options] config
-  project-catalog [options] init [<repository-url>] [<repository-type>] [<file>]
   project-catalog [options] install [<project>] [<plan>]
   project-catalog [options] branch <branch> [-f]
   project-catalog [options] branches
@@ -34,22 +33,14 @@ from docopt import docopt
 
 class ProjectCatalog(AbstractCommand):
 
-    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.project-compose')):
-        super(ProjectCatalog, self).__init__(home_dir=home_dir)
-        self.check_docker()
+    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.project-compose'), skip_docker=False):
+        super(ProjectCatalog, self).__init__(home_dir=home_dir, skip_docker=skip_docker)
 
     def run(self, argv):
         arguments = docopt(__doc__, version="0.8.0", argv=argv)
         ColorPrint.set_log_level(arguments)
 
         try:
-            if arguments.get('init'):
-                self.config_handler = ConfigHandler(home_dir=self.home_dir)
-                self.config_handler.init(repo_url=arguments.get("<repository-url>"),
-                                         repo_type=arguments.get("<repository-type>"),
-                                         file=arguments.get("<file>"))
-                ColorPrint.print_info("Init completed")
-
             self.parse_config()
 
             if arguments.get('config'):

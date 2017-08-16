@@ -1,0 +1,5 @@
+default:
+  branch: master
+  file: project-catalog.yml
+  repositoryType: git
+  server: https://github.com/shiwaforce/project-compose-example.git

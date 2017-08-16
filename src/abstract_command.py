@@ -19,11 +19,15 @@ class AbstractCommand(object):
     '''project name'''
     name = None
 
-    def __init__(self, home_dir):
-            self.home_dir = home_dir
+    def __init__(self, home_dir, skip_docker):
+        self.home_dir = home_dir
+        self.skip_docker = skip_docker
+        if not skip_docker:
+            self.check_docker()
 
-    def check_docker(self):
-        p = Popen(["docker", "version", "-f", "'{{split (.Server.Version) \".\"}}"],
+    @staticmethod
+    def check_docker():
+        p = Popen(["docker", "version", "-f", "'{{split (.Server.Version) \".\"}}'"],
                   stdout=PIPE, stderr=PIPE)
         out, err = p.communicate()
         if not len(err) == 0 or len(out) == 0:
@@ -33,10 +37,6 @@ class AbstractCommand(object):
 
     def parse_config(self):
         self.config_handler = ConfigHandler(home_dir=self.home_dir)
-        if not self.config_handler.exists():
-            ColorPrint.print_error(message="Local config doesnt exists: %s" % self.config_handler.get_file())
-            ColorPrint.exit_after_print_messages(message="Please use project-catalog init for generate environment",
-                                                 msg_type="warn")
 
     def parse_catalog(self, offline):
         self.catalog_handler = CatalogHandler(home_dir=self.home_dir,

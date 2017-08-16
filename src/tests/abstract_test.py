@@ -25,7 +25,7 @@ class AbstractTestSuite(unittest.TestCase):
         'server': 'https://github.com/shiwaforce/project-compose-example.git',
         'file': 'project-catalog.yml',
         'branch': 'master'
-     }
+        }
     }
 
     STACK_LIST_SAMPLE = {

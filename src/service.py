@@ -26,44 +26,43 @@ from docopt import docopt
 
 class ProjectService(AbstractCommand):
 
-    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.project-compose')):
-        super(ProjectService, self).__init__(home_dir=home_dir)
-        self.check_docker()
+    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.project-compose'), skip_docker=False):
+        super(ProjectService, self).__init__(home_dir=home_dir, skip_docker=skip_docker)
 
     def run(self, argv):
         arguments = docopt(__doc__, version="0.8.0", argv=argv)
         ColorPrint.set_log_level(arguments)
 
-        #try:
-        '''Parse config and catalog'''
-        self.parse_config()
-        self.parse_catalog()
+        try:
+            '''Parse config and catalog'''
+            self.parse_config()
+            self.parse_catalog()
 
-        if arguments.get('<project>') is None:
-            arguments['<project>'] = FileUtils.get_directory_name()
+            if arguments.get('<project>') is None:
+                arguments['<project>'] = FileUtils.get_directory_name()
 
-        '''Get project name'''
-        self.name = arguments.get('<project>')
-        '''Init project utils'''
-        self.init_project_utils(offline=arguments.get("--offline"))
-        '''Init compose handler'''
-        self.init_compose_handler(arguments=arguments)
+            '''Get project name'''
+            self.name = arguments.get('<project>')
+            '''Init project utils'''
+            self.init_project_utils(offline=arguments.get("--offline"))
+            '''Init compose handler'''
+            self.init_compose_handler(arguments=arguments)
 
-        '''Handling top level commands'''
-        if arguments.get('start'):
-            self.run_before(offline=arguments.get("--offline"))
-            self.run_docker_command(commands="start")
-            self.run_after()
-        if arguments.get('stop'):
-            self.run_before(offline=arguments.get("--offline"))
-            self.run_docker_command(commands="stop")
-            self.run_after()
-        if arguments.get('restart'):
-            self.run_before(offline=arguments.get("--offline"))
-            self.run_docker_command(commands="restart")
-            self.run_after()
-        # except Exception as ex:
-        #    ColorPrint.exit_after_print_messages(message="Unexpected error:\n" + ex.message)
+            '''Handling top level commands'''
+            if arguments.get('start'):
+                self.run_before(offline=arguments.get("--offline"))
+                self.run_docker_command(commands="start")
+                self.run_after()
+            if arguments.get('stop'):
+                self.run_before(offline=arguments.get("--offline"))
+                self.run_docker_command(commands="stop")
+                self.run_after()
+            if arguments.get('restart'):
+                self.run_before(offline=arguments.get("--offline"))
+                self.run_docker_command(commands="restart")
+                self.run_after()
+        except Exception as ex:
+           ColorPrint.exit_after_print_messages(message="Unexpected error:\n" + ex.message)
 
 
 def main():

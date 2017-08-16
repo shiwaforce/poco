@@ -27,17 +27,17 @@ Quick start
 
 [![asciicast](https://asciinema.org/a/131956.png)](https://asciinema.org/a/131956)
 
-Install the latest project-compose and initialise the sample catalogue:
+Install the latest project-compose:
 
 ``$ pip install project-compose``
 
-``$ project-catalog init https://github.com/shiwaforce/project-compose-example.git``
-
-List all projects in the catalogue and list all available plans of the example-voting-app:
+List all projects in the catalogue (It will be initialise the sample catalogue at first time):
 
 ``$ project-catalog ls``
 
 ``example-voting-app``
+
+List all available plans of the example-voting-app:
 
 ``$ project-compose plan ls example-voting-app``
 
@@ -98,7 +98,7 @@ or
 Home directory
 --------------
 
-The home directory must exist in the user's local home directory with the name: .project-compose
+The home directory is in the user's local home directory with the name: .project-compose
 
 For example (OSX):
     /Users/john.doe/.project-compose
@@ -227,10 +227,6 @@ lists the available projects (from the project catalog file)
     **project-catalog config**
 
 prints the local config
-
-    **project-catalog init [<repository-url>] [<repository-type>] [<file>]**
-
-creates the config and project-catalog files if they do not exist. if the repository-url, type, and file references are not empty it will write to the local config
 
     **project-catalog branch <branch> [-f]**
 

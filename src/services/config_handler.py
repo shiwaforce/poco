@@ -1,6 +1,7 @@
 import os
+import shutil
 from .abstract_yaml import AbstractYamlHandler
-from .console_logger import Doc
+from .console_logger import Doc, ColorPrint
 from .environment_utils import EnvironmentUtils
 from .file_utils import FileUtils
 
@@ -16,9 +17,10 @@ class ConfigHandler(AbstractYamlHandler):
         self.log_dir = os.path.join(self.home_dir, 'logs')
         super(ConfigHandler, self).__init__(os.path.join(self.home_dir, 'config'))
 
-        if self.exists():
-            if not os.path.exists(self.log_dir):
-                os.mkdir(self.log_dir)
+        if not self.exists():
+            self.init()
+        if not os.path.exists(self.log_dir):
+            os.mkdir(self.log_dir)
 
     def read(self):
         """Parse local configuration file"""
@@ -96,25 +98,15 @@ class ConfigHandler(AbstractYamlHandler):
     def exists(self):
         return os.path.exists(path=self.home_dir) and os.path.exists(path=self.file)
 
-    def init(self, repo_url=None, repo_type=None, file=None):
+    def init(self):
         """Check home directory"""
         if not self.exists():
+            ColorPrint.print_info(message="Default configuration initialized: " + str(self.file))
             if not os.path.exists(self.home_dir):
                 os.mkdir(self.home_dir)
             if not os.path.exists(self.file):
-
-                content = dict()
-                content['default'] = dict()
-                if repo_url is not None:
-                    content['default']['server'] = repo_url
-                    if repo_type is not None:
-                        content['default']['repositoryType'] = repo_type
-                    else:
-                        content['default']['repositoryType'] = 'git'
-                if file is not None:
-                    content['default']['file'] = file
-                print(content)
-                self.write(content)
+                src_file = os.path.join(os.path.dirname(__file__), 'resources/config')
+                shutil.copyfile(src=src_file, dst=self.file)
             self.read()
 
         '''Check file type catalog'''
