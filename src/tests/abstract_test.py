@@ -23,7 +23,6 @@ class AbstractTestSuite(unittest.TestCase):
       'default': {
         'repositoryType': 'git',
         'server': 'https://github.com/shiwaforce/project-compose-example.git',
-        'file': 'project-catalog.yml',
         'branch': 'master'
         }
     }

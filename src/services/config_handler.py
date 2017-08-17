@@ -77,9 +77,9 @@ class ConfigHandler(AbstractYamlHandler):
     def get_catalog_file(self):
         """Get catalog file"""
         self.read()
-        if self.actual_config is not None:
+        if self.actual_config is not None and self.get_repository_type() == 'file':
             return self.actual_config.get('file', 'project-catalog.yml')
-        return 'project-catalog.yml'
+        return None
 
     def get_config(self):
         """Get the full content of config file"""

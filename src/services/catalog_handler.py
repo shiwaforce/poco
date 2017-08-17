@@ -9,8 +9,9 @@ from .svn_repository import SvnRepository
 class CatalogHandler:
 
     def __init__(self, home_dir, repo_type, offline, file=None, url=None, branch=None, ssh=None):
+        self.repo_type = repo_type
         self.catalog_file = file
-
+        self.catalog = None
         self.offline_mode = offline
         if self.offline_mode and repo_type in ('git', 'svn'):
             self.catalog_repository = FileRepository(target_dir=path.join(home_dir, 'catalogHome'))
@@ -24,13 +25,18 @@ class CatalogHandler:
 
     def get_catalog(self):
         """Parse catalog file"""
-        lst = self.catalog_repository.get_yaml_file(file=self.catalog_file, create=True)
-        if lst is None:
-            ColorPrint.exit_after_print_messages(message="file not exists : " + str(self.catalog_file),
-                                                 doc=Doc.CONFIG)
-        if not isinstance(lst, dict):
-            ColorPrint.exit_after_print_messages(message="file not valid : " + str(self.catalog_file),
-                                                 doc=Doc.CONFIG)
+        if self.catalog is not None:
+            return self.catalog
+        if self.repo_type == 'file' and not path.isdir(self.catalog_repository.get_file(file=self.catalog_file)):
+            lst = self.catalog_repository.get_yaml_file(file=self.catalog_file, create=True)
+            if lst is None:
+                ColorPrint.exit_after_print_messages(message="file not exists : " + str(self.catalog_file),
+                                                     doc=Doc.CONFIG)
+            if not isinstance(lst, dict):
+                ColorPrint.exit_after_print_messages(message="file not valid : " + str(self.catalog_file),
+                                                     doc=Doc.CONFIG)
+        else:
+            lst = self.scan_and_parse()
         return lst
 
     def write_catalog(self, lst):
@@ -76,3 +82,20 @@ class CatalogHandler:
 
     def push(self):
         self.catalog_repository.push()
+
+    def scan_and_parse(self):
+        lst = dict()
+        for file in self.catalog_repository.scan_yaml_files():
+            catalog = self.catalog_repository.get_yaml_file(file=file)
+            if catalog is not None and self.valid_catalog(catalog):
+                lst.update(catalog)
+        return lst
+
+    @staticmethod
+    def valid_catalog(catalog):
+        if not isinstance(catalog, dict):
+            return False
+        for key in catalog.keys():
+            if 'git' not in catalog[key]:
+                return False
+        return True
