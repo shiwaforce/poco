@@ -23,7 +23,6 @@ Requirements
 ------------
 
  - Docker, version > 17
- - Python, version > 2.7
 
 Quick start
 ===========
