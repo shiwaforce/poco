@@ -41,71 +41,68 @@ from .services.console_logger import ColorPrint
 
 class ProjectCompose(AbstractCommand):
 
-    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.project-compose'), skip_docker=False):
-        super(ProjectCompose, self).__init__(home_dir=home_dir, skip_docker=skip_docker)
+    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.project-compose'), skip_docker=False,
+                 argv=sys.argv[1:]):
+        super(ProjectCompose, self).__init__(home_dir=home_dir, skip_docker=skip_docker, doc=__doc__, argv=argv)
 
-    def run(self, argv):
-        arguments = docopt(__doc__, version="0.8.0", argv=argv)
-        ColorPrint.set_log_level(arguments)
-
+    def run(self):
         try:
-            '''Parse config and catalog'''
-            self.parse_config()
-            self.parse_catalog(offline=arguments.get("--offline"))
+            '''Parse catalog'''
+            self.parse_catalog(offline=self.arguments.get("--offline"))
 
-            if arguments.get('<project>') is None:
-                arguments['<project>'] = FileUtils.get_directory_name()
+            if self.arguments.get('<project>') is None:
+                self.arguments['<project>'] = FileUtils.get_directory_name()
 
             '''Handling top level commands'''
-            if arguments.get('clean'):
+            if self.arguments.get('clean'):
                 CleanHandler().clean()
                 ColorPrint.exit_after_print_messages(message="Clean complete", msg_type="info")
 
             '''Init project utils'''
-            self.init_project_utils(offline=arguments.get("--offline"))
+            self.init_project_utils(offline=self.arguments.get("--offline"))
 
             '''Get project name'''
-            self.name = arguments.get('<project>')
+            self.name = self.arguments.get('<project>')
 
-            if arguments.get('branches'):
+            if self.arguments.get('branches'):
                 self.print_branches(repo=self.get_project_repository())
 
-            if arguments.get('branch'):
-                branch = arguments.get('<branch>')
+            if self.arguments.get('branch'):
+                branch = self.arguments.get('<branch>')
                 repo = self.get_project_repository()
-                repo.set_branch(branch=branch, force=arguments.get("-f"))
+                repo.set_branch(branch=branch, force=self.arguments.get("-f"))
                 project_descriptor = self.catalog_handler.get(name=self.name)
                 project_descriptor['branch'] = branch
                 self.catalog_handler.set(name=self.name, modified=project_descriptor)
                 ColorPrint.print_info("Branch changed")
 
-            if arguments.get('install'):
+            if self.arguments.get('install'):
                 self.get_project_repository()
                 ColorPrint.print_info("Project installed")
 
-            if arguments.get('init'):
+            if self.arguments.get('init'):
                 self.init()
                 '''Init compose handler'''
-                self.init_compose_handler(arguments=arguments)
+                self.init_compose_handler(arguments=self.arguments)
                 self.run_scripts(script_type="init_script")
 
             '''Init compose handler'''
-            self.init_compose_handler(arguments=arguments)
+            self.init_compose_handler(arguments=self.arguments)
 
-            if arguments.get('plan') and arguments.get('ls'):
+            if self.arguments.get('plan') and self.arguments.get('ls'):
                 self.compose_handler.get_plan_list(name=self.name)
 
-            if arguments.get('config'):
+            if self.arguments.get('config'):
                 self.run_scripts(script_type="before_script")
                 self.run_docker_command(commands="config")
 
-            if arguments.get('build'):
-                self.run_before(offline=arguments.get("--offline"))
+            if self.arguments.get('build'):
+                self.run_before(offline=self.arguments.get("--offline"))
                 self.run_docker_command(commands="build")
                 ColorPrint.print_info("Project built")
 
-            if arguments.get('up') or arguments.get('start'):
-                self.run_before(offline=arguments.get("--offline"))
+            if self.arguments.get('up') or self.arguments.get('start'):
+                self.run_before(offline=self.arguments.get("--offline"))
                 self.run_docker_command(commands="build")
                 self.run_docker_command(commands="config")
                 self.run_docker_command(commands=["up", "-d"])
@@ -113,25 +110,25 @@ class ProjectCompose(AbstractCommand):
                 self.run_docker_command(commands="ps")
                 self.run_after()
 
-            if arguments.get('down'):
+            if self.arguments.get('down'):
                 self.run_docker_command(commands=["down", "--remove-orphans"])
                 ColorPrint.print_info("Project stopped")
 
-            if arguments.get('ps'):
-                self.run_before(offline=arguments.get("--offline"))
+            if self.arguments.get('ps'):
+                self.run_before(offline=self.arguments.get("--offline"))
                 self.run_docker_command(commands="ps")
                 self.run_after()
 
-            if arguments.get('pull'):
-                self.run_before(offline=arguments.get("--offline"))
+            if self.arguments.get('pull'):
+                self.run_before(offline=self.arguments.get("--offline"))
                 self.run_docker_command(commands="pull")
                 ColorPrint.print_info("Project pull complete")
 
-            if arguments.get('stop'):
+            if self.arguments.get('stop'):
                 self.run_docker_command(commands="stop")
                 self.run_after()
 
-            if arguments.get('logs') or arguments.get('log'):
+            if self.arguments.get('logs') or self.arguments.get('log'):
                 self.run_docker_command(commands=["logs", "-f"])
 
         except Exception as ex:
@@ -154,7 +151,7 @@ class ProjectCompose(AbstractCommand):
 
 def main():
     compose = ProjectCompose()
-    compose.run(sys.argv[1:])
+    compose.run()
 
 if __name__ == '__main__':
     sys.exit(main())

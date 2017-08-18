@@ -1,4 +1,5 @@
 import os
+from docopt import docopt
 from subprocess import Popen, call, check_call, PIPE
 from .services.config_handler import ConfigHandler
 from .services.catalog_handler import CatalogHandler
@@ -19,11 +20,15 @@ class AbstractCommand(object):
     '''project name'''
     name = None
 
-    def __init__(self, home_dir, skip_docker):
+    def __init__(self, home_dir, skip_docker, doc, argv):
         self.home_dir = home_dir
         self.skip_docker = skip_docker
         if not skip_docker:
             self.check_docker()
+        self.arguments = docopt(doc, version="0.9.0", argv=argv)
+        ColorPrint.set_log_level(self.arguments)
+        ''' Parse config '''
+        self.parse_config()
 
     @staticmethod
     def check_docker():

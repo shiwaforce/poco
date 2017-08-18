@@ -26,39 +26,37 @@ from docopt import docopt
 
 class ProjectService(AbstractCommand):
 
-    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.project-compose'), skip_docker=False):
-        super(ProjectService, self).__init__(home_dir=home_dir, skip_docker=skip_docker)
+    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.project-compose'), skip_docker=False,
+                 argv=sys.argv[1:]):
+        super(ProjectService, self).__init__(home_dir=home_dir, skip_docker=skip_docker, doc=__doc__, argv=argv)
 
-    def run(self, argv):
-        arguments = docopt(__doc__, version="0.8.0", argv=argv)
-        ColorPrint.set_log_level(arguments)
+    def run(self):
 
         try:
-            '''Parse config and catalog'''
-            self.parse_config()
+            '''Parse catalog'''
             self.parse_catalog()
 
-            if arguments.get('<project>') is None:
-                arguments['<project>'] = FileUtils.get_directory_name()
+            if self.arguments.get('<project>') is None:
+                self.arguments['<project>'] = FileUtils.get_directory_name()
 
             '''Get project name'''
-            self.name = arguments.get('<project>')
+            self.name = self.arguments.get('<project>')
             '''Init project utils'''
-            self.init_project_utils(offline=arguments.get("--offline"))
+            self.init_project_utils(offline=self.arguments.get("--offline"))
             '''Init compose handler'''
-            self.init_compose_handler(arguments=arguments)
+            self.init_compose_handler(arguments=self.arguments)
 
             '''Handling top level commands'''
-            if arguments.get('start'):
-                self.run_before(offline=arguments.get("--offline"))
+            if self.arguments.get('start'):
+                self.run_before(offline=self.arguments.get("--offline"))
                 self.run_docker_command(commands="start")
                 self.run_after()
-            if arguments.get('stop'):
-                self.run_before(offline=arguments.get("--offline"))
+            if self.arguments.get('stop'):
+                self.run_before(offline=self.arguments.get("--offline"))
                 self.run_docker_command(commands="stop")
                 self.run_after()
-            if arguments.get('restart'):
-                self.run_before(offline=arguments.get("--offline"))
+            if self.arguments.get('restart'):
+                self.run_before(offline=self.arguments.get("--offline"))
                 self.run_docker_command(commands="restart")
                 self.run_after()
         except Exception as ex:
@@ -67,7 +65,7 @@ class ProjectService(AbstractCommand):
 
 def main():
     service = ProjectService()
-    service.run(sys.argv[1:])
+    service.run()
 
 if __name__ == '__main__':
     sys.exit(main())
