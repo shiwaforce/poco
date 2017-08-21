@@ -44,14 +44,8 @@ class AbstractCommand(object):
         self.config_handler = ConfigHandler(home_dir=self.home_dir)
 
     def parse_catalog(self, offline):
-        self.catalog_handler = CatalogHandler(home_dir=self.home_dir,
-                                              repo_type=self.config_handler.get_repository_type(),
-                                              file=self.config_handler.get_catalog_file(),
-                                              offline=offline,
-                                              url=self.config_handler.get_url(),
-                                              branch=self.config_handler.get_branch(),
-                                              ssh=self.get_node(self.config_handler.get_actual_config(),
-                                                                ["default", "ssh-key"]))
+        self.catalog_handler = CatalogHandler(home_dir=self.home_dir, config=self.config_handler.get_config(),
+                                              offline=offline)
 
     def init_project_utils(self, offline):
         self.project_utils = ProjectUtils(home_dir=self.home_dir, work_dir=self.config_handler.get_work_dir(),
@@ -118,7 +112,6 @@ class AbstractCommand(object):
                                     data=err if len(err) > 0 else out)
 
     def get_catalog_list(self):
-        # TODO group parse here!
         return self.catalog_handler.get_catalog()
 
     def get_catalog(self, name):
@@ -136,7 +129,8 @@ class AbstractCommand(object):
 
         return structure[node] if node in structure else default
 
-    def print_branches(self, repo):
+    @staticmethod
+    def print_branches(repo):
         """Get available branches"""
         actual_branch = repo.get_actual_branch()
         ColorPrint.print_with_lvl(message="----------------------------------------------------------", lvl=-1)

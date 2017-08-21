@@ -22,6 +22,7 @@ class AbstractTestSuite(unittest.TestCase):
     REMOTE_CONFIG = {
       'default': {
         'repositoryType': 'git',
+        'file': 'project-catalog.yml',
         'server': 'https://github.com/shiwaforce/project-compose-example.git',
         'branch': 'master'
         }
@@ -76,5 +77,5 @@ class AbstractTestSuite(unittest.TestCase):
                       indent=4)
 
     def add_workspace_dir(self, config):
-        config["default"]["workspace"] = self.ws_dir
+        config["workspace"] = self.ws_dir
         return config

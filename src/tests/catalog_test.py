@@ -27,7 +27,7 @@ class CatalogTestSuite(AbstractTestSuite):
             catalog = ProjectCatalog(home_dir=self.tmpdir, skip_docker=True, argv=["config"])
             catalog.run()
         self.assertEqual(0, len(err.getvalue()))
-        AbstractTestSuite.REMOTE_CONFIG['default'].pop('workspace')
+        AbstractTestSuite.REMOTE_CONFIG.pop('workspace')
         self.assertIn(yaml.dump(data=AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='',
                                 indent=4).strip(), out.getvalue().strip())
 

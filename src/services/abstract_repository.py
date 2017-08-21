@@ -1,7 +1,14 @@
 import os
 import yaml
+import sys
+import platform
 from .console_logger import ColorPrint
 from .file_utils import FileUtils
+from subprocess import Popen, PIPE
+if sys.version_info[0] < 3:
+    import urlparse
+else:
+    import urllib.parse as urlparse
 
 
 class AbstractRepository(object):
@@ -63,3 +70,23 @@ class AbstractRepository(object):
     def push(self):
         pass
 
+    @staticmethod
+    def check_remote(url):
+        # TODO need a better solution
+        o = urlparse.urlparse(url)
+        cmd = list()
+        cmd.append("ping")
+        if platform.system().lower().startswith("win"):
+            cmd.append("-n")
+            cmd.append(1)
+            cmd.append("-w")
+            cmd.append(1000)
+        else:
+            cmd.append("-c1")
+            cmd.append("-t1")
+            cmd.append(o.netloc)
+
+        p = Popen(cmd, stdout=PIPE, stderr=PIPE)
+        out, err = p.communicate()
+
+        return len(err) == 0

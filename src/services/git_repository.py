@@ -57,8 +57,12 @@ class GitRepository(AbstractRepository):
     def pull(self):
         if self.repo is None:
             ColorPrint.exit_after_print_messages(message="It is not an git repository: " + self.target_dir)
+        if not self.check_remote(self.repo.remotes.origin.url):
+            ColorPrint.print_with_lvl(message="Remote repository " + self.repo.remotes.origin.url + " not accessible. Maybe not up to date ", lvl=1)
+            return str(self.repo.active_branch)
         ColorPrint.print_with_lvl(message="Repository " + self.repo.remotes.origin.url + " with "
                                           + str(self.repo.active_branch) + " branch pull response:", lvl=1)
+
         ColorPrint.print_with_lvl(message=self.repo.git.pull(), lvl=1)
 
     def get_actual_branch(self):

@@ -112,7 +112,7 @@ Basic configuration file
 Location: under the home directory with name: config
 The format of the file is YAML, including a default section.
 
-If the default section is empty the project-catalog.yml file must exist in the config directory
+If the default section is empty the project-catalog.yml file looking in the config directory
 
 Parameters:
  - repositoryType (optional):  git | svn | file
@@ -127,7 +127,7 @@ Example 1 (empty):
 
     default:
 
-Example 2 (Git):
+Example 2 (Git, multiple):
 ::
 
     default:
@@ -135,6 +135,12 @@ Example 2 (Git):
         url: https://github.com/shiwaforce/project-compose-example.git
         file: project-catalog.yml
         branch: master
+    another:
+        repositoryType: git
+        url: https://github.com/shiwaforce/project-compose-example-another.git
+        file: project-catalog.yml
+        branch: master
+    workspace: /Users/john.doe/workspace
 
 Project catalog file
 --------------------
@@ -219,9 +225,9 @@ For example:
 Commands
 --------
 
-    **project-catalog add [<target-dir>]**
+    **project-catalog add [<target-dir>] [<catalog>]**
 
-adds the current directory (or target directory) to the project-catalog (if it is a Git repository)
+adds the current directory (or target directory) to the project-catalog - default or selected (if it is a Git repository)
 
     **project-catalog ls**
 
@@ -231,17 +237,17 @@ lists the available projects (from the project catalog file)
 
 prints the local config
 
-    **project-catalog branch <branch> [-f]**
+    **project-catalog branch <branch> [<catalog>] [-f]**
 
-switches branch in the project-catalog repository, use -f to force
+switches branch in the project-catalog (default is the name with 'default' or the first) repository, use -f to force
 
-    **project-catalog branches**
+    **project-catalog branches [<catalog>]**
 
-lists the available project-catalog repository branches
+lists the available project-catalog (default is the name with 'default' or the first) repository branches
 
-    **project-catalog push**
+    **project-catalog push [<catalog>]**
 
-pushes project-catalog changes to the repository (if it is not a local file)
+pushes project-catalog (default is the name with 'default' or the first) changes to the repository (if it is not a local file)
 
     **project-catalog remove <project>**
 

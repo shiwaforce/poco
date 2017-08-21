@@ -53,3 +53,4 @@ class ProjectUtils:
     @staticmethod
     def get_target_dir(work_dir, name, project_element):
         return os.path.join(work_dir, project_element.get('repository_dir', name))
+
