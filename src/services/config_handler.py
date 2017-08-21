@@ -8,7 +8,6 @@ from .file_utils import FileUtils
 class ConfigHandler(AbstractYamlHandler):
 
     config = None
-    default_config = None
     work_dir = None
 
     def __init__(self, home_dir):
@@ -27,13 +26,8 @@ class ConfigHandler(AbstractYamlHandler):
         if not self.parsed:
             self.config = super(ConfigHandler, self).read(doc=Doc.CONFIG)
 
-            if type(self.config) is dict:
-                if 'default' in self.config:
-                    self.default_config = self.config['default']
-                self.default_config = self.config[list(self.config.keys())[0]]
-            else:
+            if not type(self.config) is dict:
                 self.config['default'] = {}
-                self.default_config = {}
 
             if 'workspace' not in self.config:
                 self.work_dir = os.path.join(os.path.expanduser(path='~'), 'workspace')
@@ -49,12 +43,15 @@ class ConfigHandler(AbstractYamlHandler):
         """Set catalog actual branch"""
         self.read()
         if config is None:
-            self.default_config['branch'] = branch
-        else:
-            if config not in self.config.keys():
-                ColorPrint.exit_after_print_messages(message="Config section not exists with name: " + config)
-            self.config[config]['branch'] = branch
-            self.write(self.config)
+            if 'default' in self.config:
+                config = 'default'
+            else:
+                config = self.config[list(self.config.keys())[0]]
+
+        if config not in self.config.keys():
+            ColorPrint.exit_after_print_messages(message="Config section not exists with name: " + config)
+        self.config[config]['branch'] = branch
+        self.write(self.config)
 
     def get_config(self):
         """Get the full content of config file"""
