@@ -3,7 +3,7 @@
 import os
 import yaml
 import git
-from src.catalog import ProjectCatalog
+from projectcompose.catalog import ProjectCatalog
 from docopt import DocoptExit
 from .abstract_test import AbstractTestSuite
 

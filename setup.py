@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import src
+import projectcompose
 import sys
 import platform
 from setuptools import setup, find_packages
@@ -20,7 +20,7 @@ class PyTestCommand(TestCommand):
     """
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ['--verbose', '--cov', 'src']
+        self.test_args = ['--verbose', '--cov', 'projectcompose']
         self.test_suite = True
 
     def run(self):
@@ -30,7 +30,7 @@ class PyTestCommand(TestCommand):
 
 setup_options = dict(
     name='project-compose',
-    version=src.__version__,
+    version=projectcompose.__version__,
     description='project-compose project-compose lets you catalogue and manage your Docker projects using simple YAML files to shorten the route from finding your project to initialising it in your environment.',
     long_description=open('README.rst').read(),
     author='Shiwaforce.com',

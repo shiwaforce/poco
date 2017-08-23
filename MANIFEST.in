@@ -1,0 +1,5 @@
+include README.rst
+include LICENCE
+include config
+include docker-compose.yml
+include project-compose.yml

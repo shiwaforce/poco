@@ -2,8 +2,8 @@ import git
 import os
 from docopt import DocoptExit
 from .abstract_test import AbstractTestSuite
-from src.compose import ProjectCompose
-from src.catalog import ProjectCatalog
+from projectcompose.compose import ProjectCompose
+from projectcompose.catalog import ProjectCatalog
 
 
 class ComposeTestSuite(AbstractTestSuite):
