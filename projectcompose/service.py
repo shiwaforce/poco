@@ -21,7 +21,6 @@ import sys
 from .abstract_command import AbstractCommand
 from .services.file_utils import FileUtils
 from .services.console_logger import ColorPrint
-from docopt import docopt
 
 
 class ProjectService(AbstractCommand):
@@ -60,7 +59,7 @@ class ProjectService(AbstractCommand):
                 self.run_docker_command(commands="restart")
                 self.run_after()
         except Exception as ex:
-           ColorPrint.exit_after_print_messages(message="Unexpected error:\n" + ex.message)
+            ColorPrint.exit_after_print_messages(message="Unexpected error:\n" + ex.message)
 
 
 def main():

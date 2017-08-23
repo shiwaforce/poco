@@ -36,46 +36,46 @@ class ProjectCatalog(AbstractCommand):
         super(ProjectCatalog, self).__init__(home_dir=home_dir, skip_docker=skip_docker, doc=__doc__, argv=argv)
 
     def run(self):
-        #try:
-        if self.arguments.get('config'):
-            ColorPrint.print_info(message=yaml.dump(
-                data=self.config_handler.get_config(), default_flow_style=False, default_style='', indent=4),
-                lvl=-1)
+        try:
+            if self.arguments.get('config'):
+                ColorPrint.print_info(message=yaml.dump(
+                    data=self.config_handler.get_config(), default_flow_style=False, default_style='', indent=4),
+                    lvl=-1)
 
-        if not self.arguments.get('init') and not self.arguments.get('config'):
-            self.parse_catalog(offline=self.arguments.get("--offline"))
+            if not self.arguments.get('init') and not self.arguments.get('config'):
+                self.parse_catalog(offline=self.arguments.get("--offline"))
 
-            if self.arguments.get('ls'):
-                self.print_ls()
-            if self.arguments.get('branches'):
-                self.print_branches(repo=self.catalog_handler.get_catalog_repository(self.arguments.get('<catalog>')))
-            if self.arguments.get('branch'):
-                branch = self.arguments.get('<branch>')
-                self.set_branch(branch=branch, force=self.arguments.get("-f"))
-                ColorPrint.print_info("Branch changed")
-            if self.arguments.get('push'):
-                self.catalog_handler.push(self.arguments.get('<catalog>'))
-                ColorPrint.print_info("Push completed")
-            if self.arguments.get('add'):
-                target_dir = FileUtils.get_normalized_dir(self.arguments.get('<target-dir>'))
-                repo, repo_dir = FileUtils.get_git_repo(target_dir)
-                self.add_to_catalog(target_dir=target_dir, repo_dir=repo_dir, repo=repo,
-                                    catalog=self.arguments.get('<catalog>'))
-                ColorPrint.print_info("Project added")
+                if self.arguments.get('ls'):
+                    self.print_ls()
+                if self.arguments.get('branches'):
+                    self.print_branches(repo=self.catalog_handler.get_catalog_repository(self.arguments.get('<catalog>')))
+                if self.arguments.get('branch'):
+                    branch = self.arguments.get('<branch>')
+                    self.set_branch(branch=branch, force=self.arguments.get("-f"))
+                    ColorPrint.print_info("Branch changed")
+                if self.arguments.get('push'):
+                    self.catalog_handler.push(self.arguments.get('<catalog>'))
+                    ColorPrint.print_info("Push completed")
+                if self.arguments.get('add'):
+                    target_dir = FileUtils.get_normalized_dir(self.arguments.get('<target-dir>'))
+                    repo, repo_dir = FileUtils.get_git_repo(target_dir)
+                    self.add_to_catalog(target_dir=target_dir, repo_dir=repo_dir, repo=repo,
+                                        catalog=self.arguments.get('<catalog>'))
+                    ColorPrint.print_info("Project added")
 
-            if self.arguments.get('<project>') is None:
-                self.arguments['<project>'] = FileUtils.get_directory_name()
-            self.name = self.arguments.get('<project>')
-            if self.arguments.get('remove'):
-                ColorPrint.print_info("Project removed")
-                self.remove_from_catalog(self.arguments)
-            if self.arguments.get('install'):
-                '''Init project utils'''
-                self.init_project_utils(offline=self.arguments.get("--offline"))
-                self.get_project_repository()
-                ColorPrint.print_info("Project installed")
-        #except Exception as ex:
-        #    ColorPrint.exit_after_print_messages(message="Unexpected error:\n" + ex.message)
+                if self.arguments.get('<project>') is None:
+                    self.arguments['<project>'] = FileUtils.get_directory_name()
+                self.name = self.arguments.get('<project>')
+                if self.arguments.get('remove'):
+                    ColorPrint.print_info("Project removed")
+                    self.remove_from_catalog(self.arguments)
+                if self.arguments.get('install'):
+                    '''Init project utils'''
+                    self.init_project_utils(offline=self.arguments.get("--offline"))
+                    self.get_project_repository()
+                    ColorPrint.print_info("Project installed")
+        except Exception as ex:
+            ColorPrint.exit_after_print_messages(message="Unexpected error:\n" + ex.message)
 
     def print_ls(self):
         """Get catalog list"""

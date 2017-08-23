@@ -44,8 +44,8 @@ setup_options = dict(
     tests_require=test_requires,
     cmdclass={'test': PyTestCommand},
     entry_points={
-      'console_scripts': ['project-catalog=src.catalog:main', 'project-compose=src.compose:main',
-                          'project-service=src.service:main'],
+      'console_scripts': ['project-catalog=projectcompose.catalog:main', 'project-compose=projectcompose.compose:main',
+                          'project-service=projectcompose.service:main'],
     },
     license="Apache License 2.0",
     classifiers=(
