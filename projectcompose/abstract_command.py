@@ -25,7 +25,7 @@ class AbstractCommand(object):
         self.skip_docker = skip_docker
         if not skip_docker:
             self.check_docker()
-        self.arguments = docopt(doc, version="0.12.0", argv=argv)
+        self.arguments = docopt(doc, version="0.13.0", argv=argv)
         ColorPrint.set_log_level(self.arguments)
         ''' Parse config '''
         self.parse_config()
