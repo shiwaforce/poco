@@ -21,7 +21,7 @@ About
 
 This helps you set up your local development environment and to run demos.
 
-Working examples can be found here: https://github.com/shiwaforce/project-compose-example
+Working examples can be found here: https://github.com/shiwaforce/poco-example
 
 Requirements
 ------------
