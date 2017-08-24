@@ -83,5 +83,5 @@ class ConfigHandler(AbstractYamlHandler):
                 continue
             if conf.get("repositoryType", "file") is "file":
                 FileUtils.make_empty_file_with_empty_dict(directory=self.home_dir,
-                                                          file=conf.get('file', 'project-catalog.yml'))
+                                                          file=conf.get('file', 'poco-catalog.yml'))
 

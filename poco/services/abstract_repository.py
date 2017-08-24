@@ -16,15 +16,6 @@ class AbstractRepository(object):
     def __init__(self, target_dir):
         self.target_dir = target_dir
 
-    def scan_yaml_files(self):
-        result = []
-        for root, dirs, files in os.walk(self.target_dir):
-            for file in files:
-                if file.endswith(".yml") and \
-                        not file.startswith("project-compose") and not file.startswith("docker-compose"):
-                    result.append(os.path.join(root, file))
-        return result
-
     def get_file(self, file):
         result = os.path.join(self.target_dir, file)
         return result

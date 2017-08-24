@@ -1,5 +1,5 @@
 include README.rst
 include LICENCE
-recursive-include projectcompose config
-recursive-include projectcompose docker-compose.yml
-recursive-include projectcompose project-compose.yml
+recursive-include poco config
+recursive-include poco docker-compose.yml
+recursive-include poco poco.yml

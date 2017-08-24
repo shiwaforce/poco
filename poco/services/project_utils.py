@@ -37,13 +37,13 @@ class ProjectUtils:
     def get_compose_file(self, name, project_element, ssh, silent=False):
         """Get compose file from project repository """
         repo_handler = self.get_project_repository(name=name, project_element=project_element, ssh=ssh)
-        file = repo_handler.get_file(project_element.get('file', 'project-compose.yml'))
+        file = repo_handler.get_file(project_element.get('file', 'poco.yml'))
         if not os.path.exists(file):
             if silent:
                 return None
             ColorPrint.exit_after_print_messages(
                 message="Compose file : %s not exists in project : %s " % (str(file), str(name)),
-                doc=Doc.PROJECT_CATALOG)
+                doc=Doc.POCO_CATALOG)
         return file
 
     def get_file(self, name, file):

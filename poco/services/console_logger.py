@@ -11,17 +11,13 @@ class Colors:
 class Doc:
     CONFIG = """Configuration:
 
-    For generate default environment, please run:
-        project-catalog init
-
     YAML format.
-    Need to be an default section (it's the only one, which supported now)
 
-    If default section is empty, the project-catalog.yml file must be exists in config directory
+    If default section is empty, the poco-catalog.yml file must be exists in config directory
 
     repositoryType (optional):  git | svn | file
     url (optional): must be a valid GIT or SVN url
-    file (optional):    catalog file path in the repository or local filesystem - default : project-catalog.yml
+    file (optional):    catalog file path in the repository or local filesystem - default : poco-catalog.yml
     branch (optional):  branch name - default : master
     ssh-key (optional): ssh file location for git repository - default: ~/.ssh/id_rsa
     workspace (optional): the directory where the script will checkout the projects - default: ~/workspace
@@ -31,16 +27,16 @@ class Doc:
         default:
             repositoryType: git
             url: ssh://git@git.shiwaforce.com/scm/project-catalog/project-catalog.git
-            file: project-catalog.yml
+            file: poco-catalog.yml
             branch: master
     """
 
-    PROJECT_CATALOG = """Project catalog.
+    POCO_CATALOG = """Poco catalog.
 
         YAML format.
 
-        Generate a sample project-compose file for project, please run:
-            project-compose init
+        Generate a sample poco file for project, please run:
+            poco init
 
         Configuration:
             keys: The name of the projects
@@ -48,9 +44,9 @@ class Doc:
             git (optional): must be a valid GIT url for the project
             svn (optional): must be a valid SVN url for the project
             branch (optional): branch name - default : master
-            file(optional): path to the project-compose file. - Default : project-compose.yml
+            file(optional): path to the poco file. - Default : poco.yml
                 If you not define repository, it will relative to config file
-                If the path is a directory, then will extended the path the default filename : project-compose.yml
+                If the path is a directory, then will extended the path the default filename : poco.yml
 
         For example:
 
@@ -66,7 +62,7 @@ class Doc:
             file: another/directory/anoter_compose.yml
         """
 
-    PROJECT_COMPOSE = """Project compose.
+    POCO = """Poco.
 
         YAML format.
 

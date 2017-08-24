@@ -53,14 +53,14 @@ class ComposeHandler:
 
                 if 'plan' not in self.compose_project:
                     ColorPrint.exit_after_print_messages(
-                        message="'plan' section must exists in compose file (project-compose.yml) ",
+                        message="'plan' section must exists in compose file (poco.yml) ",
                         doc=Doc.COMPOSE_DOC)
                 if not isinstance(self.compose_project['plan'], dict):
                     ColorPrint.exit_after_print_messages(
-                        message="'plan' section must be a list", doc=Doc.PROJECT_COMPOSE)
+                        message="'plan' section must be a list", doc=Doc.POCO)
                 if len(self.compose_project['plan'].keys()) < 1:
                     ColorPrint.exit_after_print_messages(
-                        message="'plan' section must be one child element", doc=Doc.PROJECT_COMPOSE)
+                        message="'plan' section must be one child element", doc=Doc.POCO)
                 if self.plan is None:
                     if "demo" in self.compose_project['plan']:
                         self.plan = "demo"
@@ -70,15 +70,15 @@ class ComposeHandler:
                         self.plan = self.compose_project['plan'].keys()[0]
                 if self.plan not in self.compose_project['plan']:
                     ColorPrint.exit_after_print_messages(
-                        message="stages section must contains the selected stage: " + str(self.plan), doc=Doc.PROJECT_COMPOSE)
+                        message="stages section must contains the selected stage: " + str(self.plan), doc=Doc.POCO)
 
                 actual_plan = self.compose_project['plan'].get(self.plan)
                 if actual_plan is None:
                     ColorPrint.exit_after_print_messages(
-                        message="selected plan %s is empty" % str(self.plan), msg_type="warn", doc=Doc.PROJECT_COMPOSE)
+                        message="selected plan %s is empty" % str(self.plan), msg_type="warn", doc=Doc.POCO)
             except yaml.YAMLError as exc:
                 ColorPrint.exit_after_print_messages(message="Error: Wrong YAML format:\n " + str(exc),
-                                                     doc=Doc.PROJECT_COMPOSE)
+                                                     doc=Doc.POCO)
 
     def parse_environment_dict(self, path, env, name, get_file):
         """Compose dictionary from environment variables."""
@@ -102,7 +102,7 @@ class ComposeHandler:
         if "environment" in self.compose_project:
             self.parse_environment_dict(path=self.compose_project["environment"]["include"], env=environment,
                                         name=name, get_file=get_file)
-        if (type(envs) is list):
+        if type(envs) is list:
             for env in envs:
                 self.parse_environment_dict(path=env, env=environment, name=name, get_file=get_file)
         elif envs is not None:
@@ -206,7 +206,7 @@ class ComposeHandler:
     def get_list_value(value):
         """Get list format, doesn't matter the config use one or list plan"""
         lst = list()
-        if (type(value) is list):
+        if type(value) is list:
             lst.extend(value)
         else:
             lst.append(value)
