@@ -65,6 +65,11 @@ class AbstractRepository(object):
     def check_remote(url):
         # TODO need a better solution
         o = urlparse.urlparse(url)
+        host = o.netloc
+        while "@" in host:
+            host = host[host.find("@")+1:]
+        while ":" in host:
+            host = host[:host.find(":")]
         cmd = list()
         cmd.append("ping")
         if platform.system().lower().startswith("win"):
@@ -75,7 +80,7 @@ class AbstractRepository(object):
         else:
             cmd.append("-c1")
             cmd.append("-t1")
-            cmd.append(o.netloc)
+        cmd.append(host)
 
         p = Popen(cmd, stdout=PIPE, stderr=PIPE)
         out, err = p.communicate()

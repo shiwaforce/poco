@@ -205,7 +205,7 @@ For example:
         - ls -l
     after_script:
         - ls -l
-    checkout: bankarmulato ssh://git@git.shiwaforce.com:7999/teszt/teszt.git
+    checkout: test ssh://git@git.shiwaforce.com:7999/test/test.git
     working-directory: microservice-all-war
     enviroment:
         include: conf/default.env

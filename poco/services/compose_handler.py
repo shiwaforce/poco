@@ -158,30 +158,8 @@ class ComposeHandler:
         scripts = list()
         if script_type in self.compose_project:
             scripts = self.get_list_value(self.compose_project[script_type])
-        return scripts
-
-    def get_after_scripts(self):
-        """Get after scripts """
-        self.get_compose_project()
-        scripts = list()
-        if 'after_script' in self.compose_project:
-            scripts = self.get_list_value(self.compose_project['after_script'])
-        return scripts
-
-    def get_init_scripts(self):
-        """Get install scripts """
-        self.get_compose_project()
-        scripts = list()
-        if 'init_scripts' in self.compose_project:
-            scripts = self.get_list_value(self.compose_project['init_scripts'])
-        return scripts
-
-    def get_remove_scripts(self):
-        """Get uninstall scripts """
-        self.get_compose_project()
-        scripts = list()
-        if 'remove_scripts' in self.compose_project:
-            scripts = self.get_list_value(self.compose_project['remove_scripts'])
+        if script_type in self.compose_project['plan'][self.plan]:
+            scripts.extend(self.get_list_value(self.compose_project['plan'][self.plan][script_type]))
         return scripts
 
     def get_checkouts(self):
@@ -190,6 +168,8 @@ class ComposeHandler:
         checkouts = list()
         if 'checkout' in self.compose_project:
             checkouts = self.get_list_value(self.compose_project['checkout'])
+        if 'checkout' in self.compose_project['plan'][self.plan]:
+            checkouts.extend(self.get_list_value(self.compose_project['plan'][self.plan]['checkout']))
         return checkouts
 
     def get_plan_list(self, name):
