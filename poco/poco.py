@@ -52,7 +52,7 @@ from .services.project_utils import ProjectUtils
 from .services.console_logger import ColorPrint
 
 
-__version__ = '0.15.0'
+__version__ = '0.16.0'
 
 
 class Poco(object):
