@@ -118,14 +118,6 @@ class CatalogHandler:
             catalog = self.get_default_catalog()
             self.catalog_repositories[catalog].repository.push()
 
-    def scan_and_parse(self, data):
-        lst = dict()
-        for file in data.repository.scan_yaml_files():
-            catalog = data.repository.get_yaml_file(file=file)
-            if catalog is not None and self.valid_catalog(catalog):
-                lst.update(catalog)
-        return lst
-
     def get_default_catalog(self):
         if 'default' in self.get_catalog():
             return 'default'
@@ -155,7 +147,7 @@ class CatalogHandler:
         """Get catalog URL if its an remote repository"""
         if config is not None and "server" in config:
             return config['server']
-        return EnvironmentUtils.get_variable('PROJECT_CATALOG')
+        return EnvironmentUtils.get_variable('POCO_CATALOG')
 
     @staticmethod
     def get_branch(config):
@@ -168,8 +160,9 @@ class CatalogHandler:
     def get_catalog_file(config):
         """Get catalog file"""
         if config is not None:
-            return config.get('file', 'project-catalog.yml')
+            return config.get('file', 'poco-catalog.yml')
         return None
+
 
 class CatalogData:
     def __init__(self, config, repository):

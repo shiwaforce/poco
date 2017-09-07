@@ -1,23 +1,27 @@
-project-compose
-===============
+Poco
+====
 
 .. image:: https://travis-ci.org/shiwaforce/project-compose.svg?branch=master
     :target: https://travis-ci.org/shiwaforce/project-compose
 
-.. image:: https://img.shields.io/pypi/v/project-compose.svg
-    :target: https://pypi.python.org/pypi/project-compose
+.. image:: https://img.shields.io/pypi/v/poco.svg
+    :target: https://pypi.python.org/pypi/poco
 
-.. image:: https://img.shields.io/pypi/pyversions/project-compose.svg
-    :target: https://pypi.python.org/pypi/project-compose
+.. image:: https://img.shields.io/pypi/pyversions/poco.svg
+    :target: https://pypi.python.org/pypi/poco
+
+.. image:: logo.jpg
+    :height: 400px
+    :width: 400px
 
 About
 -----
 
-**project-compose** lets you catalogue and manage your Docker projects using simple YAML files to shorten the route from finding your project to initialising it in your local environment.
+**poco** lets you catalogue and manage your Docker projects using simple YAML files to shorten the route from finding your project to initialising it in your local environment.
 
 This helps you set up your local development environment and to run demos.
 
-Working examples can be found here: https://github.com/shiwaforce/project-compose-example
+Working examples can be found here: https://github.com/shiwaforce/poco-example
 
 Requirements
 ------------
@@ -30,19 +34,19 @@ Quick start
 .. image:: https://asciinema.org/a/131956.png
     :target: https://asciinema.org/a/131956
 
-Install the latest project-compose:
+Install the latest poco:
 
-``$ pip install project-compose``
+``$ pip install poco``
 
 List all projects in the catalogue (It will be initialise the sample catalogue at first time):
 
-``$ project-catalog ls``
+``$ poco catalog ls``
 
 ``example-voting-app``
 
 List all available plans of the example-voting-app:
 
-``$ project-compose plan ls example-voting-app``
+``$ poco plan ls example-voting-app``
 
 ``default``
 
@@ -54,7 +58,7 @@ Make sure your local Docker engine is up and running.
 
 Start the Docker example voting app in javaworker plan:
 
-``$ project-compose start example-voting-app javaworker``
+``$ poco start example-voting-app javaworker``
 
 This will download all the required Docker images and start them. The last step of the process will issue a "docker ps" command listing all the running containers.
 
@@ -64,13 +68,13 @@ The application was started in javaworker plan, so the examplevotingapp_worker c
 
 Stop the example voting app:
 
-``$ project-compose down example-voting-app javaworker``
+``$ poco down example-voting-app javaworker``
 
 ``Project stopped``
 
 Start the Docker example voting app in default plan:
 
-``$ project-compose start example-voting-app default``
+``$ poco start example-voting-app default``
 
 Visit http://localhost:5000 to see the application's main page.
 
@@ -78,7 +82,7 @@ The application was started in default plan, so the examplevotingapp_worker cont
 
 Stop the example voting app:
 
-``$ project-compose down example-voting-app default``
+``$ poco down example-voting-app default``
 
 ``Project stopped``
 
@@ -92,7 +96,7 @@ Detailed installation steps
 
 Use pip:
 
-``$ pip install project-compose``
+``$ pip install poco``
 
 or
 
@@ -101,10 +105,10 @@ or
 Home directory
 --------------
 
-The home directory is in the user's local home directory with the name: .project-compose
+The home directory is in the user's local home directory with the name: .poco
 
 For example (OSX):
-    /Users/john.doe/.project-compose
+    /Users/john.doe/.poco
 
 Basic configuration file
 ------------------------
@@ -112,12 +116,12 @@ Basic configuration file
 Location: under the home directory with name: config
 The format of the file is YAML, including a default section.
 
-If the default section is empty the project-catalog.yml file looking in the config directory
+If the default section is empty the poco-catalog.yml file looking in the config directory
 
 Parameters:
  - repositoryType (optional):  git | svn | file
  - url (optional): must be a valid GIT or SVN url
- - file (optional): catalog file path in the repository or local filesystem - default : project-catalog.yml
+ - file (optional): catalog file path in the repository or local filesystem - default : poco-catalog.yml
  - branch (optional): branch name - default : master
  - ssh-key (optional): ssh file location for git repository - default: ~/.ssh/id_rsa
  - workspace (optional): the base directory, where the project will be checked out - default : ~/workspace
@@ -132,39 +136,39 @@ Example 2 (Git, multiple):
 
     default:
         repositoryType: git
-        url: https://github.com/shiwaforce/project-compose-example.git
-        file: project-catalog.yml
+        url: https://github.com/shiwaforce/poco-example.git
+        file: poco-catalog.yml
         branch: master
     another:
         repositoryType: git
-        url: https://github.com/shiwaforce/project-compose-example-another.git
-        file: project-catalog.yml
+        url: https://github.com/shiwaforce/poco-example-another.git
+        file: poco-catalog.yml
         branch: master
     workspace: /Users/john.doe/workspace
 
 Project catalog file
 --------------------
 
-It describes the lists of the projects and the location of the projects' project-compose files in YAML format.
+It describes the lists of the projects and the location of the projects' poco files in YAML format.
 
 Configuration:
  - keys: The name of the projects
  - git (optional): must be a valid GIT url for the project
  - svn (optional): must be a valid SVN url for the project
  - branch (optional): branch name - default : master
- - file (optional): path to the project-compose file. - Default : project-compose.yml
+ - file (optional): path to the poco file. - Default : poco.yml
  - repository-dir (optional): the base directory name where the project will be checked out. - Default: name of the project
  - ssh-key (optional): ssh file location for the Git repository - default: ~/.ssh/id_rsa
 
 If you don't define the repository it will be relative to the config file's location
 
-If the path ends with a name of a directory it will be extended with the default filename : project-compose.yml
+If the path ends with a name of a directory it will be extended with the default filename : poco.yml
 
 For example:
 ::
 
     test1:
-        git: https://github.com/shiwaforce/project-compose-example.git
+        git: https://github.com/shiwaforce/poco-example.git
         branch: master
     test2:
         svn: http://svn.apache.org/repos/test2/trunk
@@ -174,8 +178,8 @@ For example:
         git: ssh://git@git.example.com/test4/test4.git
         file: another/directory/anoter_compose.yml
 
-Project-compose file
---------------------
+Poco file
+---------
 
 It describes the project's hierarchy divided into several 'plans' in YAML format.
 
@@ -201,7 +205,7 @@ For example:
         - ls -l
     after_script:
         - ls -l
-    checkout: bankarmulato ssh://git@git.shiwaforce.com:7999/teszt/teszt.git
+    checkout: test ssh://git@git.shiwaforce.com:7999/test/test.git
     working-directory: microservice-all-war
     enviroment:
         include: conf/default.env
@@ -225,122 +229,115 @@ For example:
 Commands
 --------
 
-    **project-catalog add [<target-dir>] [<catalog>]**
+    **poco catalog add [<target-dir>] [<catalog>]**
 
-adds the current directory (or target directory) to the project-catalog - default or selected (if it is a Git repository)
+adds the current directory (or target directory) to the poco-catalog - default or selected (if it is a Git repository)
 
-    **project-catalog ls**
+    **poco catalog ls**
 
-lists the available projects (from the project catalog file)
+lists the available projects (from the poco-catalog file)
 
-    **project-catalog config**
+    **poco catalog config**
 
 prints the local config
 
-    **project-catalog branch <branch> [<catalog>] [-f]**
+    **poco catalog branch <branch> [<catalog>] [-f]**
 
-switches branch in the project-catalog (default is the name with 'default' or the first) repository, use -f to force
+switches branch in the poco-catalog (default is the name with 'default' or the first) repository, use -f to force
 
-    **project-catalog branches [<catalog>]**
+    **poco catalog branches [<catalog>]**
 
-lists the available project-catalog (default is the name with 'default' or the first) repository branches
+lists the available poco-catalog (default is the name with 'default' or the first) repository branches
 
-    **project-catalog push [<catalog>]**
+    **poco catalog push [<catalog>]**
 
-pushes project-catalog (default is the name with 'default' or the first) changes to the repository (if it is not a local file)
+pushes poco-catalog (default is the name with 'default' or the first) changes to the repository (if it is not a local file)
 
-    **project-catalog remove <project>**
+    **poco catalog remove <project>**
 
-removes selected project form the project-catalog
+removes selected project form the poco-catalog
 
-    **project-compose config <project> [plan]**
+    **poco config <project> [plan]**
 
 prints the full config for selected project with plan (docker-compose file with environment variables)
 
-    **project-compose clean**
+    **poco clean**
 
 cleans up all docker images, volumes and pulled repositories and data
 
-    **project-compose init <project>**
+    **poco init <project>**
 
 initialises selected project with the following steps:
-creates the project-compose file if it does not exist
+creates the poco file if it does not exist
 creates the docker-compose sample file if it does not exist
 
-    **project-compose install <project> [plan]**
+    **poco install <project> [plan]**
 
 installs selected project with selected plan
 gets project descriptors from repository
 
-    **project-compose up <project> [plan]**
+    **poco up <project> [plan]**
 
 starts the project with selected plan (if exists)
 installs if it isn't installed yet
 
-    **project-compose down <project> [plan]**
+    **poco down <project> [plan]**
 
 stops docker containers belonging the given project with selected plan
 
-    **project-compose build <project> [plan]**
+    **poco build <project> [plan]**
 
 builds docker images for the selected project with the specified plan
 
-    **project-compose ps <project> [plan]**
+    **poco ps <project> [plan]**
 
 lists the state of docker images in selected project
 
-    **project-compose plan ls <project>**
+    **poco plan ls <project>**
 
 lists available plans in selected projects
 
-    **project-compose pull <project> [plan]**
+    **poco pull <project> [plan]**
 
 pulls docker images for the specified project with the selected plan
 
-    **project-compose start <project> [plan]**
+    **poco start <project> [plan]**
 
 alternative for up
 
-    **project-compose stop <project> [plan]**
+    **poco stop <project> [plan]**
 
-stops docker containers which belongs to the specified project with selected plan
+alternative for down
 
-    **project-compose log <project> [plan]**
+    **poco restart <project>**
+
+restarts docker containers which belong to the selected project
+
+    **poco log <project> [plan]**
 
 prints log from docker containers which belongs to the specified project with selected plan
 
-    **project-compose logs <project> [plan]**
+    **poco logs <project> [plan]**
 
 prints log from docker containers which belongs to the specified project with selected plan
 
-    **project-compose branch <project> <branch>**
+    **poco branch <project> <branch>**
 
 switches branch in the specified project repository
 
-    **project-compose branches <project>**
+    **poco branches <project>**
 
-lists the available project-catalog repository branches
+lists the available project repository branches
 
-    **project-service start <project>**
-
-starts docker containers which belong to the selected project
-
-    **project-service stop <project>**
-
-stops docker containers which belong to the selected project
-
-    **project-service restart <project>**
-
-restarts docker containers which belong to the selected project
 
 Local uninstall
 ---------------
 
-Delete the egg file from the current Python site-packages (for example: sf_project_compose-0.3-py2.7)
+Delete the egg file from the current Python site-packages (for example: poco-0.15-py2.7)
 
 OSX
 """
-remove scripts from /usr/local/bin (project-catalog, project-compose, project-servive)
+remove script from /usr/local/bin (poco)
 
 License
 -------

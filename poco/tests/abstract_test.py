@@ -15,14 +15,14 @@ class AbstractTestSuite(unittest.TestCase):
     LOCAL_CONFIG = {
         'default': {
             'repositoryType': 'file',
-            'file': 'project-catalog.yml',
+            'file': 'poco-catalog.yml',
         }
     }
 
     REMOTE_CONFIG = {
       'default': {
         'repositoryType': 'git',
-        'file': 'project-catalog.yml',
+        'file': 'poco-catalog.yml',
         'server': 'https://github.com/shiwaforce/project-compose-example.git',
         'branch': 'master'
         }
@@ -52,9 +52,9 @@ class AbstractTestSuite(unittest.TestCase):
             sys.stdout, sys.stderr = old_out, old_err
 
     def setUp(self):
-        self.tmpdir = tempfile.mkdtemp(prefix='project-compose-home')
+        self.tmpdir = tempfile.mkdtemp(prefix='poco-home')
         self.config_file = os.path.join(self.tmpdir, 'config')
-        self.local_stack_list = os.path.join(self.tmpdir, 'project-catalog.yml')
+        self.local_stack_list = os.path.join(self.tmpdir, 'poco-catalog.yml')
         self.ws_dir = os.path.join(self.tmpdir, 'ws')
         os.makedirs(self.ws_dir)
 
