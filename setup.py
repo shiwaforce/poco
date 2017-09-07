@@ -39,6 +39,7 @@ setup_options = dict(
     packages=find_packages(exclude=['tests*']),
     package_data={'': ['poco.yml',
                        'docker-compose.yml',
+                       'command-hierarchy.yml',
                        'config']},
     include_package_data=True,
     install_requires=requires,

@@ -54,3 +54,13 @@ class ProjectUtils:
     def get_target_dir(work_dir, name, project_element):
         return os.path.join(work_dir, project_element.get('repository_dir', name))
 
+    @staticmethod
+    def get_list_value(value):
+        """Get list format, doesn't matter the config use one or list plan"""
+        lst = list()
+        if type(value) is list:
+            lst.extend(value)
+        else:
+            lst.append(value)
+        return lst
+

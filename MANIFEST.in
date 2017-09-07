@@ -3,3 +3,4 @@ include LICENCE
 recursive-include poco config
 recursive-include poco docker-compose.yml
 recursive-include poco poco.yml
+recursive-include poco command-hierarchy.yml

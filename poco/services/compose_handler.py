@@ -2,6 +2,7 @@ import os
 import yaml
 from .console_logger import *
 from .file_utils import FileUtils
+from .project_utils import ProjectUtils
 
 
 class ComposeHandler:
@@ -129,10 +130,10 @@ class ComposeHandler:
         selected_type = self.compose_project['plan'].get(self.plan)
         docker_files = list()
         if isinstance(selected_type, dict) and 'docker-compose-file' in selected_type:
-            for service in self.get_list_value(selected_type['docker-compose-file']):
+            for service in ProjectUtils.get_list_value(selected_type['docker-compose-file']):
                 docker_files.append(self.get_docker_compose(service=service, name=name, get_file=get_file))
         else:
-            for service in self.get_list_value(selected_type):
+            for service in ProjectUtils.get_list_value(selected_type):
                 docker_files.append(self.get_docker_compose(service=service, name=name, get_file=get_file))
         return docker_files
 
@@ -152,24 +153,14 @@ class ComposeHandler:
             command_array.append(commands)
         return command_array
 
-    def get_scripts(self, script_type):
-        """Get scripts """
-        self.get_compose_project()
-        scripts = list()
-        if script_type in self.compose_project:
-            scripts = self.get_list_value(self.compose_project[script_type])
-        if script_type in self.compose_project['plan'][self.plan]:
-            scripts.extend(self.get_list_value(self.compose_project['plan'][self.plan][script_type]))
-        return scripts
-
     def get_checkouts(self):
         """Get checkouts list from compose file"""
         self.get_compose_project()
         checkouts = list()
         if 'checkout' in self.compose_project:
-            checkouts = self.get_list_value(self.compose_project['checkout'])
+            checkouts = ProjectUtils.get_list_value(self.compose_project['checkout'])
         if 'checkout' in self.compose_project['plan'][self.plan]:
-            checkouts.extend(self.get_list_value(self.compose_project['plan'][self.plan]['checkout']))
+            checkouts.extend(ProjectUtils.get_list_value(self.compose_project['plan'][self.plan]['checkout']))
         return checkouts
 
     def get_plan_list(self, name):
@@ -182,12 +173,3 @@ class ComposeHandler:
         for key in self.compose_project['plan'].keys():
             ColorPrint.print_with_lvl(message=key, lvl=-1)
 
-    @staticmethod
-    def get_list_value(value):
-        """Get list format, doesn't matter the config use one or list plan"""
-        lst = list()
-        if type(value) is list:
-            lst.extend(value)
-        else:
-            lst.append(value)
-        return lst

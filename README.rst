@@ -11,8 +11,8 @@ Poco
     :target: https://pypi.python.org/pypi/poco
 
 .. image:: logo.jpg
-    :height: 400px
-    :width: 400px
+    :height: 200px
+    :width: 200px
 
 About
 -----

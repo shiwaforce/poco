@@ -70,3 +70,8 @@ class FileUtils:
                                                              " not a valid git repository")
             return FileUtils.get_git_repo(os.path.dirname(base_dir))
 
+    @staticmethod
+    def get_compose_file_relative_path(repo_dir, working_directory, file_name):
+        """return the compose file relative path from repository root"""
+        return os.path.join(FileUtils.get_relative_path(repo_dir, working_directory), file_name)
+

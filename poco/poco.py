@@ -41,7 +41,7 @@ import shutil
 import sys
 import yaml
 from docopt import docopt
-from subprocess import Popen, call, check_call, PIPE
+from subprocess import Popen, call, PIPE
 from .services.catalog_handler import CatalogHandler
 from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
@@ -50,9 +50,10 @@ from .services.file_utils import FileUtils
 from .services.git_repository import GitRepository
 from .services.project_utils import ProjectUtils
 from .services.console_logger import ColorPrint
+from .services.command_handler import CommandHandler
 
 
-__version__ = '0.16.0'
+__version__ = '0.17.0'
 
 
 class Poco(object):
@@ -61,6 +62,7 @@ class Poco(object):
     catalog_handler = None
     project_utils = None
     compose_handler = None
+    command_handler = None
 
     '''project name'''
     name = None
@@ -132,9 +134,6 @@ class Poco(object):
                 self.remove_from_catalog(self.arguments)
                 return
 
-            '''Get project name'''
-            self.name = self.arguments.get('<project>')
-
             if self.has_attributes('branches'):
                 self.print_branches(repo=self.get_project_repository())
                 return
@@ -158,7 +157,9 @@ class Poco(object):
                 self.init()
                 '''Init compose handler'''
                 self.init_compose_handler(arguments=self.arguments)
-                self.run_scripts(script_type="init_script")
+                CommandHandler(args=self.arguments,
+                               compose_handler=self.compose_handler,
+                               project_utils=self.project_utils).run_script("init_script")
                 return
 
             '''Init compose handler'''
@@ -166,50 +167,46 @@ class Poco(object):
 
             if self.has_attributes('plan', 'ls'):
                 self.compose_handler.get_plan_list(name=self.name)
+                return
+
+            self.command_handler = CommandHandler(args=self.arguments,
+                                                  compose_handler=self.compose_handler,
+                                                  project_utils=self.project_utils)
 
             if self.has_attributes('config'):
-                self.run_scripts(script_type="before_script")
-                self.run_docker_command(commands="config")
+                self.command_handler.run('config')
 
             if self.has_attributes('build'):
                 self.run_before(offline=offline)
-                self.run_docker_command(commands="build")
+                self.command_handler.run('build')
                 ColorPrint.print_info("Project built")
 
             if self.has_attributes('up') or self.has_attributes('start'):
                 self.run_before(offline=offline)
-                self.run_docker_command(commands="build")
-                self.run_docker_command(commands="config")
-                self.run_docker_command(commands=["up", "-d"])
-                self.run_docker_command(commands="logs")
-                self.run_docker_command(commands="ps")
-                self.run_after()
+                self.command_handler.run('up')
 
             if self.has_attributes('restart'):
                 self.run_before(offline=offline)
-                self.run_docker_command(commands="restart")
-                self.run_after()
+                self.command_handler.run('restart')
 
             if self.has_attributes('down'):
-                self.run_docker_command(commands=["down", "--remove-orphans"])
+                self.command_handler.run('down')
                 ColorPrint.print_info("Project stopped")
 
             if self.has_attributes('ps'):
                 self.run_before(offline=offline)
-                self.run_docker_command(commands="ps")
-                self.run_after()
+                self.command_handler.run('ps')
 
             if self.has_attributes('pull'):
                 self.run_before(offline=offline)
-                self.run_docker_command(commands="pull")
+                self.command_handler.run('pull')
                 ColorPrint.print_info("Project pull complete")
 
             if self.has_attributes('stop'):
-                self.run_docker_command(commands="stop")
-                self.run_after()
+                self.command_handler.run('stop')
 
             if self.has_attributes('logs') or self.has_attributes('log'):
-                self.run_docker_command(commands=["logs", "-f"])
+                self.command_handler.run('logs')
 
         except Exception as ex:
             ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
@@ -255,25 +252,9 @@ class Poco(object):
                                               plan=arguments.get('<plan>'),
                                               repo_dir=repo_dir)
 
-    def run_docker_command(self, commands):
-        cmd = self.compose_handler.get_command(name=self.name, commands=commands, get_file=self.project_utils.get_file)
-        ColorPrint.print_with_lvl(message="Docker command: " + str(cmd), lvl=1)
-        call(cmd,
-             cwd=self.compose_handler.get_working_directory(),
-             env=self.compose_handler.get_environment_variables(name=self.name, get_file=self.project_utils.get_file))
-
     def run_before(self, offline):
-        self.run_scripts(script_type="before_script")
+        #self.save_docker_config()
         self.run_checkouts(offline=offline)
-        self.save_docker_config()
-
-    def run_after(self):
-        call(["docker", "ps"])
-        self.run_scripts(script_type="after_script")
-
-    def run_scripts(self, script_type):
-        for script in self.compose_handler.get_scripts(script_type=script_type):
-            check_call(script.split(' '), cwd=self.compose_handler.get_working_directory())
 
     def run_checkouts(self, offline):
         for checkout in self.compose_handler.get_checkouts():
@@ -311,7 +292,9 @@ class Poco(object):
         self.name = arguments.get('<project>')
         if self.name in self.catalog_handler.get_catalog():
             if self.get_compose_file(silent=True) is not None:
-                self.run_scripts(script_type="remove_script")
+                CommandHandler(args=self.arguments,
+                               compose_handler=self.compose_handler,
+                               project_utils=self.project_utils).run_script("remove_script")
         self.catalog_handler.remove_from_list(name=self.name)
 
     def set_branch(self, branch, force=False):
@@ -376,6 +359,7 @@ class Poco(object):
 
 def main():
     poco = Poco()
+
     poco.run()
 
 if __name__ == '__main__':

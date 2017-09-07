@@ -1,0 +1,45 @@
+{
+  config: {
+    before: true,
+    docker: ["config"]
+  },
+  build: {
+    before: true,
+    docker: ["build"]
+  },
+  up: {
+    before: true,
+    docker: ["build", "config", ["up", "-d"], "logs", "ps"],
+    after: true
+  },
+  start: {
+    before: true,
+    docker: ["build", "config", ["up", "-d"], "logs", "ps"],
+    after: true
+  },
+  restart: {
+    before: true,
+    docker: ["restart", "ps"],
+    after: true
+  },
+  down: {
+    docker: [["down", "--remove-orphans"]]
+  },
+  ps: {
+    before: true,
+    docker: ["ps"],
+    after: true
+  },
+  pull: {
+    before: true,
+    docker: ["ps"],
+    after: true
+  },
+  stop: {
+    docker: ["stop", "ps"],
+    after: true
+  },
+  logs: {
+    docker: [["logs", "-f"]]
+  }
+}

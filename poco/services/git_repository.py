@@ -34,6 +34,7 @@ class GitRepository(AbstractRepository):
     def set_branch(self, branch, force):
         try:
             if branch not in self.repo.branches and branch == 'master':
+                print(self.repo.branches)
                 '''Make init commit'''
                 self.repo.index.add(["*"])
                 self.repo.index.commit("init")
@@ -58,7 +59,8 @@ class GitRepository(AbstractRepository):
         if self.repo is None:
             ColorPrint.exit_after_print_messages(message="It is not an git repository: " + self.target_dir)
         if not self.check_remote(self.repo.remotes.origin.url):
-            ColorPrint.print_with_lvl(message="Remote repository " + self.repo.remotes.origin.url + " not accessible. Maybe not up to date ", lvl=1)
+            ColorPrint.print_with_lvl(message="Remote repository " + self.repo.remotes.origin.url +
+                                              " not accessible. Maybe not up to date ")
             return str(self.repo.active_branch)
         ColorPrint.print_with_lvl(message="Repository " + self.repo.remotes.origin.url + " with "
                                           + str(self.repo.active_branch) + " branch pull response:", lvl=1)
