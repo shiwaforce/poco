@@ -1,8 +1,8 @@
 Poco
 ====
 
-.. image:: https://travis-ci.org/shiwaforce/project-compose.svg?branch=master
-    :target: https://travis-ci.org/shiwaforce/project-compose
+.. image:: https://travis-ci.org/shiwaforce/poco.svg?branch=master
+    :target: https://travis-ci.org/shiwaforce/poco
 
 .. image:: https://img.shields.io/pypi/v/poco.svg
     :target: https://pypi.python.org/pypi/poco
