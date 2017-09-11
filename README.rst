@@ -31,8 +31,8 @@ Requirements
 Quick start
 ===========
 
-.. image:: https://asciinema.org/a/131956.png
-    :target: https://asciinema.org/a/131956
+.. image:: https://asciinema.org/a/137166.png
+    :target: https://asciinema.org/a/137166
 
 Install the latest poco:
 
