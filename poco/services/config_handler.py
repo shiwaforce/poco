@@ -3,6 +3,7 @@ import shutil
 from .abstract_yaml import AbstractYamlHandler
 from .console_logger import Doc, ColorPrint
 from .file_utils import FileUtils
+from .state import StateHolder
 
 
 class ConfigHandler(AbstractYamlHandler):
@@ -10,16 +11,15 @@ class ConfigHandler(AbstractYamlHandler):
     config = None
     work_dir = None
 
-    def __init__(self, home_dir):
+    def __init__(self):
         self.parsed = False
-        self.home_dir = home_dir
-        self.log_dir = os.path.join(self.home_dir, 'logs')
-        super(ConfigHandler, self).__init__(os.path.join(self.home_dir, 'config'))
+        StateHolder.log_dir = os.path.join(StateHolder.home_dir, 'logs')
+        super(ConfigHandler, self).__init__(os.path.join(StateHolder.home_dir, 'config'))
 
         if not self.exists():
             self.init()
-        if not os.path.exists(self.log_dir):
-            os.mkdir(self.log_dir)
+        if not os.path.exists(StateHolder.log_dir):
+            os.mkdir(StateHolder.log_dir)
 
     def read(self):
         """Parse local configuration file"""
@@ -63,14 +63,14 @@ class ConfigHandler(AbstractYamlHandler):
         return self.work_dir
 
     def exists(self):
-        return os.path.exists(path=self.home_dir) and os.path.exists(path=self.file)
+        return os.path.exists(path=StateHolder.home_dir) and os.path.exists(path=self.file)
 
     def init(self):
         """Check home directory"""
         if not self.exists():
             ColorPrint.print_info(message="Default configuration initialized: " + str(self.file))
-            if not os.path.exists(self.home_dir):
-                os.mkdir(self.home_dir)
+            if not os.path.exists(StateHolder.home_dir):
+                os.mkdir(StateHolder.home_dir)
             if not os.path.exists(self.file):
                 src_file = os.path.join(os.path.dirname(__file__), 'resources/config')
                 shutil.copyfile(src=src_file, dst=self.file)
@@ -82,6 +82,6 @@ class ConfigHandler(AbstractYamlHandler):
             if type(conf) is not dict:
                 continue
             if conf.get("repositoryType", "file") is "file":
-                FileUtils.make_empty_file_with_empty_dict(directory=self.home_dir,
+                FileUtils.make_empty_file_with_empty_dict(directory=StateHolder.home_dir,
                                                           file=conf.get('file', 'poco-catalog.yml'))
 

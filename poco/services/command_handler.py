@@ -4,6 +4,7 @@ from subprocess import check_call, call
 from .console_logger import ColorPrint, Doc
 from .file_utils import FileUtils
 from .project_utils import ProjectUtils
+from .state import StateHolder
 
 
 class CommandHandler(object):
@@ -18,7 +19,6 @@ class CommandHandler(object):
                                                      doc=Doc.POCO)
 
         self.args = args
-        self.name = self.args.get('<project>')
         self.compose_handler = compose_handler
         compose_handler.get_compose_project()
         self.project_compose = self.compose_handler.compose_project
@@ -58,7 +58,7 @@ class CommandHandler(object):
             self.script_runner.run(plan=plan, script_type='script')
         else:
             for cmd in command_list['docker']:
-                self.docker_runner.run(name=self.name, plan=plan, commands=cmd,
+                self.docker_runner.run(name=StateHolder.name, plan=plan, commands=cmd,
                                        envs=self.get_environment_variables(plan=plan))
 
         if command_list.get('after', False):
@@ -69,11 +69,11 @@ class CommandHandler(object):
         file_name = FileUtils.get_compose_file_relative_path(repo_dir=self.repo_dir,
                                                              working_directory=self.working_directory,
                                                              file_name=path)
-        env_file = self.project_utils.get_file(name=self.name, file=file_name)
+        env_file = self.project_utils.get_file(file=file_name)
         if env_file is None:
             ColorPrint.exit_after_print_messages(
                 message="Environment file (" + str(file_name) + ") not exists in repository: "
-                        + self.name)
+                        + StateHolder.name)
         with open(env_file) as stream:
             for line in stream.readlines():
                 if not line.startswith("#"):
@@ -198,8 +198,7 @@ class DockerPlanRunner(AbstractPlanRunner):
     def get_docker_compose(self, service, name):
         """Get back the docker compose file"""
         file_name = self.get_compose_file_name(service=service)
-        compose_file = self.project_utils.get_file(name=name,
-                                                   file=FileUtils.get_compose_file_relative_path(
+        compose_file = self.project_utils.get_file(file=FileUtils.get_compose_file_relative_path(
                                                        repo_dir=self.repo_dir, working_directory=self.working_directory,
                                                        file_name=file_name))
         if compose_file is None:

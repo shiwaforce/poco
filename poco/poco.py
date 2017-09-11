@@ -41,7 +41,7 @@ import shutil
 import sys
 import yaml
 from docopt import docopt
-from subprocess import Popen, call, PIPE
+from subprocess import Popen, PIPE
 from .services.catalog_handler import CatalogHandler
 from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
@@ -51,6 +51,7 @@ from .services.git_repository import GitRepository
 from .services.project_utils import ProjectUtils
 from .services.console_logger import ColorPrint
 from .services.command_handler import CommandHandler
+from .services.state import StateHolder
 
 
 __version__ = '0.17.0'
@@ -63,156 +64,154 @@ class Poco(object):
     project_utils = None
     compose_handler = None
     command_handler = None
+    state = StateHolder
 
-    '''project name'''
-    name = None
-
-    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.poco'), skip_docker=False,
+    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.poco'),
                  argv=sys.argv[1:]):
-        self.home_dir = home_dir
-        self.skip_docker = skip_docker
-        if not skip_docker:
+
+        """Fill state"""
+
+        self.state.home_dir = home_dir
+        if not self.state.skip_docker:
             self.check_docker()
         self.arguments = docopt(__doc__, version=__version__, argv=argv)
         ColorPrint.set_log_level(self.arguments)
-        ''' Parse config '''
-        self.config_handler = ConfigHandler(home_dir=self.home_dir)
+
+        if self.arguments.get('<project>') is None:
+            self.arguments['<project>'] = FileUtils.get_directory_name()
+        self.state.name = self.arguments.get('<project>')
+        self.state.offline = self.arguments.get("--offline")
+
+        """Parse config """
+        self.config_handler = ConfigHandler()
 
     def run(self):
-        try:
-            if self.has_attributes('catalog', 'config'):
-                ColorPrint.print_info(message=yaml.dump(
-                    data=self.config_handler.get_config(), default_flow_style=False, default_style='', indent=4),
-                    lvl=-1)
-                return
+        #try:
+        if self.has_attributes('catalog', 'config'):
+            ColorPrint.print_info(message=yaml.dump(
+                data=self.config_handler.get_config(), default_flow_style=False, default_style='', indent=4),
+                lvl=-1)
+            return
 
-            offline = self.arguments.get("--offline")
+        """Parse catalog"""
+        self.catalog_handler = CatalogHandler(config=self.config_handler.get_config())
 
-            '''Parse catalog'''
-            self.catalog_handler = CatalogHandler(home_dir=self.home_dir, config=self.config_handler.get_config(),
-                                                  offline=offline)
+        if self.has_attributes('catalog', 'ls'):
+            self.print_ls()
+            return
+        if self.has_attributes('catalog', 'branches'):
+            self.print_branches(repo=self.catalog_handler.get_catalog_repository(self.arguments.get('<catalog>')))
+            return
+        if self.has_attributes('catalog', 'branch'):
+            branch = self.arguments.get('<branch>')
+            self.set_branch(branch=branch, force=self.arguments.get("-f"))
+            ColorPrint.print_info("Branch changed")
+            return
+        if self.has_attributes('catalog', 'push'):
+            self.catalog_handler.push(self.arguments.get('<catalog>'))
+            ColorPrint.print_info("Push completed")
+            return
+        if self.has_attributes('catalog', 'add'):
+            target_dir = FileUtils.get_normalized_dir(self.arguments.get('<target-dir>'))
+            repo, repo_dir = FileUtils.get_git_repo(target_dir)
+            self.add_to_catalog(target_dir=target_dir, repo_dir=repo_dir, repo=repo,
+                                catalog=self.arguments.get('<catalog>'))
+            ColorPrint.print_info("Project added")
+            return
 
-            if self.has_attributes('catalog', 'ls'):
-                self.print_ls()
-                return
-            if self.has_attributes('catalog', 'branches'):
-                self.print_branches(repo=self.catalog_handler.get_catalog_repository(self.arguments.get('<catalog>')))
-                return
-            if self.has_attributes('catalog', 'branch'):
-                branch = self.arguments.get('<branch>')
-                self.set_branch(branch=branch, force=self.arguments.get("-f"))
-                ColorPrint.print_info("Branch changed")
-                return
-            if self.has_attributes('catalog', 'push'):
-                self.catalog_handler.push(self.arguments.get('<catalog>'))
-                ColorPrint.print_info("Push completed")
-                return
-            if self.has_attributes('catalog', 'add'):
-                target_dir = FileUtils.get_normalized_dir(self.arguments.get('<target-dir>'))
-                repo, repo_dir = FileUtils.get_git_repo(target_dir)
-                self.add_to_catalog(target_dir=target_dir, repo_dir=repo_dir, repo=repo,
-                                    catalog=self.arguments.get('<catalog>'))
-                ColorPrint.print_info("Project added")
-                return
+        '''Handling top level commands'''
+        if self.has_attributes('clean'):
+            CleanHandler().clean()
+            ColorPrint.exit_after_print_messages(message="Clean complete", msg_type="info")
+            return
 
-            if self.arguments.get('<project>') is None:
-                self.arguments['<project>'] = FileUtils.get_directory_name()
-            self.name = self.arguments.get('<project>')
+        '''Init project utils'''
+        self.project_utils = ProjectUtils(work_dir=self.config_handler.get_work_dir())
 
-            '''Handling top level commands'''
-            if self.has_attributes('clean'):
-                CleanHandler().clean()
-                ColorPrint.exit_after_print_messages(message="Clean complete", msg_type="info")
-                return
+        if self.has_attributes('catalog', 'remove'):
+            ColorPrint.print_info("Project removed")
+            self.remove_from_catalog(self.arguments)
+            return
 
-            '''Init project utils'''
-            self.project_utils = ProjectUtils(home_dir=self.home_dir, work_dir=self.config_handler.get_work_dir(),
-                                              offline=offline)
+        if self.has_attributes('branches'):
+            self.print_branches(repo=self.get_project_repository())
+            return
 
-            if self.has_attributes('catalog', 'remove'):
-                ColorPrint.print_info("Project removed")
-                self.remove_from_catalog(self.arguments)
-                return
+        if self.has_attributes('branch'):
+            branch = self.arguments.get('<branch>')
+            repo = self.get_project_repository()
+            repo.set_branch(branch=branch, force=self.arguments.get("-f"))
+            project_descriptor = self.catalog_handler.get()
+            project_descriptor['branch'] = branch
+            self.catalog_handler.set(modified=project_descriptor)
+            ColorPrint.print_info(message="Branch changed")
+            return
 
-            if self.has_attributes('branches'):
-                self.print_branches(repo=self.get_project_repository())
-                return
+        if self.has_attributes('install'):
+            self.get_project_repository()
+            ColorPrint.print_info("Project installed")
+            return
 
-            if self.has_attributes('branch'):
-                branch = self.arguments.get('<branch>')
-                repo = self.get_project_repository()
-                repo.set_branch(branch=branch, force=self.arguments.get("-f"))
-                project_descriptor = self.catalog_handler.get(name=self.name)
-                project_descriptor['branch'] = branch
-                self.catalog_handler.set(name=self.name, modified=project_descriptor)
-                ColorPrint.print_info(message="Branch changed")
-                return
-
-            if self.has_attributes('install'):
-                self.get_project_repository()
-                ColorPrint.print_info("Project installed")
-                return
-
-            if self.has_attributes('init'):
-                self.init()
-                '''Init compose handler'''
-                self.init_compose_handler(arguments=self.arguments)
-                CommandHandler(args=self.arguments,
-                               compose_handler=self.compose_handler,
-                               project_utils=self.project_utils).run_script("init_script")
-                return
-
+        if self.has_attributes('init'):
+            self.init()
             '''Init compose handler'''
             self.init_compose_handler(arguments=self.arguments)
+            CommandHandler(args=self.arguments,
+                           compose_handler=self.compose_handler,
+                           project_utils=self.project_utils).run_script("init_script")
+            return
 
-            if self.has_attributes('plan', 'ls'):
-                self.compose_handler.get_plan_list(name=self.name)
-                return
+        '''Init compose handler'''
+        self.init_compose_handler(arguments=self.arguments)
 
-            self.command_handler = CommandHandler(args=self.arguments,
-                                                  compose_handler=self.compose_handler,
-                                                  project_utils=self.project_utils)
+        if self.has_attributes('plan', 'ls'):
+            self.compose_handler.get_plan_list()
+            return
 
-            if self.has_attributes('config'):
-                self.command_handler.run('config')
+        self.command_handler = CommandHandler(args=self.arguments,
+                                              compose_handler=self.compose_handler,
+                                              project_utils=self.project_utils)
 
-            if self.has_attributes('build'):
-                self.run_before(offline=offline)
-                self.command_handler.run('build')
-                ColorPrint.print_info("Project built")
+        if self.has_attributes('config'):
+            self.command_handler.run('config')
 
-            if self.has_attributes('up') or self.has_attributes('start'):
-                self.run_before(offline=offline)
-                self.command_handler.run('up')
+        if self.has_attributes('build'):
+            self.run_before()
+            self.command_handler.run('build')
+            ColorPrint.print_info("Project built")
 
-            if self.has_attributes('restart'):
-                self.run_before(offline=offline)
-                self.command_handler.run('restart')
+        if self.has_attributes('up') or self.has_attributes('start'):
+            self.run_before()
+            self.command_handler.run('up')
 
-            if self.has_attributes('down'):
-                self.command_handler.run('down')
-                ColorPrint.print_info("Project stopped")
+        if self.has_attributes('restart'):
+            self.run_before()
+            self.command_handler.run('restart')
 
-            if self.has_attributes('ps'):
-                self.run_before(offline=offline)
-                self.command_handler.run('ps')
+        if self.has_attributes('down'):
+            self.command_handler.run('down')
+            ColorPrint.print_info("Project stopped")
 
-            if self.has_attributes('pull'):
-                self.run_before(offline=offline)
-                self.command_handler.run('pull')
-                ColorPrint.print_info("Project pull complete")
+        if self.has_attributes('ps'):
+            self.run_before()
+            self.command_handler.run('ps')
 
-            if self.has_attributes('stop'):
-                self.command_handler.run('stop')
+        if self.has_attributes('pull'):
+            self.run_before()
+            self.command_handler.run('pull')
+            ColorPrint.print_info("Project pull complete")
 
-            if self.has_attributes('logs') or self.has_attributes('log'):
-                self.command_handler.run('logs')
+        if self.has_attributes('stop'):
+            self.command_handler.run('stop')
 
-        except Exception as ex:
-            ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
+        if self.has_attributes('logs') or self.has_attributes('log'):
+            self.command_handler.run('logs')
+
+        #except Exception as ex:
+        #    ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
 
     def init(self):
-        project_element = self.get_catalog(self.name)
+        project_element = self.get_catalog()
         repo = self.get_project_repository()
         file = repo.get_file(project_element.get('file', 'poco.yml'))
 
@@ -231,52 +230,50 @@ class Poco(object):
                 return False
         return True
 
-    def get_catalog(self, name):
-        return self.catalog_handler.get(name=name)
+    def get_catalog(self):
+        return self.catalog_handler.get()
 
     def get_compose_file(self, silent=False):
-        catalog = self.get_catalog(self.name)
-        return self.project_utils.get_compose_file(name=self.name, project_element=catalog,
+        catalog = self.get_catalog()
+        return self.project_utils.get_compose_file(project_element=catalog,
                                                    ssh=self.get_node(catalog, ["ssh-key"]), silent=silent)
 
     def get_project_repository(self):
-        catalog = self.get_catalog(self.name)
-        return self.project_utils.get_project_repository(name=self.name, project_element=catalog,
+        catalog = self.get_catalog()
+        return self.project_utils.get_project_repository(project_element=catalog,
                                                          ssh=self.get_node(catalog, ["ssh-key"]))
 
     def init_compose_handler(self, arguments):
         compose_file = self.get_compose_file()
-        repo_dir = self.project_utils.get_target_dir(self.config_handler.get_work_dir(), self.name,
-                                                     self.catalog_handler.get(name=self.name))
+        repo_dir = self.project_utils.get_target_dir(self.config_handler.get_work_dir(),
+                                                     self.catalog_handler.get())
         self.compose_handler = ComposeHandler(compose_file=compose_file,
                                               plan=arguments.get('<plan>'),
                                               repo_dir=repo_dir)
 
-    def run_before(self, offline):
-        #self.save_docker_config()
-        self.run_checkouts(offline=offline)
+    def run_before(self):
+        self.save_docker_config()
+        self.run_checkouts()
 
-    def run_checkouts(self, offline):
+    def run_checkouts(self):
         for checkout in self.compose_handler.get_checkouts():
             if " " not in checkout:
                 ColorPrint.exit_after_print_messages(message="Wrong checkout command: " + checkout)
             directory, repository = checkout.split(" ")
             target_dir = os.path.join(self.compose_handler.get_working_directory(), directory)
-            if not offline:
+            if not self.state.offline:
                 GitRepository(target_dir=target_dir, url=repository, branch="master")
             if not os.path.exists(target_dir):
                 ColorPrint.exit_after_print_messages("checkout directory is empty: " + str(directory))
 
     def save_docker_config(self):
-        p = Popen(self.compose_handler.get_command(name=self.name, commands="config",
-                  get_file=self.project_utils.get_file),
+        p = Popen(self.compose_handler.get_command(commands="config",
+                                                   get_file=self.project_utils.get_file),
                   cwd=self.compose_handler.get_working_directory(),
-                  env=self.compose_handler.get_environment_variables(name=self.name,
-                                                                     get_file=self.project_utils.get_file),
+                  env=self.compose_handler.get_environment_variables(get_file=self.project_utils.get_file),
                   stdout=PIPE, stderr=PIPE)
         out, err = p.communicate()
-        FileUtils.write_compose_log(directory=self.config_handler.log_dir, project=self.name,
-                                    data=err if len(err) > 0 else out)
+        FileUtils.write_compose_log(directory=self.state.log_dir, data=err if len(err) > 0 else out)
 
     def add_to_catalog(self, target_dir, repo_dir, repo, catalog=None):
         file_prefix = ""
@@ -289,13 +286,13 @@ class Poco(object):
                                          repo_name=repo_name)
 
     def remove_from_catalog(self, arguments):
-        self.name = arguments.get('<project>')
-        if self.name in self.catalog_handler.get_catalog():
+        self.state.name = arguments.get('<project>')
+        if self.state.name in self.catalog_handler.get_catalog():
             if self.get_compose_file(silent=True) is not None:
                 CommandHandler(args=self.arguments,
                                compose_handler=self.compose_handler,
                                project_utils=self.project_utils).run_script("remove_script")
-        self.catalog_handler.remove_from_list(name=self.name)
+        self.catalog_handler.remove_from_list()
 
     def set_branch(self, branch, force=False):
         catalog = self.arguments.get('<catalog>')
@@ -329,7 +326,7 @@ class Poco(object):
                     if os.path.exists(os.path.join(
                             self.config_handler.get_work_dir(),
                             lst[cat][key]["repository_dir"] if "repository_dir" in lst[cat][key] else key)):
-                            msg += " (*)"
+                        msg += " (*)"
                     ColorPrint.print_with_lvl(message=msg, lvl=-1)
         else:
             ColorPrint.print_with_lvl(
@@ -359,7 +356,6 @@ class Poco(object):
 
 def main():
     poco = Poco()
-
     poco.run()
 
 if __name__ == '__main__':

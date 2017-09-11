@@ -23,21 +23,21 @@ class AbstractTestSuite(unittest.TestCase):
       'default': {
         'repositoryType': 'git',
         'file': 'poco-catalog.yml',
-        'server': 'https://github.com/shiwaforce/project-compose-example.git',
+        'server': 'https://github.com/shiwaforce/poco-example.git',
         'branch': 'master'
         }
     }
 
     STACK_LIST_SAMPLE = {
         'nginx': {
-            'file': 'nginx/project-compose.yml',
-            'git': 'https://github.com/shiwaforce/project-compose-example.git',
-            'repository_dir': 'project-compose-example'
+            'file': 'nginx/poco-compose.yml',
+            'git': 'https://github.com/shiwaforce/poco-example.git',
+            'repository_dir': 'poco-example'
         },
         'mysql': {
-            'file': 'mysql/project-compose.yml',
-            'git': 'https://github.com/shiwaforce/project-compose-example.git',
-            'repository_dir': 'project-compose-example'
+            'file': 'mysql/poco-compose.yml',
+            'git': 'https://github.com/shiwaforce/poco-example.git',
+            'repository_dir': 'poco-example'
         }
     }
 

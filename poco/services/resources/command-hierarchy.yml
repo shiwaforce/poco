@@ -23,7 +23,8 @@
     after: true
   },
   down: {
-    docker: [["down", "--remove-orphans"]]
+    docker: [["down", "--remove-orphans"]],
+    after: true
   },
   ps: {
     before: true,

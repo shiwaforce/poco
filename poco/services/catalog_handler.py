@@ -5,18 +5,18 @@ from .file_repository import FileRepository
 from .git_repository import GitRepository
 from .svn_repository import SvnRepository
 from .environment_utils import EnvironmentUtils
+from .state import StateHolder
 
 
 class CatalogHandler:
 
-    def __init__(self, home_dir, config, offline):
+    def __init__(self, config):
 
         self.config = config
         self.catalog_repositories = dict()
         self.default_repository = None
 
         self.catalogs = None
-        self.offline_mode = offline
         for key in config.keys():
             # TODO refactor
             if key == 'workspace':
@@ -24,15 +24,15 @@ class CatalogHandler:
             conf = config[key]
             repo = self.get_repository_type(conf)
 
-            if self.offline_mode and repo in ('git', 'svn'):
-                repository = FileRepository(target_dir=path.join(home_dir, 'catalogHome', key))
+            if StateHolder.offline and repo in ('git', 'svn'):
+                repository = FileRepository(target_dir=path.join(StateHolder.home_dir, 'catalogHome', key))
             elif 'git' == repo:
-                repository = GitRepository(target_dir=path.join(home_dir, 'catalogHome', key), url=self.get_url(conf),
+                repository = GitRepository(target_dir=path.join(StateHolder.home_dir, 'catalogHome', key), url=self.get_url(conf),
                                            branch=self.get_branch(conf), git_ssh_identity_file=conf.get("ssh-key"))
             elif 'svn' == repo:
-                repository = SvnRepository(target_dir=path.join(home_dir, 'catalogHome', key), url=self.get_url(conf))
+                repository = SvnRepository(target_dir=path.join(StateHolder.home_dir, 'catalogHome', key), url=self.get_url(conf))
             else:
-                repository = FileRepository(target_dir=home_dir)
+                repository = FileRepository(target_dir=StateHolder.home_dir)
 
             if self.default_repository is None or key == 'default':
                 self.default_repository = CatalogData(config=conf, repository=repository)
@@ -65,18 +65,18 @@ class CatalogHandler:
             self.catalog_repositories[catalog].repository.write_yaml_file(self.get_catalog_file(
                 self.catalog_repositories[catalog].config), string_format)
 
-    def get(self, name):
+    def get(self):
         """Get project parameters form catalog, if it is exists"""
         for catalog in self.get_catalog():
-            if name in self.catalogs[catalog]:
-                return self.catalogs[catalog].get(name)
-        ColorPrint.exit_after_print_messages(message="Project with name: %s not exist" % name)
+            if StateHolder.name in self.catalogs[catalog]:
+                return self.catalogs[catalog].get(StateHolder.name)
+        ColorPrint.exit_after_print_messages(message="Project with name: %s not exist" % StateHolder.name)
 
-    def set(self, name, modified):
+    def set(self, modified):
         """Set project parameters and write, if it is exists"""
         for catalog in self.get_catalog():
-            if name in self.catalogs[catalog]:
-                self.catalogs[catalog][name] = modified
+            if StateHolder.name in self.catalogs[catalog]:
+                self.catalogs[catalog][StateHolder.name] = modified
             self.write_catalog(catalog)
 
     def add_to_list(self, name, handler, url, catalog, file=None, repo_name=None):
@@ -94,16 +94,16 @@ class CatalogHandler:
             lst[name]['repository_dir'] = repo_name
         self.write_catalog(catalog=catalog)
 
-    def remove_from_list(self, name):
+    def remove_from_list(self):
         """Remove project from catalog"""
 
         for catalog in self.get_catalog():
             lst = self.catalogs[catalog]
-            if name in lst:
-                lst.pop(name)
+            if StateHolder.name in lst:
+                lst.pop(StateHolder.name)
                 self.write_catalog(catalog=catalog)
                 return
-        ColorPrint.exit_after_print_messages(message="Project not exists in catalog: " + name)
+        ColorPrint.exit_after_print_messages(message="Project not exists in catalog: " + StateHolder.name)
 
     def get_catalog_repository(self, catalog=None):
         if catalog is None:

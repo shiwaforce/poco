@@ -3,6 +3,7 @@ import git
 import os
 import yaml
 from .console_logger import ColorPrint
+from .state import StateHolder
 
 
 class FileUtils:
@@ -27,8 +28,8 @@ class FileUtils:
                 stream.write(yaml.dump(data=content, default_flow_style=False))
 
     @staticmethod
-    def write_compose_log(directory, project, data):
-        file = os.path.join(directory, project + "-" + datetime.datetime.now().strftime("%Y.%m.%d-%H-%M-%S") + ".log")
+    def write_compose_log(directory, data):
+        file = os.path.join(directory, StateHolder.name + "-" + datetime.datetime.now().strftime("%Y.%m.%d-%H-%M-%S") + ".log")
         if not os.path.exists(file):
             with open(file, 'w') as stream:
                 stream.write(str(data))

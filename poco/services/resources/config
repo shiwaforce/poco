@@ -2,4 +2,4 @@ default:
   branch: master
   file: poco-catalog.yml
   repositoryType: git
-  server: https://github.com/shiwaforce/project-compose-example.git
+  server: https://github.com/shiwaforce/poco-example.git
