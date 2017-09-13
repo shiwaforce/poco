@@ -1,43 +1,40 @@
 import os
 import shutil
-from .abstract_yaml import AbstractYamlHandler
 from .console_logger import Doc, ColorPrint
 from .file_utils import FileUtils
 from .state import StateHolder
+from .yaml_handler import YamlHandler
 
 
-class ConfigHandler(AbstractYamlHandler):
+class ConfigHandler(object):
 
     config = None
-    work_dir = None
 
     def __init__(self):
-        self.parsed = False
-        StateHolder.log_dir = os.path.join(StateHolder.home_dir, 'logs')
-        super(ConfigHandler, self).__init__(os.path.join(StateHolder.home_dir, 'config'))
+        StateHolder.config_parsed = False
 
-        if not self.exists():
+        if not ConfigHandler.exists():
             self.init()
         if not os.path.exists(StateHolder.log_dir):
             os.mkdir(StateHolder.log_dir)
 
     def read(self):
         """Parse local configuration file"""
-        if not self.parsed:
-            self.config = super(ConfigHandler, self).read(doc=Doc.CONFIG)
+        if not StateHolder.config_parsed:
+            self.config = YamlHandler.read(file=StateHolder.config_file, doc=Doc.CONFIG)
 
             if not type(self.config) is dict:
                 self.config['default'] = {}
 
             if 'workspace' not in self.config:
-                self.work_dir = os.path.join(os.path.expanduser(path='~'), 'workspace')
-                self.config['workspace'] = self.work_dir
-                super(ConfigHandler, self).write(self.config)
+                StateHolder.work_dir = os.path.join(os.path.expanduser(path='~'), 'workspace')
+                self.config['workspace'] = StateHolder.work_dir
+                YamlHandler.write(file=StateHolder.config_file, data=self.config)
             else:
-                self.work_dir = self.config.get('workspace')
-            if not (os.path.exists(path=self.work_dir)):
-                os.makedirs(self.work_dir)
-            self.parsed = True
+                StateHolder.work_dir = self.config.get('workspace')
+            if not (os.path.exists(path=StateHolder.work_dir)):
+                os.makedirs(StateHolder.work_dir)
+            StateHolder.config_parsed = True
 
     def set_branch(self, branch, config=None):
         """Set catalog actual branch"""
@@ -51,30 +48,23 @@ class ConfigHandler(AbstractYamlHandler):
         if config not in self.config.keys():
             ColorPrint.exit_after_print_messages(message="Config section not exists with name: " + config)
         self.config[config]['branch'] = branch
-        self.write(self.config)
+        YamlHandler.write(file=StateHolder.config_file, data=self.config)
 
     def get_config(self):
         """Get the full content of config file"""
         self.read()
         return self.config
 
-    def get_work_dir(self):
-        self.read()
-        return self.work_dir
-
-    def exists(self):
-        return os.path.exists(path=StateHolder.home_dir) and os.path.exists(path=self.file)
-
     def init(self):
         """Check home directory"""
-        if not self.exists():
-            ColorPrint.print_info(message="Default configuration initialized: " + str(self.file))
+        if not ConfigHandler.exists():
+            ColorPrint.print_info(message="Default configuration initialized: " + str(StateHolder.config_file))
             if not os.path.exists(StateHolder.home_dir):
                 os.mkdir(StateHolder.home_dir)
-            if not os.path.exists(self.file):
+            if not os.path.exists(StateHolder.config_file):
                 src_file = os.path.join(os.path.dirname(__file__), 'resources/config')
-                shutil.copyfile(src=src_file, dst=self.file)
-                self.parsed = False
+                shutil.copyfile(src=src_file, dst=StateHolder.config_file)
+                StateHolder.config_parsed = False
         self.read()
         '''Check file type catalog'''
         for config in self.config:
@@ -85,3 +75,6 @@ class ConfigHandler(AbstractYamlHandler):
                 FileUtils.make_empty_file_with_empty_dict(directory=StateHolder.home_dir,
                                                           file=conf.get('file', 'poco-catalog.yml'))
 
+    @staticmethod
+    def exists():
+        return os.path.exists(path=StateHolder.home_dir) and os.path.exists(path=StateHolder.config_file)

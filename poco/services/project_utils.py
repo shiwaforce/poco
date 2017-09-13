@@ -8,28 +8,23 @@ from .console_logger import *
 
 class ProjectUtils:
 
-    def __init__(self, work_dir):
-        self.work_dir = work_dir
+    def __init__(self):
         self.repositories = {}
 
     def get_project_repository(self, project_element, ssh):
         """Get and store repository handler for named project"""
         if StateHolder.offline:
-            repo_handler = FileRepository(target_dir=self.get_target_dir(work_dir=self.work_dir,
-                                                                         project_element=project_element))
+            repo_handler = FileRepository(target_dir=self.get_target_dir(project_element=project_element))
         elif 'git' in project_element:
             branch = project_element.get('branch', 'master')
-            repo_handler = GitRepository(target_dir=self.get_target_dir(work_dir=self.work_dir,
-                                         project_element=project_element),
+            repo_handler = GitRepository(target_dir=self.get_target_dir(project_element=project_element),
                                          url=project_element.get('git'), branch=branch,
                                          git_ssh_identity_file=ssh)
         elif 'svn' in project_element:
-            repo_handler = SvnRepository(target_dir=self.get_target_dir(work_dir=self.work_dir,
-                                         project_element=project_element),
+            repo_handler = SvnRepository(target_dir=self.get_target_dir(project_element=project_element),
                                          url=project_element.get('svn'))
         else:
-            repo_handler = FileRepository(target_dir=self.get_target_dir(work_dir=self.work_dir,
-                                          project_element=project_element))
+            repo_handler = FileRepository(target_dir=self.get_target_dir(project_element=project_element))
         self.repositories[StateHolder.name] = repo_handler
         return repo_handler
 
@@ -50,8 +45,8 @@ class ProjectUtils:
         return self.repositories.get(StateHolder.name).get_file(file)
 
     @staticmethod
-    def get_target_dir(work_dir, project_element):
-        return os.path.join(work_dir, project_element.get('repository_dir', StateHolder.name))
+    def get_target_dir(project_element):
+        return os.path.join(StateHolder.work_dir, project_element.get('repository_dir', StateHolder.name))
 
     @staticmethod
     def get_list_value(value):

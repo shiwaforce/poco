@@ -72,6 +72,8 @@ class Poco(object):
         """Fill state"""
 
         self.state.home_dir = home_dir
+        self.state.log_dir = os.path.join(StateHolder.home_dir, 'logs')
+        self.state.config_file = os.path.join(StateHolder.home_dir, 'config')
         if not self.state.skip_docker:
             self.check_docker()
         self.arguments = docopt(__doc__, version=__version__, argv=argv)
@@ -126,7 +128,7 @@ class Poco(object):
             return
 
         '''Init project utils'''
-        self.project_utils = ProjectUtils(work_dir=self.config_handler.get_work_dir())
+        self.project_utils = ProjectUtils()
 
         if self.has_attributes('catalog', 'remove'):
             ColorPrint.print_info("Project removed")
@@ -245,8 +247,7 @@ class Poco(object):
 
     def init_compose_handler(self, arguments):
         compose_file = self.get_compose_file()
-        repo_dir = self.project_utils.get_target_dir(self.config_handler.get_work_dir(),
-                                                     self.catalog_handler.get())
+        repo_dir = self.project_utils.get_target_dir(self.catalog_handler.get())
         self.compose_handler = ComposeHandler(compose_file=compose_file,
                                               plan=arguments.get('<plan>'),
                                               repo_dir=repo_dir)
@@ -324,7 +325,7 @@ class Poco(object):
                 for key in lst[cat].keys():
                     msg = key
                     if os.path.exists(os.path.join(
-                            self.config_handler.get_work_dir(),
+                            StateHolder.work_dir,
                             lst[cat][key]["repository_dir"] if "repository_dir" in lst[cat][key] else key)):
                         msg += " (*)"
                     ColorPrint.print_with_lvl(message=msg, lvl=-1)
