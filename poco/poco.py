@@ -33,6 +33,7 @@ Options:
   -h --help     Show this screen.
   -v --verbose  Print more text.
   -q --quiet    Print less text.
+  --developer   Project repository handle by user
   --offline     Offline mode
 
 """
@@ -83,6 +84,7 @@ class Poco(object):
             self.arguments['<project>'] = FileUtils.get_directory_name()
         self.state.name = self.arguments.get('<project>')
         self.state.offline = self.arguments.get("--offline")
+        self.state.developer_mode = self.arguments.get("--developer")
 
         """Parse config """
         self.config_handler = ConfigHandler()

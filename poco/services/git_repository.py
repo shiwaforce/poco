@@ -3,6 +3,7 @@ import git
 import shutil
 from .abstract_repository import AbstractRepository
 from .console_logger import ColorPrint
+from .state import StateHolder
 
 
 class GitRepository(AbstractRepository):
@@ -40,6 +41,8 @@ class GitRepository(AbstractRepository):
                 self.repo.index.commit("init")
                 remote = self.repo.create_remote('master', self.repo.remotes.origin.url)
                 remote.push(refspec='{}:{}'.format(self.repo.active_branch, 'master'))
+            if self.is_developer_mode():
+                return
             if str(self.repo.active_branch) != branch:
                 self.repo.git.checkout(branch, force=force)
             else:
@@ -48,6 +51,9 @@ class GitRepository(AbstractRepository):
             ColorPrint.exit_after_print_messages(message=exc.stderr)
 
     def push(self):
+        if self.is_developer_mode():
+            ColorPrint.print_with_lvl(message="It's run in developer mode. You must push by hand.")
+            return
         if self.repo is None:
             ColorPrint.exit_after_print_messages(message="It is not an git repository: " + self.target_dir)
         if self.repo.is_dirty(untracked_files=True):
@@ -56,6 +62,9 @@ class GitRepository(AbstractRepository):
             self.repo.git.push()
 
     def pull(self):
+        if self.is_developer_mode():
+            ColorPrint.print_with_lvl(message="It's run in developer mode. You must pull by hand.")
+            return
         if self.repo is None:
             ColorPrint.exit_after_print_messages(message="It is not an git repository: " + self.target_dir)
         if not self.check_remote(self.repo.remotes.origin.url):
@@ -66,6 +75,9 @@ class GitRepository(AbstractRepository):
                                           + str(self.repo.active_branch) + " branch pull response:", lvl=1)
 
         ColorPrint.print_with_lvl(message=self.repo.git.pull(), lvl=1)
+
+    def is_developer_mode(self):
+        return self.target_dir != os.path.join(StateHolder.home_dir, 'catalogHome') and StateHolder.developer_mode
 
     def get_actual_branch(self):
         return str(self.repo.active_branch)

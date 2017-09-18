@@ -12,7 +12,7 @@ class StateHolder:
     name = None
 
     offline = False
-
+    developer_mode = False
 
     '''For testing'''
     skip_docker = False
