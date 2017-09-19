@@ -112,13 +112,13 @@ class AbstractPlanRunner(object):
 
     @staticmethod
     def run_script_with_check(cmd, working_directory):
-        res = check_call(args=cmd, cwd=working_directory, shell=True)
+        res = check_call(" ".join(cmd), cwd=working_directory, shell=True)
         if res > 0:
             ColorPrint.exit_after_print_messages(message=res)
 
     @staticmethod
     def run_script(cmd, working_directory, envs):
-        call(cmd, cwd=working_directory, env=envs, shell=True)
+        call(" ".join(cmd), cwd=working_directory, env=envs, shell=True)
 
 
 class ScriptPlanRunner(AbstractPlanRunner):

@@ -270,8 +270,8 @@ class Poco(object):
                 ColorPrint.exit_after_print_messages("checkout directory is empty: " + str(directory))
 
     def save_docker_config(self):
-        p = Popen(self.compose_handler.get_command(commands="config",
-                                                   get_file=self.project_utils.get_file),
+        p = Popen(" ".join(self.compose_handler.get_command(commands="config",
+                  get_file=self.project_utils.get_file)),
                   cwd=self.compose_handler.get_working_directory(),
                   env=self.compose_handler.get_environment_variables(get_file=self.project_utils.get_file),
                   stdout=PIPE, stderr=PIPE, shell=True)
@@ -338,7 +338,7 @@ class Poco(object):
 
     @staticmethod
     def check_docker():
-        p = Popen(["docker", "version", "-f", "'{{split (.Server.Version) \".\"}}'"],
+        p = Popen("docker version -f '{{split (.Server.Version) \".\"}}'",
                   stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
         if not len(err) == 0 or len(out) == 0:

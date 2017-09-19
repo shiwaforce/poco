@@ -11,7 +11,7 @@ class CleanHandler:
         self.check_volumes()
 
     def check_container(self, status):
-        out = check_output(["docker", "ps", "-qf", "status=" + str(status)], shell=True)
+        out = check_output(" ".join(["docker", "ps", "-qf", "status=" + str(status)]), shell=True)
         if len(out) == 0:
             ColorPrint.print_warning('No "' + str(status) + '" containers to remove.')
         else:
@@ -23,7 +23,7 @@ class CleanHandler:
                 self.print_error(grepexc)
 
     def check_images(self):
-        out = check_output(["docker", "images", "-q"], shell=True)
+        out = check_output(" ".join(["docker", "images", "-q"]), shell=True)
         if len(out) == 0:
             ColorPrint.print_warning('No images to remove.')
         else:
@@ -35,7 +35,7 @@ class CleanHandler:
                 self.print_error(grepexc)
 
     def check_volumes(self):
-        out = check_output(["docker", "volume", "ls", "-q"], shell=True)
+        out = check_output(" ".join(["docker", "volume", "ls", "-q"]), shell=True)
         if len(out) == 0:
             ColorPrint.print_warning('No volumes to remove.')
         else:
@@ -52,7 +52,7 @@ class CleanHandler:
             else:
                 command_array.append(command)
         try:
-            check_output(command_array, shell=True)
+            check_output(" ".join(command_array), shell=True)
         except CalledProcessError as grepexc:
             self.print_error(grepexc)
 

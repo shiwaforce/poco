@@ -82,7 +82,7 @@ class AbstractRepository(object):
             cmd.append("-t1")
         cmd.append(host)
 
-        p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
+        p = Popen(" ".join(cmd), stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
 
         return len(err) == 0
