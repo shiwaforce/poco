@@ -55,7 +55,7 @@ from .services.command_handler import CommandHandler
 from .services.state import StateHolder
 
 
-__version__ = '0.17.1'
+__version__ = '0.17.2'
 
 
 class Poco(object):
@@ -90,129 +90,129 @@ class Poco(object):
         self.config_handler = ConfigHandler()
 
     def run(self):
-        #try:
-        if self.has_attributes('catalog', 'config'):
-            ColorPrint.print_info(message=yaml.dump(
-                data=self.config_handler.get_config(), default_flow_style=False, default_style='', indent=4),
-                lvl=-1)
-            return
+        try:
+            if self.has_attributes('catalog', 'config'):
+                ColorPrint.print_info(message=yaml.dump(
+                    data=self.config_handler.get_config(), default_flow_style=False, default_style='', indent=4),
+                    lvl=-1)
+                return
 
-        """Parse catalog"""
-        self.catalog_handler = CatalogHandler(config=self.config_handler.get_config())
+            """Parse catalog"""
+            self.catalog_handler = CatalogHandler(config=self.config_handler.get_config())
 
-        if self.has_attributes('catalog', 'ls'):
-            self.print_ls()
-            return
-        if self.has_attributes('catalog', 'branches'):
-            self.print_branches(repo=self.catalog_handler.get_catalog_repository(self.arguments.get('<catalog>')))
-            return
-        if self.has_attributes('catalog', 'branch'):
-            branch = self.arguments.get('<branch>')
-            self.set_branch(branch=branch, force=self.arguments.get("-f"))
-            ColorPrint.print_info("Branch changed")
-            return
-        if self.has_attributes('catalog', 'push'):
-            self.catalog_handler.push(self.arguments.get('<catalog>'))
-            ColorPrint.print_info("Push completed")
-            return
-        if self.has_attributes('catalog', 'add'):
-            target_dir = FileUtils.get_normalized_dir(self.arguments.get('<target-dir>'))
-            repo, repo_dir = FileUtils.get_git_repo(target_dir)
-            self.add_to_catalog(target_dir=target_dir, repo_dir=repo_dir, repo=repo,
-                                catalog=self.arguments.get('<catalog>'))
-            ColorPrint.print_info("Project added")
-            return
+            if self.has_attributes('catalog', 'ls'):
+                self.print_ls()
+                return
+            if self.has_attributes('catalog', 'branches'):
+                self.print_branches(repo=self.catalog_handler.get_catalog_repository(self.arguments.get('<catalog>')))
+                return
+            if self.has_attributes('catalog', 'branch'):
+                branch = self.arguments.get('<branch>')
+                self.set_branch(branch=branch, force=self.arguments.get("-f"))
+                ColorPrint.print_info("Branch changed")
+                return
+            if self.has_attributes('catalog', 'push'):
+                self.catalog_handler.push(self.arguments.get('<catalog>'))
+                ColorPrint.print_info("Push completed")
+                return
+            if self.has_attributes('catalog', 'add'):
+                target_dir = FileUtils.get_normalized_dir(self.arguments.get('<target-dir>'))
+                repo, repo_dir = FileUtils.get_git_repo(target_dir)
+                self.add_to_catalog(target_dir=target_dir, repo_dir=repo_dir, repo=repo,
+                                    catalog=self.arguments.get('<catalog>'))
+                ColorPrint.print_info("Project added")
+                return
 
-        '''Handling top level commands'''
-        if self.has_attributes('clean'):
-            CleanHandler().clean()
-            ColorPrint.exit_after_print_messages(message="Clean complete", msg_type="info")
-            return
+            '''Handling top level commands'''
+            if self.has_attributes('clean'):
+                CleanHandler().clean()
+                ColorPrint.exit_after_print_messages(message="Clean complete", msg_type="info")
+                return
 
-        '''Init project utils'''
-        self.project_utils = ProjectUtils()
+            '''Init project utils'''
+            self.project_utils = ProjectUtils()
 
-        if self.has_attributes('catalog', 'remove'):
-            ColorPrint.print_info("Project removed")
-            self.remove_from_catalog(self.arguments)
-            return
+            if self.has_attributes('catalog', 'remove'):
+                ColorPrint.print_info("Project removed")
+                self.remove_from_catalog(self.arguments)
+                return
 
-        if self.has_attributes('branches'):
-            self.print_branches(repo=self.get_project_repository())
-            return
+            if self.has_attributes('branches'):
+                self.print_branches(repo=self.get_project_repository())
+                return
 
-        if self.has_attributes('branch'):
-            branch = self.arguments.get('<branch>')
-            repo = self.get_project_repository()
-            repo.set_branch(branch=branch, force=self.arguments.get("-f"))
-            project_descriptor = self.catalog_handler.get()
-            project_descriptor['branch'] = branch
-            self.catalog_handler.set(modified=project_descriptor)
-            ColorPrint.print_info(message="Branch changed")
-            return
+            if self.has_attributes('branch'):
+                branch = self.arguments.get('<branch>')
+                repo = self.get_project_repository()
+                repo.set_branch(branch=branch, force=self.arguments.get("-f"))
+                project_descriptor = self.catalog_handler.get()
+                project_descriptor['branch'] = branch
+                self.catalog_handler.set(modified=project_descriptor)
+                ColorPrint.print_info(message="Branch changed")
+                return
 
-        if self.has_attributes('install'):
-            self.get_project_repository()
-            ColorPrint.print_info("Project installed")
-            return
+            if self.has_attributes('install'):
+                self.get_project_repository()
+                ColorPrint.print_info("Project installed")
+                return
 
-        if self.has_attributes('init'):
-            self.init()
+            if self.has_attributes('init'):
+                self.init()
+                '''Init compose handler'''
+                self.init_compose_handler(arguments=self.arguments)
+                CommandHandler(args=self.arguments,
+                               compose_handler=self.compose_handler,
+                               project_utils=self.project_utils).run_script("init_script")
+                return
+
             '''Init compose handler'''
             self.init_compose_handler(arguments=self.arguments)
-            CommandHandler(args=self.arguments,
-                           compose_handler=self.compose_handler,
-                           project_utils=self.project_utils).run_script("init_script")
-            return
 
-        '''Init compose handler'''
-        self.init_compose_handler(arguments=self.arguments)
+            if self.has_attributes('plan', 'ls'):
+                self.compose_handler.get_plan_list()
+                return
 
-        if self.has_attributes('plan', 'ls'):
-            self.compose_handler.get_plan_list()
-            return
+            self.command_handler = CommandHandler(args=self.arguments,
+                                                  compose_handler=self.compose_handler,
+                                                  project_utils=self.project_utils)
 
-        self.command_handler = CommandHandler(args=self.arguments,
-                                              compose_handler=self.compose_handler,
-                                              project_utils=self.project_utils)
+            if self.has_attributes('config'):
+                self.command_handler.run('config')
 
-        if self.has_attributes('config'):
-            self.command_handler.run('config')
+            if self.has_attributes('build'):
+                self.run_before()
+                self.command_handler.run('build')
+                ColorPrint.print_info("Project built")
 
-        if self.has_attributes('build'):
-            self.run_before()
-            self.command_handler.run('build')
-            ColorPrint.print_info("Project built")
+            if self.has_attributes('up') or self.has_attributes('start'):
+                self.run_before()
+                self.command_handler.run('up')
 
-        if self.has_attributes('up') or self.has_attributes('start'):
-            self.run_before()
-            self.command_handler.run('up')
+            if self.has_attributes('restart'):
+                self.run_before()
+                self.command_handler.run('restart')
 
-        if self.has_attributes('restart'):
-            self.run_before()
-            self.command_handler.run('restart')
+            if self.has_attributes('down'):
+                self.command_handler.run('down')
+                ColorPrint.print_info("Project stopped")
 
-        if self.has_attributes('down'):
-            self.command_handler.run('down')
-            ColorPrint.print_info("Project stopped")
+            if self.has_attributes('ps'):
+                self.run_before()
+                self.command_handler.run('ps')
 
-        if self.has_attributes('ps'):
-            self.run_before()
-            self.command_handler.run('ps')
+            if self.has_attributes('pull'):
+                self.run_before()
+                self.command_handler.run('pull')
+                ColorPrint.print_info("Project pull complete")
 
-        if self.has_attributes('pull'):
-            self.run_before()
-            self.command_handler.run('pull')
-            ColorPrint.print_info("Project pull complete")
+            if self.has_attributes('stop'):
+                self.command_handler.run('stop')
 
-        if self.has_attributes('stop'):
-            self.command_handler.run('stop')
+            if self.has_attributes('logs') or self.has_attributes('log'):
+                self.command_handler.run('logs')
 
-        if self.has_attributes('logs') or self.has_attributes('log'):
-            self.command_handler.run('logs')
-
-        #except Exception as ex:
-        #    ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
+        except Exception as ex:
+            ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
 
     def init(self):
         project_element = self.get_catalog()
