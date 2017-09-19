@@ -338,12 +338,12 @@ class Poco(object):
 
     @staticmethod
     def check_docker():
-        p = Popen("docker version -f '{{split (.Server.Version) \".\"}}'",
+        p = Popen("docker version -f {{.Server.Version}}",
                   stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
         if not len(err) == 0 or len(out) == 0:
             ColorPrint.exit_after_print_messages(message='Docker not running.')
-        if out[0] < 17:
+        if out.split(".")[0] < str(17):
             ColorPrint.exit_after_print_messages(message='Please upgrade Docker to version 17 or above')
 
     @staticmethod
