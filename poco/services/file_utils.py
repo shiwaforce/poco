@@ -2,6 +2,7 @@ import datetime
 import git
 import os
 import yaml
+import stat
 from .console_logger import ColorPrint
 from .state import StateHolder
 
@@ -76,3 +77,7 @@ class FileUtils:
         """return the compose file relative path from repository root"""
         return os.path.join(FileUtils.get_relative_path(repo_dir, working_directory), file_name)
 
+    @staticmethod
+    def remove_readonly(func, path, excinfo):
+        os.chmod(path, stat.S_IWRITE)
+        func(path)

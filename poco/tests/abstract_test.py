@@ -5,6 +5,7 @@ import shutil
 import tempfile
 import yaml
 from contextlib import contextmanager
+from ..services.file_utils import FileUtils
 try:
     from StringIO import StringIO
 except ImportError:
@@ -59,7 +60,7 @@ class AbstractTestSuite(unittest.TestCase):
         os.makedirs(self.ws_dir)
 
     def tearDown(self):
-        shutil.rmtree(self.tmpdir)
+        shutil.rmtree(self.tmpdir, onerror=FileUtils.remove_readonly)
 
     def init_with_local_catalog(self):
         data = self.add_workspace_dir(AbstractTestSuite.LOCAL_CONFIG)

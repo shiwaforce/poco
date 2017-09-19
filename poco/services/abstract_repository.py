@@ -74,15 +74,15 @@ class AbstractRepository(object):
         cmd.append("ping")
         if platform.system().lower().startswith("win"):
             cmd.append("-n")
-            cmd.append(1)
+            cmd.append("1")
             cmd.append("-w")
-            cmd.append(1000)
+            cmd.append("1000")
         else:
             cmd.append("-c1")
             cmd.append("-t1")
         cmd.append(host)
 
-        p = Popen(cmd, stdout=PIPE, stderr=PIPE)
+        p = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
 
         return len(err) == 0

@@ -274,7 +274,7 @@ class Poco(object):
                                                    get_file=self.project_utils.get_file),
                   cwd=self.compose_handler.get_working_directory(),
                   env=self.compose_handler.get_environment_variables(get_file=self.project_utils.get_file),
-                  stdout=PIPE, stderr=PIPE)
+                  stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
         FileUtils.write_compose_log(directory=self.state.log_dir, data=err if len(err) > 0 else out)
 
@@ -339,7 +339,7 @@ class Poco(object):
     @staticmethod
     def check_docker():
         p = Popen(["docker", "version", "-f", "'{{split (.Server.Version) \".\"}}'"],
-                  stdout=PIPE, stderr=PIPE)
+                  stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
         if not len(err) == 0 or len(out) == 0:
             ColorPrint.exit_after_print_messages(message='Docker not running.')

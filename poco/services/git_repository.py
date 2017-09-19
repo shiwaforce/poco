@@ -4,6 +4,7 @@ import shutil
 from .abstract_repository import AbstractRepository
 from .console_logger import ColorPrint
 from .state import StateHolder
+from .file_utils import FileUtils
 
 
 class GitRepository(AbstractRepository):
@@ -23,7 +24,7 @@ class GitRepository(AbstractRepository):
                     self.repo = git.Repo(target_dir)
                     old_url = self.repo.remotes.origin.url
                     if old_url != url:
-                        shutil.rmtree(target_dir)
+                        shutil.rmtree(target_dir, onerror=FileUtils.remove_readonly)
                         self.repo = git.Repo.clone_from(url=url, to_path=target_dir)
                 self.set_branch(branch=branch, force=force)
         except git.GitCommandError as exc:
