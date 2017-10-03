@@ -55,7 +55,7 @@ from .services.command_handler import CommandHandler
 from .services.state import StateHolder
 
 
-__version__ = '0.17.2'
+__version__ = '0.17.3'
 
 
 class Poco(object):
@@ -343,7 +343,7 @@ class Poco(object):
         out, err = p.communicate()
         if not len(err) == 0 or len(out) == 0:
             ColorPrint.exit_after_print_messages(message='Docker not running.')
-        if out.split(".")[0] < str(17):
+        if str(out).split(".")[0] < str(17):
             ColorPrint.exit_after_print_messages(message='Please upgrade Docker to version 17 or above')
 
     @staticmethod
