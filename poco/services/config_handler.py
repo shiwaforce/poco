@@ -34,6 +34,14 @@ class ConfigHandler(object):
                 StateHolder.work_dir = self.config.get('workspace')
             if not (os.path.exists(path=StateHolder.work_dir)):
                 os.makedirs(StateHolder.work_dir)
+
+            StateHolder.config = dict(self.config)
+            del StateHolder.config['workspace']
+
+            if 'developer-mode' in self.config:
+                StateHolder.developer_mode = ConfigHandler.str2bool(self.config['developer-mode'])
+                del StateHolder.config['developer-mode']
+
             StateHolder.config_parsed = True
 
     def set_branch(self, branch, config=None):
@@ -49,11 +57,6 @@ class ConfigHandler(object):
             ColorPrint.exit_after_print_messages(message="Config section not exists with name: " + config)
         self.config[config]['branch'] = branch
         YamlHandler.write(file=StateHolder.config_file, data=self.config)
-
-    def get_config(self):
-        """Get the full content of config file"""
-        self.read()
-        return self.config
 
     def init(self):
         """Check home directory"""
@@ -75,6 +78,13 @@ class ConfigHandler(object):
                 FileUtils.make_empty_file_with_empty_dict(directory=StateHolder.home_dir,
                                                           file=conf.get('file', 'poco-catalog.yml'))
 
+    def dump(self):
+        YamlHandler.dump(data=self.config)
+
     @staticmethod
     def exists():
         return os.path.exists(path=StateHolder.home_dir) and os.path.exists(path=StateHolder.config_file)
+
+    @staticmethod
+    def str2bool(val):
+        return str(val).lower() in ("yes", "true", "t", "1")

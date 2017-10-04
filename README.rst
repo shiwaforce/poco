@@ -125,6 +125,7 @@ Parameters:
  - branch (optional): branch name - default : master
  - ssh-key (optional): ssh file location for git repository - default: ~/.ssh/id_rsa
  - workspace (optional): the base directory, where the project will be checked out - default : ~/workspace
+ - developer-mode (optional): git commands not be used in workspace directory - not change branch and pull in projects
 
 Example 1 (empty):
 ::
@@ -145,6 +146,7 @@ Example 2 (Git, multiple):
         file: poco-catalog.yml
         branch: master
     workspace: /Users/john.doe/workspace
+    developer-mode: true
 
 Project catalog file
 --------------------
@@ -309,9 +311,9 @@ alternative for up
 
 alternative for down
 
-    **poco restart <project>**
+    **poco restart <project> [plan]**
 
-restarts docker containers which belong to the selected project
+restarts docker containers which belong to the specified project with selected plan
 
     **poco log <project> [plan]**
 

@@ -19,6 +19,7 @@ Usage:
   poco [options] ps [<project>] [<plan>]
   poco [options] plan ls [<project>]
   poco [options] pull [<project>] [<plan>]
+  poco [options] restart [<project>] [<plan>]
   poco [options] start [<project>] [<plan>]
   poco [options] stop [<project>] [<plan>]
   poco [options] log [<project>] [<plan>]
@@ -40,7 +41,6 @@ Options:
 import os
 import shutil
 import sys
-import yaml
 from docopt import docopt
 from subprocess import Popen, PIPE
 from .services.catalog_handler import CatalogHandler
@@ -55,7 +55,7 @@ from .services.command_handler import CommandHandler
 from .services.state import StateHolder
 
 
-__version__ = '0.17.3'
+__version__ = '0.18.0'
 
 
 class Poco(object):
@@ -84,21 +84,22 @@ class Poco(object):
             self.arguments['<project>'] = FileUtils.get_directory_name()
         self.state.name = self.arguments.get('<project>')
         self.state.offline = self.arguments.get("--offline")
-        self.state.developer_mode = self.arguments.get("--developer")
 
         """Parse config """
         self.config_handler = ConfigHandler()
+        self.config_handler.read()
+
+        if self.arguments.get("--developer"):
+            self.state.developer_mode = self.arguments.get("--developer")
 
     def run(self):
         try:
             if self.has_attributes('catalog', 'config'):
-                ColorPrint.print_info(message=yaml.dump(
-                    data=self.config_handler.get_config(), default_flow_style=False, default_style='', indent=4),
-                    lvl=-1)
+                self.config_handler.dump()
                 return
 
             """Parse catalog"""
-            self.catalog_handler = CatalogHandler(config=self.config_handler.get_config())
+            self.catalog_handler = CatalogHandler()
 
             if self.has_attributes('catalog', 'ls'):
                 self.print_ls()

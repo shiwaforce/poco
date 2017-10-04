@@ -10,27 +10,25 @@ from .state import StateHolder
 
 class CatalogHandler:
 
-    def __init__(self, config):
+    def __init__(self):
 
-        self.config = config
         self.catalog_repositories = dict()
         self.default_repository = None
 
         self.catalogs = None
-        for key in config.keys():
-            # TODO refactor
-            if key == 'workspace':
-                continue
-            conf = config[key]
+        for key in StateHolder.config.keys():
+            conf = StateHolder.config[key]
             repo = self.get_repository_type(conf)
 
             if StateHolder.offline and repo in ('git', 'svn'):
                 repository = FileRepository(target_dir=path.join(StateHolder.home_dir, 'catalogHome', key))
             elif 'git' == repo:
-                repository = GitRepository(target_dir=path.join(StateHolder.home_dir, 'catalogHome', key), url=self.get_url(conf),
+                repository = GitRepository(target_dir=path.join(StateHolder.home_dir, 'catalogHome', key),
+                                           url=self.get_url(conf),
                                            branch=self.get_branch(conf), git_ssh_identity_file=conf.get("ssh-key"))
             elif 'svn' == repo:
-                repository = SvnRepository(target_dir=path.join(StateHolder.home_dir, 'catalogHome', key), url=self.get_url(conf))
+                repository = SvnRepository(target_dir=path.join(StateHolder.home_dir, 'catalogHome', key),
+                                           url=self.get_url(conf))
             else:
                 repository = FileRepository(target_dir=StateHolder.home_dir)
 

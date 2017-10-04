@@ -19,3 +19,8 @@ class YamlHandler:
     def write(file, data):
         with open(file, 'w') as stream:
             stream.write(yaml.dump(data=data, default_flow_style=False))
+
+    @staticmethod
+    def dump(data):
+        ColorPrint.print_info(message=yaml.dump(
+            data=data, default_flow_style=False, default_style='', indent=4), lvl=-1)

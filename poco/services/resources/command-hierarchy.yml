@@ -19,7 +19,7 @@
   },
   restart: {
     before: true,
-    docker: ["restart", "ps"],
+    docker: ["stop", "ps", "build", "config", ["up", "-d"], "logs", "ps"],
     after: true
   },
   down: {

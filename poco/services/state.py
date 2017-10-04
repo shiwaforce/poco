@@ -8,6 +8,9 @@ class StateHolder:
     work_dir = None
     config_parsed = False
 
+    ''' full content of config file without work_dir and developer-mode'''
+    config = None
+
     '''project name'''
     name = None
 
