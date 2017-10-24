@@ -1,6 +1,7 @@
 import os
 import git
 import shutil
+import string
 from .abstract_repository import AbstractRepository
 from .console_logger import ColorPrint
 from .state import StateHolder
@@ -23,7 +24,8 @@ class GitRepository(AbstractRepository):
                 else:
                     self.repo = git.Repo(target_dir)
                     old_url = self.repo.remotes.origin.url
-                    if old_url != url:
+
+                    if not self.is_same_host(old_url, url):
                         shutil.rmtree(target_dir, onerror=FileUtils.remove_readonly)
                         self.repo = git.Repo.clone_from(url=url, to_path=target_dir)
                 self.set_branch(branch=branch, force=force)
@@ -82,3 +84,30 @@ class GitRepository(AbstractRepository):
 
     def get_actual_branch(self):
         return str(self.repo.active_branch)
+
+    def is_same_host(self, old_url, url):
+        return self.clean_url(str(old_url)) == self.clean_url(str(url))
+
+    def clean_url(self, url):
+        # remove leading protocol
+        url = url.lstrip("https://")
+        url = url.lstrip("ssh://")
+
+        #remove user info
+        idx = url.find("@")
+        if not idx == -1:
+            url = url[idx+1:]
+
+        #remove port
+        idx = url.find(":")
+        if not idx == -1:
+            idx2 = url.find("/", idx)
+            if not idx2 == -1:
+                url = url[:idx] + url[idx2:]
+
+        #remove scm part ( Atlassian stash compatibility )
+        idx = url.find("/scm")
+        if not idx == -1:
+            url = url[:idx] + url[idx+4:]
+
+        return url
