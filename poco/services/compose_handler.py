@@ -68,7 +68,7 @@ class ComposeHandler:
                     elif "default" in self.compose_project['plan']:
                         self.plan = "default"
                     else:
-                        self.plan = self.compose_project['plan'].keys()[0]
+                        self.plan = list(self.compose_project['plan'].keys())[0]
                 if self.plan not in self.compose_project['plan']:
                     ColorPrint.exit_after_print_messages(
                         message="stages section must contains the selected stage: " + str(self.plan), doc=Doc.POCO)
