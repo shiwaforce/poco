@@ -1,5 +1,6 @@
 import os
 import yaml
+import platform
 from subprocess import check_call, call
 from .console_logger import ColorPrint, Doc
 from .file_utils import FileUtils
@@ -105,6 +106,9 @@ class CommandHandler(object):
         env_copy = os.environ.copy()
         for key in env_dict.keys():
             env_copy[key] = env_dict[key]
+
+        """Add host system to environment"""
+        env_copy["HOST_SYSTEM"] = platform.system()
         return env_copy
 
 
@@ -149,6 +153,11 @@ class ScriptPlanRunner(AbstractPlanRunner):
         command_array = list()
         command_array.append("docker")
         command_array.append("run")
+
+        """Add host system to environment"""
+        command_array.append("-e")
+        command_array.append("HOST_SYSTEM="+platform.system())
+
         command_array.append("-v")
         command_array.append(str(self.working_directory) + ":/usr/local")
         command_array.append("-w")
@@ -186,6 +195,7 @@ class DockerPlanRunner(AbstractPlanRunner):
         for compose_file in docker_files:
             cmd.append("-f")
             cmd.append(str(compose_file))
+
         if type(commands) is list:
             for command in commands:
                 cmd.append(command)
