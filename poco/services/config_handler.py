@@ -15,8 +15,6 @@ class ConfigHandler(object):
 
         if not ConfigHandler.exists():
             self.init()
-        if not os.path.exists(StateHolder.log_dir):
-            os.mkdir(StateHolder.log_dir)
 
     def read(self):
         """Parse local configuration file"""

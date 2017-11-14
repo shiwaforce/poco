@@ -75,7 +75,6 @@ class Poco(object):
         """Fill state"""
 
         self.state.home_dir = home_dir
-        self.state.log_dir = os.path.join(StateHolder.home_dir, 'logs')
         self.state.config_file = os.path.join(StateHolder.home_dir, 'config')
         if not self.state.skip_docker:
             self.check_docker()
@@ -187,16 +186,16 @@ class Poco(object):
                 self.command_handler.run('config')
 
             if self.has_attributes('build'):
-                self.run_before()
+                self.run_checkouts()
                 self.command_handler.run('build')
                 ColorPrint.print_info("Project built")
 
             if self.has_attributes('up') or self.has_attributes('start'):
-                self.run_before()
+                self.run_checkouts()
                 self.command_handler.run('up')
 
             if self.has_attributes('restart'):
-                self.run_before()
+                self.run_checkouts()
                 self.command_handler.run('restart')
 
             if self.has_attributes('down'):
@@ -204,11 +203,11 @@ class Poco(object):
                 ColorPrint.print_info("Project stopped")
 
             if self.has_attributes('ps'):
-                self.run_before()
+                self.run_checkouts()
                 self.command_handler.run('ps')
 
             if self.has_attributes('pull'):
-                self.run_before()
+                self.run_checkouts()
                 self.command_handler.run('pull')
                 ColorPrint.print_info("Project pull complete")
 
@@ -261,10 +260,6 @@ class Poco(object):
                                               plan=arguments.get('<plan>'),
                                               repo_dir=repo_dir)
 
-    def run_before(self):
-        self.save_docker_config()
-        self.run_checkouts()
-
     def run_checkouts(self):
         for checkout in self.compose_handler.get_checkouts():
             if " " not in checkout:
@@ -275,15 +270,6 @@ class Poco(object):
                 GitRepository(target_dir=target_dir, url=repository, branch="master")
             if not os.path.exists(target_dir):
                 ColorPrint.exit_after_print_messages("checkout directory is empty: " + str(directory))
-
-    def save_docker_config(self):
-        p = Popen(" ".join(self.compose_handler.get_command(commands="config",
-                  get_file=self.project_utils.get_file)),
-                  cwd=self.compose_handler.get_working_directory(),
-                  env=self.compose_handler.get_environment_variables(get_file=self.project_utils.get_file),
-                  stdout=PIPE, stderr=PIPE, shell=True)
-        out, err = p.communicate()
-        FileUtils.write_compose_log(directory=self.state.log_dir, data=err if len(err) > 0 else out)
 
     def add_to_catalog(self, target_dir, repo_dir, repo, catalog=None):
         file_prefix = ""

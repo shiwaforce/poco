@@ -78,6 +78,32 @@ class FileUtils:
         return os.path.join(FileUtils.get_relative_path(repo_dir, working_directory), file_name)
 
     @staticmethod
+    def get_file_path(repo_dir, working_directory, file_name):
+        """return the compose file relative path from repository root"""
+        return os.path.join(repo_dir, FileUtils.get_relative_path(repo_dir, working_directory), file_name)
+
+    @staticmethod
     def remove_readonly(func, path, excinfo):
         os.chmod(path, stat.S_IWRITE)
         func(path)
+
+    @staticmethod
+    def get_filtered_sorted_alter_from_base_dir(base_dir, actual_dir, target_directories=list(), filter_ends=list()):
+        files_dict = dict()
+        file_list = list()
+        for directory in target_directories:
+            for root, sub_folders, files in os.walk(os.path.join(base_dir, FileUtils.get_file_path(
+                    repo_dir=base_dir, working_directory=actual_dir, file_name=directory))):
+                if len(filter_ends) > 0:
+                    files = [file for file in files if file.endswith(tuple(filter_ends))]
+                for file in files:
+                    if file not in files_dict.keys():
+                        files_dict[file] = list()
+                        files_dict[file].append(root)
+
+        for key in files_dict.keys():
+            for work_dir in files_dict[key]:
+                file_list.append(FileUtils.get_compose_file_relative_path(
+                    repo_dir=base_dir, working_directory=work_dir, file_name=key))
+        return file_list
+

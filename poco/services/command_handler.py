@@ -88,20 +88,24 @@ class CommandHandler(object):
         '''First the default, if exists'''
         if "environment" in self.project_compose:
             self.parse_environment_dict(path=self.project_compose["environment"]["include"], env=environment)
-        if type(envs) is list:
-            for env in envs:
-                self.parse_environment_dict(path=env, env=environment)
-        elif envs is not None:
-            self.parse_environment_dict(path=envs, env=environment)
+        for env in envs:
+            self.parse_environment_dict(path=env, env=environment)
         return environment
 
     def get_environment_variables(self, plan):
         """Get all environment variables depends on selected plan"""
-        envs = None
+        envs = list()
         if isinstance(plan, dict):
             if 'environment' in plan:
                 if 'include' in plan['environment']:
-                    envs = plan['environment']['include']
+                    envs.extend(ProjectUtils.get_list_value(plan['environment']['include']))
+            if 'docker-compose-dir' in plan:
+                envs.extend(FileUtils.get_filtered_sorted_alter_from_base_dir(base_dir=self.repo_dir,
+                                                                              actual_dir=self.working_directory,
+                                                                              target_directories=ProjectUtils.
+                                                                              get_list_value(
+                                                                                  plan['docker-compose-dir']),
+                                                                              filter_ends=('.env')))
         env_dict = self.get_environment_dict(envs=envs)
         env_copy = os.environ.copy()
         for key in env_dict.keys():
@@ -182,10 +186,12 @@ class DockerPlanRunner(AbstractPlanRunner):
         docker_files = list()
         if isinstance(plan, dict) and 'docker-compose-file' in plan:
             for service in ProjectUtils.get_list_value(plan['docker-compose-file']):
-                docker_files.append(self.get_docker_compose(service=service, name=name))
+                docker_files.append(self.get_docker_compose(service=service))
+        elif isinstance(plan, dict) and 'docker-compose-dir' in plan:
+            docker_files.extend(self.get_docker_compose_list(ProjectUtils.get_list_value(plan['docker-compose-dir'])))
         else:
             for service in ProjectUtils.get_list_value(plan):
-                docker_files.append(self.get_docker_compose(service=service, name=name))
+                docker_files.append(self.get_docker_compose(service=service))
 
         """Compose docker command array with project name and compose files"""
         cmd = list()
@@ -205,17 +211,21 @@ class DockerPlanRunner(AbstractPlanRunner):
         ColorPrint.print_with_lvl(message="Docker command: " + str(cmd), lvl=1)
         self.run_script(cmd=cmd, working_directory=self.working_directory, envs=envs)
 
-    def get_docker_compose(self, service, name):
+    def get_docker_compose(self, service):
         """Get back the docker compose file"""
         file_name = self.get_compose_file_name(service=service)
-        compose_file = self.project_utils.get_file(file=FileUtils.get_compose_file_relative_path(
+        return self.project_utils.get_file(file=FileUtils.get_compose_file_relative_path(
                                                        repo_dir=self.repo_dir, working_directory=self.working_directory,
                                                        file_name=file_name))
-        if compose_file is None:
-            ColorPrint.exit_after_print_messages(
-                message="Compose file (" + str(file_name) + ") not exists in repository: " + name,
-                doc=Doc.COMPOSE_DOC)
-        return compose_file
+
+    def get_docker_compose_list(self, dir_list):
+        compose_list = list()
+        for file in FileUtils.get_filtered_sorted_alter_from_base_dir(base_dir=self.repo_dir,
+                                                                      actual_dir=self.working_directory,
+                                                                      target_directories=dir_list,
+                                                                      filter_ends=('.yml', '.yaml')):
+            compose_list.append(self.project_utils.get_file(file=file))
+        return compose_list
 
     def get_compose_file_name(self, service):
         """Get back docker compose file name"""
