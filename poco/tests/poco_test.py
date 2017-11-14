@@ -43,6 +43,27 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertIn(yaml.dump(data=AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='',
                                 indent=4).strip(), out.getvalue().strip())
 
+    def test_add_and_remove_config(self):
+        self.init_with_remote_catalog()
+        with self.captured_output() as (out, err):
+            StateHolder.skip_docker = True
+            poco = Poco(home_dir=self.tmpdir, argv=["catalog", "config", "add", "teszt", "ssh://teszt.teszt/teszt"])
+            poco.run()
+        self.assertEqual(0, len(err.getvalue()))
+        data = dict()
+        data["teszt"] = dict()
+        data["teszt"]["repositoryType"] = "git"
+        data["teszt"]["server"] = "ssh://teszt.teszt/teszt"
+        self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
+                      out.getvalue().strip())
+
+        with self.captured_output() as (out, err):
+            StateHolder.skip_docker = True
+            poco = Poco(home_dir=self.tmpdir, argv=["catalog", "config", "remove", "teszt"])
+            poco.run()
+        self.assertEqual(0, len(err.getvalue()))
+        self.assertNotIn("teszt", out.getvalue().strip())
+
     def test_list_with_local_config(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):

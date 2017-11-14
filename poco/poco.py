@@ -4,7 +4,9 @@
 Usage:
   poco catalog [options] add [<target-dir>] [<catalog>]
   poco catalog [options] ls
+  poco catalog [options] config add <catalog> <git-url> [<branch>] [<file>]
   poco catalog [options] config
+  poco catalog [options] config remove <catalog>
   poco catalog [options] branch <branch> [<catalog>] [-f]
   poco catalog [options] branches [<catalog>]
   poco catalog [options] push [<catalog>]
@@ -55,7 +57,7 @@ from .services.command_handler import CommandHandler
 from .services.state import StateHolder
 
 
-__version__ = '0.19.0'
+__version__ = '0.20.0'
 
 
 class Poco(object):
@@ -95,6 +97,10 @@ class Poco(object):
     def run(self):
         try:
             if self.has_attributes('catalog', 'config'):
+                if self.has_attributes('remove'):
+                    self.config_handler.remove(self.arguments.get('<catalog>'))
+                if self.has_attributes('add'):
+                    self.config_handler.add(self.arguments)
                 self.config_handler.dump()
                 return
 

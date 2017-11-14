@@ -53,8 +53,8 @@ class ConfigHandler(object):
             else:
                 config = self.config[list(self.config.keys())[0]]
 
-        if config not in self.config.keys():
-            ColorPrint.exit_after_print_messages(message="Config section not exists with name: " + config)
+        if config not in list(self.config.keys()):
+            ColorPrint.exit_after_print_messages(message="Catalog not exists with name: " + config)
         self.config[config]['branch'] = branch
         YamlHandler.write(file=StateHolder.config_file, data=self.config)
 
@@ -77,6 +77,26 @@ class ConfigHandler(object):
             if conf.get("repositoryType", "file") is "file":
                 FileUtils.make_empty_file_with_empty_dict(directory=StateHolder.home_dir,
                                                           file=conf.get('file', 'poco-catalog.yml'))
+
+    def remove(self, catalog):
+        if catalog not in list(self.config.keys()):
+            ColorPrint.exit_after_print_messages(message="Catalog not exists with name: " + catalog)
+        del self.config[catalog]
+        YamlHandler.write(file=StateHolder.config_file, data=self.config)
+
+    def add(self, arguments):
+        catalog = arguments.get('<catalog>')
+        if catalog in list(self.config.keys()):
+            self.config.remove(catalog)
+        config = dict()
+        config['repositoryType'] = 'git'
+        config['server'] = arguments.get('<git-url>')
+        if arguments.get('<branch>') is not None:
+            config['branch'] = arguments.get('<branch>')
+        if arguments.get('<file>') is not None:
+            config['file'] = arguments.get('<file>')
+        self.config[catalog] = config
+        YamlHandler.write(file=StateHolder.config_file, data=self.config)
 
     def dump(self):
         YamlHandler.dump(data=self.config)
