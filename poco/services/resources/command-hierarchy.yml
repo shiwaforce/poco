@@ -1,7 +1,8 @@
 {
   config: {
     before: true,
-    docker: ["config"]
+    docker: ["config"],
+    kubernetes: ["describe"]
   },
   build: {
     before: true,
@@ -10,25 +11,30 @@
   up: {
     before: true,
     docker: ["build", "config", ["up", "-d"], "logs", "ps"],
+    kubernetes: ["apply"],
     after: true
   },
   start: {
     before: true,
     docker: ["build", "config", ["up", "-d"], "logs", "ps"],
+    kubernetes: ["apply"],
     after: true
   },
   restart: {
     before: true,
     docker: ["stop", "ps", "build", "config", ["up", "-d"], "logs", "ps"],
+    kubernetes: ["apply"],
     after: true
   },
   down: {
     docker: [["down", "--remove-orphans"]],
+    kubernetes: ["delete"],
     after: true
   },
   ps: {
     before: true,
     docker: ["ps"],
+    kubernetes: ["get"],
     after: true
   },
   pull: {
@@ -38,9 +44,11 @@
   },
   stop: {
     docker: ["stop", "ps"],
+    kubernetes: ["delete"],
     after: true
   },
   logs: {
-    docker: [["logs", "-f"]]
+    docker: [["logs", "-f"]],
+    kubernetes: ["get"]
   }
 }

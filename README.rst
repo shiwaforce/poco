@@ -17,7 +17,7 @@ Poco
 About
 -----
 
-**poco** lets you catalogue and manage your Docker projects using simple YAML files to shorten the route from finding your project to initialising it in your local environment.
+**poco** lets you catalogue and manage your projects using simple YAML files to shorten the route from finding your project to initialising it in your local environment.
 
 This helps you set up your local development environment and to run demos.
 
@@ -26,7 +26,8 @@ Working examples can be found here: https://github.com/shiwaforce/poco-example
 Requirements
 ------------
 
- - Docker, version > 17
+ - Docker, version > 17, if you want use Docker-compose files
+ - kubectl, if you want use Kubernetes files
 
 Quick start
 ===========
@@ -225,8 +226,15 @@ For example:
             enviroment:
                 include: conf/dev/dev.env
             docker-compose-file:
-                  - docker-compose.yml
-                  - docker-compose.yml
+                 - docker-compose.yml
+                 - docker-compose.yml
+        dev/another:
+            docker-compose-dir:
+                - /docker-files
+        dev/kubernetes:
+            kubernetes-file:
+                - kubernetes-file1.yaml
+                - kubernetes-file2.yaml
 
 Commands
 --------
@@ -261,7 +269,7 @@ removes selected project form the poco-catalog
 
     **poco config <project> [plan]**
 
-prints the full config for selected project with plan (docker-compose file with environment variables)
+prints the full config for selected project with plan (docker-compose file with environment variables or kubernetes describe)
 
     **poco clean**
 
@@ -285,15 +293,15 @@ installs if it isn't installed yet
 
     **poco down <project> [plan]**
 
-stops docker containers belonging the given project with selected plan
+stops docker or kubernetes containers belonging the given project with selected plan
 
     **poco build <project> [plan]**
 
-builds docker images for the selected project with the specified plan
+builds docker images for the selected project with the specified plan (not works with Kubernetes)
 
     **poco ps <project> [plan]**
 
-lists the state of docker images in selected project
+lists the state of docker images or kubernetes in selected project
 
     **poco plan ls <project>**
 
@@ -301,7 +309,7 @@ lists available plans in selected projects
 
     **poco pull <project> [plan]**
 
-pulls docker images for the specified project with the selected plan
+pulls docker images for the specified project with the selected plan (not works with Kubernetes)
 
     **poco start <project> [plan]**
 
@@ -313,15 +321,15 @@ alternative for down
 
     **poco restart <project> [plan]**
 
-restarts docker containers which belong to the specified project with selected plan
+restarts docker or kubernetes containers which belong to the specified project with selected plan
 
     **poco log <project> [plan]**
 
-prints log from docker containers which belongs to the specified project with selected plan
+prints log from docker or kubernetes containers which belongs to the specified project with selected plan
 
     **poco logs <project> [plan]**
 
-prints log from docker containers which belongs to the specified project with selected plan
+prints log from docker or kubernetes containers which belongs to the specified project with selected plan
 
     **poco branch <project> <branch>**
 

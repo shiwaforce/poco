@@ -1,8 +1,26 @@
 import os
-
+from subprocess import Popen, PIPE
+from .console_logger import ColorPrint
 
 class EnvironmentUtils:
 
     @staticmethod
     def get_variable(key, default=None):
         return os.environ.get(key, default)
+
+    @staticmethod
+    def check_docker():
+        p = Popen("docker version -f {{.Server.Version}}", stdout=PIPE, stderr=PIPE, shell=True)
+        out, err = p.communicate()
+        if not len(err) == 0 or len(out) == 0:
+            ColorPrint.exit_after_print_messages(message='Docker not running.')
+        if str(out).split(".")[0] < str(17):
+            ColorPrint.exit_after_print_messages(message='Please upgrade Docker to version 17 or above')
+
+    @staticmethod
+    def check_kubernetes():
+        p = Popen("kubectl  version --client  --short", stdout=PIPE, stderr=PIPE, shell=True)
+        out, err = p.communicate()
+        if not len(err) == 0 or len(out) == 0:
+            ColorPrint.exit_after_print_messages(message="Kubernetes not running.")
+        ColorPrint.print_with_lvl(message="Kubernetes " + out.strip())

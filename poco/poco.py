@@ -44,7 +44,6 @@ import os
 import shutil
 import sys
 from docopt import docopt
-from subprocess import Popen, PIPE
 from .services.catalog_handler import CatalogHandler
 from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
@@ -76,11 +75,8 @@ class Poco(object):
 
         self.state.home_dir = home_dir
         self.state.config_file = os.path.join(StateHolder.home_dir, 'config')
-        if not self.state.skip_docker:
-            self.check_docker()
         self.arguments = docopt(__doc__, version=__version__, argv=argv)
         ColorPrint.set_log_level(self.arguments)
-
         if self.arguments.get('<project>') is None:
             self.arguments['<project>'] = FileUtils.get_directory_name()
         self.state.name = self.arguments.get('<project>')
@@ -328,16 +324,6 @@ class Poco(object):
             ColorPrint.print_with_lvl(
                 message="Project catalog is empty. You can add projects with 'project-catalog add' command",
                 lvl=-1)
-
-    @staticmethod
-    def check_docker():
-        p = Popen("docker version -f {{.Server.Version}}",
-                  stdout=PIPE, stderr=PIPE, shell=True)
-        out, err = p.communicate()
-        if not len(err) == 0 or len(out) == 0:
-            ColorPrint.exit_after_print_messages(message='Docker not running.')
-        if str(out).split(".")[0] < str(17):
-            ColorPrint.exit_after_print_messages(message='Please upgrade Docker to version 17 or above')
 
     @staticmethod
     def print_branches(repo):

@@ -5,6 +5,7 @@ from subprocess import check_call, call
 from .console_logger import ColorPrint, Doc
 from .file_utils import FileUtils
 from .project_utils import ProjectUtils
+from .environment_utils import EnvironmentUtils
 from .state import StateHolder
 
 
@@ -28,12 +29,19 @@ class CommandHandler(object):
         self.repo_dir = self.compose_handler.repo_dir
         self.project_utils = project_utils
 
+        ''' Check mode '''
+        plan = self.project_compose['plan'][self.plan]
+        if isinstance(plan, dict):
+            if 'kubernetes-file' in plan or 'kubernetes-dir' in plan:
+                StateHolder.mode = "Kubernetes"
+
         self.script_runner = ScriptPlanRunner(project_compose=self.project_compose,
                                               working_directory=self.working_directory)
-        self.docker_runner = DockerPlanRunner(project_compose=self.project_compose,
-                                              working_directory=self.working_directory,
-                                              project_utils=project_utils,
-                                              repo_dir=self.repo_dir)
+
+        if not StateHolder.skip_docker and StateHolder.mode == "Docker":
+            EnvironmentUtils.check_docker()
+        if StateHolder.mode == "Kubernetes":
+            EnvironmentUtils.check_kubernetes()
 
     def run_script(self, script):
         self.script_runner.run(plan=self.project_compose['plan'][self.plan], script_type=script)
@@ -57,10 +65,22 @@ class CommandHandler(object):
 
         if isinstance(plan, dict) and 'script' in plan:
             self.script_runner.run(plan=plan, script_type='script')
+        elif StateHolder.mode == "Kubernetes":
+            runner = KubernetesRunner(working_directory=self.working_directory,
+                                      project_utils=self.project_utils,
+                                      repo_dir=self.repo_dir)
+            if len(command_list['kubernetes']) == 0:
+                ColorPrint.exit_after_print_messages("Command: " + cmd + " not supported with Kubernetes")
+            for cmd in command_list['kubernetes']:
+                runner.run(plan=plan, command=cmd, envs=self.get_environment_variables(plan=plan))
         else:
+            runner = DockerPlanRunner(project_compose=self.project_compose,
+                                      working_directory=self.working_directory,
+                                      project_utils=self.project_utils,
+                                      repo_dir=self.repo_dir)
             for cmd in command_list['docker']:
-                self.docker_runner.run(name=StateHolder.name, plan=plan, commands=cmd,
-                                       envs=self.get_environment_variables(plan=plan))
+                runner.run(name=StateHolder.name, plan=plan, commands=cmd,
+                           envs=self.get_environment_variables(plan=plan))
 
         if command_list.get('after', False):
             self.script_runner.run(plan=plan, script_type='after_script')
@@ -105,7 +125,7 @@ class CommandHandler(object):
                                                                               target_directories=ProjectUtils.
                                                                               get_list_value(
                                                                                   plan['docker-compose-dir']),
-                                                                              filter_ends=('.env')))
+                                                                              filter_ends='.env'))
         env_dict = self.get_environment_dict(envs=envs)
         env_copy = os.environ.copy()
         for key in env_dict.keys():
@@ -170,6 +190,49 @@ class ScriptPlanRunner(AbstractPlanRunner):
         command_array.append("/bin/sh")
         command_array.append("-c")
         return command_array
+
+
+class KubernetesRunner(AbstractPlanRunner):
+
+    def __init__(self, working_directory, project_utils, repo_dir):
+        self.working_directory = working_directory
+        self.project_utils = project_utils
+        self.repo_dir = repo_dir
+
+    def run(self, plan, command, envs):
+
+        files = list()
+
+        if isinstance(plan, dict) and 'kubernetes-file' in plan:
+            for file in ProjectUtils.get_list_value(plan['kubernetes-file']):
+                files.append(self.get_file(file=file))
+        elif isinstance(plan, dict) and 'kubernetes-dir' in plan:
+            files.extend(self.get_list(ProjectUtils.get_list_value(plan['kubernetes-dir'])))
+
+        """Kubernetes commands"""
+        for kube_file in files:
+            cmd = list()
+            cmd.append("kubectl")
+            cmd.append(command)
+            cmd.append("-f")
+            cmd.append(str(kube_file))
+
+            ColorPrint.print_with_lvl(message="Kubernetes command: " + str(cmd), lvl=1)
+            self.run_script(cmd=cmd, working_directory=self.working_directory, envs=envs)
+
+    def get_file(self, file):
+        return self.project_utils.get_file(file=FileUtils.get_compose_file_relative_path(
+                                                       repo_dir=self.repo_dir, working_directory=self.working_directory,
+                                                       file_name=file))
+
+    def get_list(self, dir_list):
+        kube_list = list()
+        for file in FileUtils.get_filtered_sorted_alter_from_base_dir(base_dir=self.repo_dir,
+                                                                      actual_dir=self.working_directory,
+                                                                      target_directories=dir_list,
+                                                                      filter_ends=('.yml', '.yaml')):
+            kube_list.append(self.project_utils.get_file(file=file))
+        return kube_list
 
 
 class DockerPlanRunner(AbstractPlanRunner):

@@ -3,6 +3,7 @@
 class StateHolder:
 
     home_dir = None
+    mode = "Docker"
     config_file = None
     work_dir = None
     config_parsed = False
@@ -16,5 +17,5 @@ class StateHolder:
     offline = False
     developer_mode = False
 
-    '''For testing'''
+    '''For not Docker mode'''
     skip_docker = False
