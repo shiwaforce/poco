@@ -19,8 +19,8 @@ class EnvironmentUtils:
 
     @staticmethod
     def check_kubernetes():
-        p = Popen("kubectl  version --client  --short", stdout=PIPE, stderr=PIPE, shell=True)
+        p = Popen("kubectl version --short", stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
         if not len(err) == 0 or len(out) == 0:
-            ColorPrint.exit_after_print_messages(message="Kubernetes not running.")
-        ColorPrint.print_with_lvl(message="Kubernetes " + out.strip())
+            ColorPrint.exit_after_print_messages(message=str(err).strip())
+        ColorPrint.print_with_lvl(message="Kubernetes\n " + str(out).strip())
