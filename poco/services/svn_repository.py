@@ -5,6 +5,7 @@ from .abstract_repository import AbstractRepository
 from .console_logger import ColorPrint
 from .file_utils import FileUtils
 
+
 class SvnRepository(AbstractRepository):
 
     def __init__(self, target_dir, url):

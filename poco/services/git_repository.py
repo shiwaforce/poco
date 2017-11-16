@@ -26,9 +26,13 @@ class GitRepository(AbstractRepository):
                     self.repo = git.Repo(target_dir)
                     old_url = self.repo.remotes.origin.url
 
-                    if not self.is_same_host(old_url, url):
-                        shutil.rmtree(target_dir, onerror=FileUtils.remove_readonly)
-                        self.repo = git.Repo.clone_from(url=url, to_path=target_dir)
+                    if not GitRepository.is_same_host(old_url, url):
+                        if self.is_developer_mode():
+                            ColorPrint.exit_after_print_messages(
+                                message="This directory exists with not matching git repository " + target_dir)
+                        else:
+                            shutil.rmtree(target_dir, onerror=FileUtils.remove_readonly)
+                            self.repo = git.Repo.clone_from(url=url, to_path=target_dir)
                 self.set_branch(branch=branch, force=force)
         except git.GitCommandError as exc:
             ColorPrint.exit_after_print_messages(message=exc.stderr)
@@ -86,10 +90,12 @@ class GitRepository(AbstractRepository):
     def get_actual_branch(self):
         return str(self.repo.active_branch)
 
-    def is_same_host(self, old_url, url):
-        return self.clean_url(str(old_url)) == self.clean_url(str(url))
+    @staticmethod
+    def is_same_host(old_url, url):
+        return GitRepository.clean_url(str(old_url)) == GitRepository.clean_url(str(url))
 
-    def clean_url(self, url):
+    @staticmethod
+    def clean_url(url):
         # remove leading protocol
         url = url.lstrip("https://")
         url = url.lstrip("ssh://")
