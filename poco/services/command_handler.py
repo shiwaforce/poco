@@ -160,7 +160,9 @@ class ScriptPlanRunner(AbstractPlanRunner):
         if len(scripts) > 0:
             for script in scripts:
                 cmd = self.get_script_base()
+                cmd.append("\"")
                 cmd.append(script)
+                cmd.append("\"")
                 self.run_script_with_check(cmd=cmd, working_directory=self.working_directory)
 
     def get_native_scripts(self, plan, script_type):
