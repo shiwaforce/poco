@@ -1,4 +1,5 @@
 import os
+import sys
 from subprocess import Popen, PIPE
 from .console_logger import ColorPrint
 
@@ -24,3 +25,9 @@ class EnvironmentUtils:
         if not len(err) == 0 or len(out) == 0:
             ColorPrint.exit_after_print_messages(message=str(err).strip())
         ColorPrint.print_with_lvl(message="Kubernetes\n " + str(out).strip())
+
+    @staticmethod
+    def decode(text_string):
+        if sys.version_info[0] == 3:
+            return text_string.decode("utf-8")
+        return text_string

@@ -28,6 +28,10 @@ Usage:
   poco [options] logs [<project>] [<plan>]
   poco [options] branch <project> <branch> [-f]
   poco [options] branches [<project>]
+  poco [options] pack [<project>] [<plan>]
+  poco [options] unpack
+  poco [options] localup
+  poco [options] localdown
 
   poco (-h | --help)
   poco --version
@@ -48,6 +52,7 @@ from .services.catalog_handler import CatalogHandler
 from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
 from .services.config_handler import ConfigHandler
+from .services.package_handler import PackageHandler
 from .services.file_utils import FileUtils
 from .services.git_repository import GitRepository
 from .services.project_utils import ProjectUtils
@@ -56,7 +61,7 @@ from .services.command_handler import CommandHandler
 from .services.state import StateHolder
 
 
-__version__ = '0.21.1'
+__version__ = '0.22.0'
 
 
 class Poco(object):
@@ -83,14 +88,27 @@ class Poco(object):
         self.state.offline = self.arguments.get("--offline")
 
         """Parse config """
-        self.config_handler = ConfigHandler()
-        self.config_handler.read()
+        if not self.has_attributes('unpack') and not self.has_attributes('localup') and \
+                not self.has_attributes('localdown'):
+            self.config_handler = ConfigHandler()
+            self.config_handler.read()
 
         if self.arguments.get("--developer"):
             self.state.developer_mode = self.arguments.get("--developer")
 
     def run(self):
         try:
+
+            if self.has_attributes('unpack') or self.has_attributes('localup') or self.has_attributes('localdown'):
+                package_handler = PackageHandler()
+                if self.has_attributes('unpack'):
+                    package_handler.unpack()
+                if self.has_attributes('localup'):
+                    package_handler.up()
+                if self.has_attributes('localdown'):
+                    package_handler.down()
+                return
+
             if self.has_attributes('catalog', 'config'):
                 if self.has_attributes('remove'):
                     self.config_handler.remove(self.arguments.get('<catalog>'))
@@ -212,6 +230,10 @@ class Poco(object):
 
             if self.has_attributes('logs') or self.has_attributes('log'):
                 self.command_handler.run('logs')
+
+            if self.has_attributes('pack'):
+                package_handler = PackageHandler()
+                package_handler.pack(compose_handler=self.compose_handler, project_utils=self.project_utils)
 
         except Exception as ex:
             ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))

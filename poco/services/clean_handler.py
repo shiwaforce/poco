@@ -1,4 +1,5 @@
 from .console_logger import ColorPrint
+from .environment_utils import EnvironmentUtils
 from subprocess import check_output, CalledProcessError
 
 
@@ -18,7 +19,7 @@ class CleanHandler:
             ColorPrint.print_info("=== clean unused containers  ===")
             ColorPrint.print_with_lvl(message="Remove containers:\n" + str(out), lvl=1)
             try:
-                self.checkout("docker", "rm", out.strip().splitlines())
+                self.checkout("docker", "rm", EnvironmentUtils.decode(out).strip().splitlines())
             except CalledProcessError as grepexc:
                 self.print_error(grepexc)
 
@@ -30,7 +31,7 @@ class CleanHandler:
             ColorPrint.print_info("=== clean unused images  ===")
             ColorPrint.print_with_lvl(message="Remove images:\n" + str(out), lvl=1)
             try:
-                self.checkout("docker", "rmi", "-f", out.strip().splitlines())
+                self.checkout("docker", "rmi", "-f", EnvironmentUtils.decode(out).strip().splitlines())
             except CalledProcessError as grepexc:
                 self.print_error(grepexc)
 
@@ -41,7 +42,7 @@ class CleanHandler:
         else:
             ColorPrint.print_info("=== clean unused volumes  ===")
             ColorPrint.print_with_lvl(message="Remove volumes:\n" + str(out), lvl=1)
-            self.checkout("docker", "volume", "rm", out.splitlines())
+            self.checkout("docker", "volume", "rm", EnvironmentUtils.decode(out).splitlines())
 
     def checkout(self, *args):
         command_array = list()

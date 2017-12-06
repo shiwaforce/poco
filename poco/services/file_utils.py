@@ -29,13 +29,6 @@ class FileUtils:
                 stream.write(yaml.dump(data=content, default_flow_style=False))
 
     @staticmethod
-    def write_compose_log(directory, data):
-        file = os.path.join(directory, StateHolder.name + "-" + datetime.datetime.now().strftime("%Y.%m.%d-%H-%M-%S") + ".log")
-        if not os.path.exists(file):
-            with open(file, 'w') as stream:
-                stream.write(str(data))
-
-    @staticmethod
     def get_directory_name():
         return os.path.basename(os.getcwd())
 

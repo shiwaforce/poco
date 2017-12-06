@@ -79,7 +79,7 @@ class CommandHandler(object):
                                       project_utils=self.project_utils,
                                       repo_dir=self.repo_dir)
             for cmd in command_list['docker']:
-                runner.run(name=StateHolder.name, plan=plan, commands=cmd,
+                runner.run(plan=plan, commands=cmd,
                            envs=self.get_environment_variables(plan=plan))
 
         if command_list.get('after', False):
@@ -245,7 +245,7 @@ class DockerPlanRunner(AbstractPlanRunner):
         self.project_utils = project_utils
         self.repo_dir = repo_dir
 
-    def run(self, plan, commands, name, envs):
+    def run(self, plan, commands, envs):
 
         """Get compose file(s) from config depends on selected plan"""
         docker_files = list()
@@ -262,7 +262,7 @@ class DockerPlanRunner(AbstractPlanRunner):
         cmd = list()
         cmd.append("docker-compose")
         cmd.append("--project-name")
-        cmd.append(name)
+        cmd.append(StateHolder.name)
         for compose_file in docker_files:
             cmd.append("-f")
             cmd.append(str(compose_file))
