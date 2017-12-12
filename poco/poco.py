@@ -61,7 +61,7 @@ from .services.command_handler import CommandHandler
 from .services.state import StateHolder
 
 
-__version__ = '0.22.0'
+__version__ = '0.22.1'
 
 
 class Poco(object):
