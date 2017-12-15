@@ -111,8 +111,10 @@ Without configuration and catalogue
 -----------------------------------
 
 If you haven't an own home directory but your actual directory contains an poco.yml, you can use the same commands.
+
 The "catalog" and "catalog config" commands will not works this way.
-You can change docker container's names, If you use <project> parameters.
+
+You can change docker container's names, If you use <project> parameter.
 
 Home directory
 --------------
