@@ -55,6 +55,9 @@ class AbstractRepository(object):
         ColorPrint.exit_after_print_messages(
             message="Error: branch is not supported in this repository. \n" + self.target_dir, msg_type="error")
 
+    def print_branches(self):
+        ColorPrint.print_with_lvl(message="Branch is not supported in this repository.", lvl=-1)
+
     def pull(self):
         pass
 

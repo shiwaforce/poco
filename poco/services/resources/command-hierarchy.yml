@@ -39,7 +39,7 @@
   },
   pull: {
     before: true,
-    docker: ["ps"],
+    docker: ["pull"],
     after: true
   },
   stop: {
@@ -50,5 +50,9 @@
   logs: {
     docker: [["logs", "-f"]],
     kubernetes: ["get"]
+  },
+  pack: {
+    docker: ["pull"],
+    postmethods: ["pack"]
   }
 }

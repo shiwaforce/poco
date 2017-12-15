@@ -1,7 +1,5 @@
 version: '2.0'
 maintainer: "operation@shiwaforce.com"
-containers:
-    sample: docker-compose.yml
 
 plan:
-    default: sample
+    default: docker-compose.yml

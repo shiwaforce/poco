@@ -6,6 +6,7 @@ import tempfile
 import yaml
 from contextlib import contextmanager
 from ..services.file_utils import FileUtils
+from ..services.state import StateHolder
 try:
     from StringIO import StringIO
 except ImportError:
@@ -59,8 +60,28 @@ class AbstractTestSuite(unittest.TestCase):
         self.ws_dir = os.path.join(self.tmpdir, 'ws')
         os.makedirs(self.ws_dir)
 
+        self.clean_states()
+
     def tearDown(self):
         shutil.rmtree(self.tmpdir, onerror=FileUtils.remove_readonly)
+
+    @staticmethod
+    def clean_states():
+        StateHolder.home_dir = None
+        StateHolder.mode = "Docker"
+        StateHolder.config_file = None
+        StateHolder.work_dir = None
+        StateHolder.config_parsed = False
+        StateHolder.args = dict()
+        StateHolder.config = None
+        StateHolder.catalogs = None
+        StateHolder.catalog_element = None
+        StateHolder.name = None
+        StateHolder.offline = False
+        StateHolder.developer_mode = False
+        StateHolder.skip_docker = False
+        StateHolder.config_handler = None
+        StateHolder.compose_handler = None
 
     def init_with_local_catalog(self):
         data = self.add_workspace_dir(AbstractTestSuite.LOCAL_CONFIG)

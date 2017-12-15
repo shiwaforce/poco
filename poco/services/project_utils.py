@@ -28,10 +28,21 @@ class ProjectUtils:
         self.repositories[StateHolder.name] = repo_handler
         return repo_handler
 
+    def add_repository(self, target_dir):
+
+        repo_handler = FileRepository(target_dir=target_dir)
+        self.repositories[StateHolder.name] = repo_handler
+        return repo_handler
+
     def get_compose_file(self, project_element, ssh, silent=False):
         """Get compose file from project repository """
-        repo_handler = self.get_project_repository(project_element=project_element, ssh=ssh)
-        file = repo_handler.get_file(project_element.get('file', 'poco.yml'))
+
+        if StateHolder.config is None:
+            repository = self.add_repository(target_dir=StateHolder.work_dir)
+            file = repository.get_file('poco.yml')
+        else:
+            repo_handler = self.get_project_repository(project_element=project_element, ssh=ssh)
+            file = repo_handler.get_file(project_element.get('file', 'poco.yml'))
         if not os.path.exists(file):
             if silent:
                 return None

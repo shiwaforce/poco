@@ -1,10 +1,11 @@
-import os.path as path
+import os
 import yaml
 from .console_logger import *
 from .file_repository import FileRepository
 from .git_repository import GitRepository
 from .svn_repository import SvnRepository
 from .environment_utils import EnvironmentUtils
+from .file_utils import FileUtils
 from .state import StateHolder
 
 
@@ -15,19 +16,18 @@ class CatalogHandler:
         self.catalog_repositories = dict()
         self.default_repository = None
 
-        self.catalogs = None
         for key in StateHolder.config.keys():
             conf = StateHolder.config[key]
             repo = self.get_repository_type(conf)
 
             if StateHolder.offline and repo in ('git', 'svn'):
-                repository = FileRepository(target_dir=path.join(StateHolder.home_dir, 'catalogHome', key))
+                repository = FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key))
             elif 'git' == repo:
-                repository = GitRepository(target_dir=path.join(StateHolder.home_dir, 'catalogHome', key),
+                repository = GitRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
                                            url=self.get_url(conf),
                                            branch=self.get_branch(conf), git_ssh_identity_file=conf.get("ssh-key"))
             elif 'svn' == repo:
-                repository = SvnRepository(target_dir=path.join(StateHolder.home_dir, 'catalogHome', key),
+                repository = SvnRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
                                            url=self.get_url(conf))
             else:
                 repository = FileRepository(target_dir=StateHolder.home_dir)
@@ -36,12 +36,50 @@ class CatalogHandler:
                 self.default_repository = CatalogData(config=conf, repository=repository)
             self.catalog_repositories[key] = CatalogData(config=conf, repository=repository)
 
-    def get_catalog(self):
-        """Parse catalog file"""
-        if self.catalogs is not None:
-            return self.catalogs
+        self.parse_catalog()
 
-        self.catalogs = dict()
+    def handle_command(self):
+
+        if StateHolder.has_args('catalog', 'ls'):
+            self.print_ls()
+            return
+        if StateHolder.has_args('catalog', 'branches'):
+            self.get_catalog_repository(StateHolder.args.get('<catalog>')).print_branches()
+            return
+        if StateHolder.has_args('catalog', 'branch'):
+            branch = StateHolder.args.get('<branch>')
+            catalog = StateHolder.args.get('<catalog>')
+            self.get_catalog_repository(catalog=catalog).set_branch(branch=branch, force=StateHolder.args.get("-f"))
+            StateHolder.config_handler.set_branch(branch=branch, config=catalog)
+            ColorPrint.print_info("Branch changed")
+            return
+        if StateHolder.has_args('catalog', 'push'):
+            self.push(StateHolder.args.get('<catalog>'))
+            ColorPrint.print_info("Push completed")
+            return
+        if StateHolder.has_args('catalog', 'add'):
+            target_dir = FileUtils.get_normalized_dir(StateHolder.args.get('<target-dir>'))
+            repo, repo_dir = FileUtils.get_git_repo(target_dir)
+            file_prefix = ""
+            repo_name = None
+            if target_dir != repo_dir:
+                file_prefix = FileUtils.get_relative_path(base_path=repo_dir, target_path=target_dir)
+                repo_name = os.path.basename(repo_dir)
+            self.add_to_list(name=os.path.basename(target_dir), handler="git",
+                             catalog=StateHolder.args.get('<catalog>'),
+                             url=repo.remotes.origin.url, file=file_prefix + "poco.yml",
+                             repo_name=repo_name)
+            ColorPrint.print_info("Project added")
+            return
+
+        if StateHolder.has_args('catalog', 'remove'):
+            self.remove_from_list()
+            ColorPrint.print_info("Project removed")
+            return
+
+    def parse_catalog(self):
+        """Parse catalog file"""
+        StateHolder.catalogs = dict()
 
         for key in self.catalog_repositories.keys():
             conf = self.catalog_repositories[key].config
@@ -53,37 +91,37 @@ class CatalogHandler:
             if not isinstance(lst, dict):
                 ColorPrint.exit_after_print_messages(message="file not valid : " + str(catalog_file),
                                                      doc=Doc.CONFIG)
-            self.catalogs[key] = lst
-        return self.catalogs
+            StateHolder.catalogs[key] = lst
 
     def write_catalog(self, catalog):
         """Write catalog file"""
-        if catalog is not None and catalog in self.get_catalog():
-            string_format = yaml.dump(data=self.catalogs[catalog], default_flow_style=False)
+        if catalog is not None and catalog in StateHolder.catalogs:
+            string_format = yaml.dump(data=StateHolder.catalogs[catalog], default_flow_style=False)
             self.catalog_repositories[catalog].repository.write_yaml_file(self.get_catalog_file(
                 self.catalog_repositories[catalog].config), string_format)
 
-    def get(self):
+    @staticmethod
+    def get():
         """Get project parameters form catalog, if it is exists"""
-        for catalog in self.get_catalog():
-            if StateHolder.name in self.catalogs[catalog]:
-                return self.catalogs[catalog].get(StateHolder.name)
+        for catalog in StateHolder.catalogs:
+            if StateHolder.name in StateHolder.catalogs[catalog]:
+                return StateHolder.catalogs[catalog].get(StateHolder.name)
         ColorPrint.exit_after_print_messages(message="Project with name: %s not exist" % StateHolder.name)
 
     def set(self, modified):
         """Set project parameters and write, if it is exists"""
-        for catalog in self.get_catalog():
-            if StateHolder.name in self.catalogs[catalog]:
-                self.catalogs[catalog][StateHolder.name] = modified
+        for catalog in StateHolder.catalogs:
+            if StateHolder.name in StateHolder.catalogs[catalog]:
+                StateHolder.catalogs[catalog][StateHolder.name] = modified
             self.write_catalog(catalog)
 
     def add_to_list(self, name, handler, url, catalog, file=None, repo_name=None):
         """Add project to the catalog"""
         if catalog is None:
             catalog = self.get_default_catalog()
-        if catalog not in self.get_catalog():
+        if catalog not in StateHolder.catalogs:
             ColorPrint.exit_after_print_messages(message="Catalog not exists : " + str(catalog))
-        lst = self.catalogs[catalog]
+        lst = StateHolder.catalogs[catalog]
         lst[name] = dict()
         lst[name][handler] = str(url)
         if file is not None:
@@ -95,8 +133,8 @@ class CatalogHandler:
     def remove_from_list(self):
         """Remove project from catalog"""
 
-        for catalog in self.get_catalog():
-            lst = self.catalogs[catalog]
+        for catalog in StateHolder.catalogs:
+            lst = StateHolder.catalogs[catalog]
             if StateHolder.name in lst:
                 lst.pop(StateHolder.name)
                 self.write_catalog(catalog=catalog)
@@ -116,10 +154,11 @@ class CatalogHandler:
             catalog = self.get_default_catalog()
             self.catalog_repositories[catalog].repository.push()
 
-    def get_default_catalog(self):
-        if 'default' in self.get_catalog():
+    @staticmethod
+    def get_default_catalog():
+        if 'default' in StateHolder.catalogs:
             return 'default'
-        return list(self.catalogs.keys())[0]
+        return list(StateHolder.catalogs.keys())[0]
 
     @staticmethod
     def valid_catalog(catalog):
@@ -160,6 +199,29 @@ class CatalogHandler:
         if config is not None:
             return config.get('file', 'poco-catalog.yml')
         return None
+
+    @staticmethod
+    def print_ls():
+
+        """Get catalog list"""
+        lst = StateHolder.catalogs
+        if len(lst) > 0:
+            ColorPrint.print_with_lvl(message="-------------------", lvl=-1)
+            ColorPrint.print_with_lvl(message="Available projects:", lvl=-1)
+            ColorPrint.print_with_lvl(message="-------------------", lvl=-1)
+
+            for cat in lst.keys():
+                for key in lst[cat].keys():
+                    msg = key
+                    if os.path.exists(os.path.join(
+                            StateHolder.work_dir,
+                            lst[cat][key]["repository_dir"] if "repository_dir" in lst[cat][key] else key)):
+                        msg += " (*)"
+                    ColorPrint.print_with_lvl(message=msg, lvl=-1)
+        else:
+            ColorPrint.print_with_lvl(
+                message="Project catalog is empty. You can add projects with 'project-catalog add' command",
+                lvl=-1)
 
 
 class CatalogData:

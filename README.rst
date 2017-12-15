@@ -39,7 +39,11 @@ Install the latest poco:
 
 ``$ pip install poco``
 
-List all projects in the catalogue (It will be initialise the sample catalogue at first time):
+It will be initialise the sample catalogue at first time
+
+``$ poco catalog init``
+
+List all projects in the catalogue:
 
 ``$ poco catalog ls``
 
@@ -102,6 +106,13 @@ Use pip:
 or
 
 ``$ python setup.py install``
+
+Without configuration and catalogue
+-----------------------------------
+
+If you haven't an own home directory but your actual directory contains an poco.yml, you can use the same commands.
+The "catalog" and "catalog config" commands will not works this way.
+You can change docker container's names, If you use <project> parameters.
 
 Home directory
 --------------

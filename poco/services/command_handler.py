@@ -1,17 +1,18 @@
 import os
 import yaml
 import platform
-from subprocess import check_call, call
+from subprocess import check_call
 from .console_logger import ColorPrint, Doc
 from .file_utils import FileUtils
 from .project_utils import ProjectUtils
 from .environment_utils import EnvironmentUtils
+from .package_handler import PackageHandler
 from .state import StateHolder
 
 
 class CommandHandler(object):
 
-    def __init__(self, args, compose_handler, project_utils):
+    def __init__(self, project_utils):
 
         with open(os.path.join(os.path.dirname(__file__), 'resources/command-hierarchy.yml')) as stream:
             try:
@@ -20,13 +21,11 @@ class CommandHandler(object):
                 ColorPrint.exit_after_print_messages(message="Error: Wrong YAML format:\n " + str(exc),
                                                      doc=Doc.POCO)
 
-        self.args = args
-        self.compose_handler = compose_handler
-        compose_handler.get_compose_project()
-        self.project_compose = self.compose_handler.compose_project
-        self.working_directory = self.compose_handler.get_working_directory()
-        self.plan = self.compose_handler.plan
-        self.repo_dir = self.compose_handler.repo_dir
+        StateHolder.compose_handler.get_compose_project()
+        self.project_compose = StateHolder.compose_handler.compose_project
+        self.working_directory = StateHolder.compose_handler.get_working_directory()
+        self.plan = StateHolder.compose_handler.plan
+        self.repo_dir = StateHolder.compose_handler.repo_dir
         self.project_utils = project_utils
 
         ''' Check mode '''
@@ -63,14 +62,20 @@ class CommandHandler(object):
         if command_list.get('before', False):
             self.script_runner.run(plan=plan, script_type='before_script')
 
+        if 'premethods' in command_list and len(command_list['premethods']) > 0:
+            for method in command_list['premethods']:
+                getattr(self, method)()
+
         if isinstance(plan, dict) and 'script' in plan:
-            self.script_runner.run(plan=plan, script_type='script')
-        elif StateHolder.mode == "Kubernetes":
+            # script running only if start or up command
+            if cmd == 'start' or cmd == 'up':
+                self.script_runner.run(plan=plan, script_type='script')
+        elif StateHolder.mode == 'Kubernetes':
             runner = KubernetesRunner(working_directory=self.working_directory,
                                       project_utils=self.project_utils,
                                       repo_dir=self.repo_dir)
             if len(command_list['kubernetes']) == 0:
-                ColorPrint.exit_after_print_messages("Command: " + cmd + " not supported with Kubernetes")
+                ColorPrint.exit_after_print_messages('Command: ' + cmd + ' not supported with Kubernetes')
             for cmd in command_list['kubernetes']:
                 runner.run(plan=plan, command=cmd, envs=self.get_environment_variables(plan=plan))
         else:
@@ -81,6 +86,10 @@ class CommandHandler(object):
             for cmd in command_list['docker']:
                 runner.run(plan=plan, commands=cmd,
                            envs=self.get_environment_variables(plan=plan))
+
+        if 'postmethods' in command_list and len(command_list['postmethods']) > 0:
+            for method in command_list['postmethods']:
+                getattr(self, method)()
 
         if command_list.get('after', False):
             self.script_runner.run(plan=plan, script_type='after_script')
@@ -135,18 +144,23 @@ class CommandHandler(object):
         env_copy["HOST_SYSTEM"] = platform.system()
         return env_copy
 
+    def pack(self):
+        plan = self.project_compose['plan'][self.plan]
+        envs = self.get_environment_variables(plan=plan)
+        runner = DockerPlanRunner(project_compose=self.project_compose,
+                                  working_directory=self.working_directory,
+                                  project_utils=self.project_utils,
+                                  repo_dir=self.repo_dir)
+        PackageHandler().pack(files=runner.get_docker_files(plan=plan), project_utils=self.project_utils, envs=envs)
+
 
 class AbstractPlanRunner(object):
 
     @staticmethod
-    def run_script_with_check(cmd, working_directory):
-        res = check_call(" ".join(cmd), cwd=working_directory, shell=True)
+    def run_script_with_check(cmd, working_directory, envs):
+        res = check_call(" ".join(cmd), cwd=working_directory, env=envs, shell=True)
         if res > 0:
             ColorPrint.exit_after_print_messages(message=res)
-
-    @staticmethod
-    def run_script(cmd, working_directory, envs):
-        call(" ".join(cmd), cwd=working_directory, env=envs, shell=True)
 
 
 class ScriptPlanRunner(AbstractPlanRunner):
@@ -220,7 +234,7 @@ class KubernetesRunner(AbstractPlanRunner):
             cmd.append(str(kube_file))
 
             ColorPrint.print_with_lvl(message="Kubernetes command: " + str(cmd), lvl=1)
-            self.run_script(cmd=cmd, working_directory=self.working_directory, envs=envs)
+            self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=envs)
 
     def get_file(self, file):
         return self.project_utils.get_file(file=FileUtils.get_compose_file_relative_path(
@@ -248,15 +262,7 @@ class DockerPlanRunner(AbstractPlanRunner):
     def run(self, plan, commands, envs):
 
         """Get compose file(s) from config depends on selected plan"""
-        docker_files = list()
-        if isinstance(plan, dict) and 'docker-compose-file' in plan:
-            for service in ProjectUtils.get_list_value(plan['docker-compose-file']):
-                docker_files.append(self.get_docker_compose(service=service))
-        elif isinstance(plan, dict) and 'docker-compose-dir' in plan:
-            docker_files.extend(self.get_docker_compose_list(ProjectUtils.get_list_value(plan['docker-compose-dir'])))
-        else:
-            for service in ProjectUtils.get_list_value(plan):
-                docker_files.append(self.get_docker_compose(service=service))
+        docker_files = self.get_docker_files(plan=plan)
 
         """Compose docker command array with project name and compose files"""
         cmd = list()
@@ -274,7 +280,20 @@ class DockerPlanRunner(AbstractPlanRunner):
             cmd.append(commands)
 
         ColorPrint.print_with_lvl(message="Docker command: " + str(cmd), lvl=1)
-        self.run_script(cmd=cmd, working_directory=self.working_directory, envs=envs)
+        self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=envs)
+
+    def get_docker_files(self, plan):
+        docker_files = list()
+        if isinstance(plan, dict) and 'docker-compose-file' in plan:
+            for service in ProjectUtils.get_list_value(plan['docker-compose-file']):
+                docker_files.append(self.get_docker_compose(service=service))
+        elif isinstance(plan, dict) and 'docker-compose-dir' in plan:
+            docker_files.extend(self.get_docker_compose_list(ProjectUtils.get_list_value(plan['docker-compose-dir'])))
+        else:
+            for service in ProjectUtils.get_list_value(plan):
+                docker_files.append(self.get_docker_compose(service=service))
+
+        return docker_files
 
     def get_docker_compose(self, service):
         """Get back the docker compose file"""

@@ -25,13 +25,11 @@ class ComposeTestSuite(AbstractTestSuite):
 
     def test_config_without_config(self):
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            poco = Poco(home_dir=self.tmpdir, argv=["catalog", "config"])
-            poco.run()
-        self.assertEqual(0, len(err.getvalue()))
-        AbstractTestSuite.REMOTE_CONFIG.pop('workspace')
-        self.assertIn(yaml.dump(data=AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='',
-                                indent=4).strip(), out.getvalue().strip())
+            with self.assertRaises(SystemExit) as context:
+                poco = Poco(home_dir=self.tmpdir, argv=["catalog", "config"])
+                poco.run()
+            self.assertIsNotNone(context.exception)
+        self.assertIn("catalog config commands works only with config file.", out.getvalue().strip())
 
     def test_config(self):
         self.init_with_remote_catalog()
@@ -54,9 +52,10 @@ class ComposeTestSuite(AbstractTestSuite):
         data["teszt"] = dict()
         data["teszt"]["repositoryType"] = "git"
         data["teszt"]["server"] = "ssh://teszt.teszt/teszt"
+
         self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
                       out.getvalue().strip())
-
+        self.clean_states()
         with self.captured_output() as (out, err):
             StateHolder.skip_docker = True
             poco = Poco(home_dir=self.tmpdir, argv=["catalog", "config", "remove", "teszt"])
@@ -91,8 +90,7 @@ class ComposeTestSuite(AbstractTestSuite):
             poco = Poco(home_dir=self.tmpdir, argv=["catalog", "branches"])
             poco.run()
         self.assertEqual(0, len(err.getvalue().strip()))
-        self.assertIn('Available branches in', out.getvalue().strip())
-        self.assertNotIn('master', out.getvalue().strip())
+        self.assertIn('Branch is not supported in this repository.', out.getvalue().strip())
 
     def test_branches_with_remote_config(self):
         self.init_with_remote_catalog()

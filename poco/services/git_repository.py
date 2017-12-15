@@ -1,7 +1,6 @@
 import os
 import git
 import shutil
-import string
 from .abstract_repository import AbstractRepository
 from .console_logger import ColorPrint
 from .state import StateHolder
@@ -40,7 +39,7 @@ class GitRepository(AbstractRepository):
     def get_branches(self):
         return self.repo.branches
 
-    def set_branch(self, branch, force):
+    def set_branch(self, branch, force=False):
         try:
             if branch not in self.repo.branches and branch == 'master':
                 '''Make init commit'''
@@ -90,6 +89,15 @@ class GitRepository(AbstractRepository):
     def get_actual_branch(self):
         return str(self.repo.active_branch)
 
+    def print_branches(self):
+        """Get available branches"""
+        actual_branch = self.get_actual_branch()
+        ColorPrint.print_with_lvl(message="----------------------------------------------------------", lvl=-1)
+        ColorPrint.print_with_lvl(message="Available branches in " + self.target_dir, lvl=-1)
+        ColorPrint.print_with_lvl(message="----------------------------------------------------------", lvl=-1)
+        for key in self.get_branches():
+            ColorPrint.print_with_lvl(message=str(key) + "(*)" if str(key) == actual_branch else key, lvl=-1)
+
     @staticmethod
     def is_same_host(old_url, url):
         return GitRepository.clean_url(str(old_url)) == GitRepository.clean_url(str(url))
@@ -100,19 +108,19 @@ class GitRepository(AbstractRepository):
         url = url.lstrip("https://")
         url = url.lstrip("ssh://")
 
-        #remove user info
+        # remove user info
         idx = url.find("@")
         if not idx == -1:
             url = url[idx+1:]
 
-        #remove port
+        # remove port
         idx = url.find(":")
         if not idx == -1:
             idx2 = url.find("/", idx)
             if not idx2 == -1:
                 url = url[:idx] + url[idx2:]
 
-        #remove scm part ( Atlassian stash compatibility )
+        # remove scm part ( Atlassian stash compatibility )
         idx = url.find("/scm")
         if not idx == -1:
             url = url[:idx] + url[idx+4:]

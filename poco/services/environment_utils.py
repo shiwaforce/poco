@@ -3,6 +3,7 @@ import sys
 from subprocess import Popen, PIPE
 from .console_logger import ColorPrint
 
+
 class EnvironmentUtils:
 
     @staticmethod

@@ -1,5 +1,6 @@
 import os
 import shutil
+import yaml
 from .console_logger import Doc, ColorPrint
 from .file_utils import FileUtils
 from .state import StateHolder
@@ -12,9 +13,7 @@ class ConfigHandler(object):
 
     def __init__(self):
         StateHolder.config_parsed = False
-
-        if not ConfigHandler.exists():
-            self.init()
+        StateHolder.config_handler = self
 
     def read(self):
         """Parse local configuration file"""
@@ -76,28 +75,56 @@ class ConfigHandler(object):
                 FileUtils.make_empty_file_with_empty_dict(directory=StateHolder.home_dir,
                                                           file=conf.get('file', 'poco-catalog.yml'))
 
+    def handle_command(self):
+
+        if StateHolder.has_args('init'):
+            self.init()
+            return
+
+        if StateHolder.has_args('config'):
+            if StateHolder.config is None:
+                ColorPrint.exit_after_print_messages('catalog config commands works only with config file.\n '
+                                                     'Run "catalog init" command to create one.')
+            if StateHolder.has_args('remove'):
+                self.remove(StateHolder.args.get('<catalog>'))
+            if StateHolder.has_args('add'):
+                self.add()
+            ColorPrint.print_info(self.print_config())
+            return
+
     def remove(self, catalog):
         if catalog not in list(self.config.keys()):
             ColorPrint.exit_after_print_messages(message="Catalog not exists with name: " + catalog)
         del self.config[catalog]
         YamlHandler.write(file=StateHolder.config_file, data=self.config)
 
-    def add(self, arguments):
-        catalog = arguments.get('<catalog>')
+    def add(self):
+        catalog = StateHolder.args.get('<catalog>')
         if catalog in list(self.config.keys()):
             self.config.remove(catalog)
         config = dict()
         config['repositoryType'] = 'git'
-        config['server'] = arguments.get('<git-url>')
-        if arguments.get('<branch>') is not None:
-            config['branch'] = arguments.get('<branch>')
-        if arguments.get('<file>') is not None:
-            config['file'] = arguments.get('<file>')
+        config['server'] = StateHolder.args.get('<git-url>')
+        if StateHolder.args.get('<branch>') is not None:
+            config['branch'] = StateHolder.args.get('<branch>')
+        if StateHolder.args.get('<file>') is not None:
+            config['file'] = StateHolder.args.get('<file>')
         self.config[catalog] = config
         YamlHandler.write(file=StateHolder.config_file, data=self.config)
 
-    def dump(self):
-        YamlHandler.dump(data=self.config)
+    def print_config(self):
+        config = "Actual config\n"
+        config += "-------------\n\n"
+        config += "Working directory " + str(StateHolder.work_dir) + "\n"
+        config += "Offline: " + str(StateHolder.offline) + "\n"
+        config += "Developer mode: " + str(StateHolder.developer_mode) + "\n"
+        config += "Project name: " + str(StateHolder.name) + "\n"
+        if StateHolder.config is not None:
+            config += "Config location: " + str(StateHolder.config_file) + "\n"
+            config += "Config:\n"
+            config += "-------\n"
+            config += yaml.dump(self.config, default_flow_style=False, default_style='', indent=4)
+        return config
 
     @staticmethod
     def exists():
