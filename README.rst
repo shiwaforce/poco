@@ -114,7 +114,7 @@ If you haven't an own home directory but your actual directory contains an poco.
 
 The "catalog" and "catalog config" commands will not works this way.
 
-You can change docker container's names, If you use <project> parameter.
+You can change docker container's names, if you use <project> parameter.
 
 Home directory
 --------------
