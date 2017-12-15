@@ -2,40 +2,9 @@
 """SF Program compose.
 
 Usage:
-  poco catalog [options] add [<target-dir>] [<catalog>]
-  poco catalog [options] init
-  poco catalog [options] ls
-  poco catalog [options] config add <catalog> <git-url> [<branch>] [<file>]
-  poco catalog [options] config
-  poco catalog [options] config remove <catalog>
-  poco catalog [options] branch <branch> [<catalog>] [-f]
-  poco catalog [options] branches [<catalog>]
-  poco catalog [options] push [<catalog>]
-  poco catalog [options] remove [<project>]
-  poco [options] config [<project>] [<plan>]
-  poco [options] clean
-  poco [options] init [<project>]
-  poco [options] install [<project>] [<plan>]
-  poco [options] up [<project>] [<plan>]
-  poco [options] down [<project>] [<plan>]
-  poco [options] build [<project>] [<plan>]
-  poco [options] ps [<project>] [<plan>]
-  poco [options] plan ls [<project>]
-  poco [options] pull [<project>] [<plan>]
-  poco [options] restart [<project>] [<plan>]
-  poco [options] start [<project>] [<plan>]
-  poco [options] stop [<project>] [<plan>]
-  poco [options] log [<project>] [<plan>]
-  poco [options] logs [<project>] [<plan>]
-  poco [options] branch <project> <branch> [-f]
-  poco [options] branches [<project>]
-  poco [options] pack [<project>] [<plan>]
-  poco [options] unpack
-  poco [options] localup
-  poco [options] localdown
+  poco [--version] [-h|--help] [-v|--verbose] [-q|--quiet] [--developer] [--offline] <command> [<args>...]
 
-  poco (-h | --help)
-  poco --version
+
 
 Options:
   -h --help     Show this screen.
@@ -43,6 +12,8 @@ Options:
   -q --quiet    Print less text.
   --developer   Project repository handle by user
   --offline     Offline mode
+
+See 'poco help <command>' for more information on a specific command.
 
 """
 import os
@@ -75,9 +46,62 @@ class Poco(object):
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.poco'),
                  argv=sys.argv[1:]):
 
+        args = docopt(__doc__,
+                      version=__version__,
+                      options_first=True)
+        print('global arguments:')
+        print(args)
+        print('command arguments:')
+
+        argv = [args['<command>']] + args['<args>']
+        if args['<command>'] == 'catalog':
+            import poco_catalog
+            print(docopt(poco_catalog.__doc__, argv=argv))
+        elif args['<command>'] == 'config':
+            import poco_config
+            print(docopt(poco_config.__doc__, argv=argv))
+        elif args['<command>'] in ['project-config', 'clean', 'init', 'install', 'up', 'down', 'build', 'ps', 'plan',
+                                   'pull', 'restart', 'start', 'stop', 'log', 'logs', 'branch', 'branches', 'pack',
+                                   'unpack']:
+            import poco_default
+            if args['<command>'] == 'project-config':
+                print(docopt(poco_default.PocoDefault.PROJECT_CONFIG, argv=argv))
+            elif args['<command>'] == 'clean':
+                print(docopt(poco_default.PocoDefault.CLEAN, argv=argv))
+            elif args['<command>'] == 'init':
+                print(docopt(poco_default.PocoDefault.INIT, argv=argv))
+            elif args['<command>'] == 'install':
+                print(docopt(poco_default.PocoDefault.INSTALL, argv=argv))
+            elif args['<command>'] in ['start', 'up']:
+                print(docopt(poco_default.PocoDefault.START, argv=argv))
+            elif args['<command>'] in ['stop', 'down']:
+                print(docopt(poco_default.PocoDefault.START, argv=argv))
+            elif args['<command>'] == 'restart':
+                print(docopt(poco_default.PocoDefault.RESTART, argv=argv))
+            elif args['<command>'] in ['log', 'logs']:
+                print(docopt(poco_default.PocoDefault.LOG, argv=argv))
+            elif args['<command>'] == 'build':
+                print(docopt(poco_default.PocoDefault.BUILD, argv=argv))
+            elif args['<command>'] == 'ps':
+                print(docopt(poco_default.PocoDefault.PS, argv=argv))
+            elif args['<command>'] == 'plan':
+                print(docopt(poco_default.PocoDefault.PLAN, argv=argv))
+            elif args['<command>'] == 'pull':
+                print(docopt(poco_default.PocoDefault.PULL, argv=argv))
+            elif args['<command>'] == 'branch':
+                print(docopt(poco_default.PocoDefault.BRANCH, argv=argv))
+            elif args['<command>'] == 'branches':
+                print(docopt(poco_default.PocoDefault.BRANCHES, argv=argv))
+            elif args['<command>'] == 'pack':
+                print(docopt(poco_default.PocoDefault.PACK, argv=argv))
+            elif args['<command>'] == 'unpack':
+                print(docopt(poco_default.PocoDefault.UNPACK, argv=argv))
+        else:
+            exit("%r is not a poco command. See 'poco help'." % args['<command>'])
+
         """Fill state"""
 
-        StateHolder.home_dir = home_dir
+        """StateHolder.home_dir = home_dir
         StateHolder.config_file = os.path.join(StateHolder.home_dir, 'config')
         StateHolder.args = docopt(__doc__, version=__version__, argv=argv)
         ColorPrint.set_log_level(StateHolder.args)
@@ -89,14 +113,14 @@ class Poco(object):
         if StateHolder.args.get("--developer"):
             StateHolder.developer_mode = StateHolder.args.get("--developer")
 
-        self.config_handler = ConfigHandler()
+        self.config_handler = ConfigHandler()"""
 
         """Parse config if exists """
-        if ConfigHandler.exists():
+        """if ConfigHandler.exists():
             self.config_handler.read()
         else:
             StateHolder.work_dir = os.getcwd()
-            StateHolder.developer_mode = True
+            StateHolder.developer_mode = True"""
 
     def run(self):
         try:
@@ -280,7 +304,7 @@ class Poco(object):
 
 def main():
     poco = Poco()
-    poco.run()
+    # poco.run()
 
 if __name__ == '__main__':
     sys.exit(main())
