@@ -5,13 +5,21 @@ Usage:
   poco [--version] [-h|--help] [-v|--verbose] [-q|--quiet] [--developer] [--offline] <command> [<args>...]
 
 
-
 Options:
   -h --help     Show this screen.
   -v --verbose  Print more text.
   -q --quiet    Print less text.
   --developer   Project repository handle by user
   --offline     Offline mode
+
+The most commonly used poco commands are:
+   catalog ls       List all available projects from catalogues
+   up               Start project
+   down             Stop project
+   restart          Restart project
+   log              Print logs from containers that belongs to project
+   plan ls          Print all plan belongs to project
+   catalog init     Create config for example catalog
 
 See 'poco help <command>' for more information on a specific command.
 
@@ -48,56 +56,24 @@ class Poco(object):
 
         args = docopt(__doc__,
                       version=__version__,
-                      options_first=True)
+                      options_first=True, argv=argv)
         print('global arguments:')
         print(args)
         print('command arguments:')
 
+        import poco_catalog
+        import poco_config
+        import poco_default
+
         argv = [args['<command>']] + args['<args>']
         if args['<command>'] == 'catalog':
-            import poco_catalog
             print(docopt(poco_catalog.__doc__, argv=argv))
         elif args['<command>'] == 'config':
-            import poco_config
             print(docopt(poco_config.__doc__, argv=argv))
-        elif args['<command>'] in ['project-config', 'clean', 'init', 'install', 'up', 'down', 'build', 'ps', 'plan',
-                                   'pull', 'restart', 'start', 'stop', 'log', 'logs', 'branch', 'branches', 'pack',
-                                   'unpack']:
-            import poco_default
-            if args['<command>'] == 'project-config':
-                print(docopt(poco_default.PocoDefault.PROJECT_CONFIG, argv=argv))
-            elif args['<command>'] == 'clean':
-                print(docopt(poco_default.PocoDefault.CLEAN, argv=argv))
-            elif args['<command>'] == 'init':
-                print(docopt(poco_default.PocoDefault.INIT, argv=argv))
-            elif args['<command>'] == 'install':
-                print(docopt(poco_default.PocoDefault.INSTALL, argv=argv))
-            elif args['<command>'] in ['start', 'up']:
-                print(docopt(poco_default.PocoDefault.START, argv=argv))
-            elif args['<command>'] in ['stop', 'down']:
-                print(docopt(poco_default.PocoDefault.START, argv=argv))
-            elif args['<command>'] == 'restart':
-                print(docopt(poco_default.PocoDefault.RESTART, argv=argv))
-            elif args['<command>'] in ['log', 'logs']:
-                print(docopt(poco_default.PocoDefault.LOG, argv=argv))
-            elif args['<command>'] == 'build':
-                print(docopt(poco_default.PocoDefault.BUILD, argv=argv))
-            elif args['<command>'] == 'ps':
-                print(docopt(poco_default.PocoDefault.PS, argv=argv))
-            elif args['<command>'] == 'plan':
-                print(docopt(poco_default.PocoDefault.PLAN, argv=argv))
-            elif args['<command>'] == 'pull':
-                print(docopt(poco_default.PocoDefault.PULL, argv=argv))
-            elif args['<command>'] == 'branch':
-                print(docopt(poco_default.PocoDefault.BRANCH, argv=argv))
-            elif args['<command>'] == 'branches':
-                print(docopt(poco_default.PocoDefault.BRANCHES, argv=argv))
-            elif args['<command>'] == 'pack':
-                print(docopt(poco_default.PocoDefault.PACK, argv=argv))
-            elif args['<command>'] == 'unpack':
-                print(docopt(poco_default.PocoDefault.UNPACK, argv=argv))
+        elif args['<command>'] in poco_default.PocoDefault.command_dict.keys():
+            print(docopt(poco_default.PocoDefault.command_dict[args['<command>']], argv=argv))
         else:
-            exit("%r is not a poco command. See 'poco help'." % args['<command>'])
+            ColorPrint.exit_after_print_messages("%r is not a poco command. See 'poco help'." % args['<command>'])
 
         """Fill state"""
 

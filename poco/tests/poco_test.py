@@ -1,22 +1,21 @@
 import git
 import os
 import yaml
-from docopt import DocoptExit
 from .abstract_test import AbstractTestSuite
 from poco.poco import Poco
 from poco.services.state import StateHolder
 
 
 class ComposeTestSuite(AbstractTestSuite):
-    pass
-"""
+
     def test_without_command(self):
-        with self.assertRaises(DocoptExit) as context:
+        with self.assertRaises(SystemExit) as context:
             StateHolder.skip_docker = True
             poco = Poco(home_dir=self.tmpdir, argv=[""])
             poco.run()
         self.assertIsNotNone(context.exception)
 
+"""
     def test_wrong_parameters(self):
         with self.assertRaises(DocoptExit) as context:
             StateHolder.skip_docker = True

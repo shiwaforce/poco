@@ -1,9 +1,3 @@
-"""Usage:
-
-  poco pack [<project>] [<plan>]
-  poco unpack
-
-"""
 
 class PocoDefault:
 
@@ -180,3 +174,25 @@ class PocoDefault:
 
     Unpack archive, install images to local repository.
 """
+
+    command_dict = {
+        'project-config': PROJECT_CONFIG,
+        'clean': CLEAN,
+        'init': INIT,
+        'install': INSTALL,
+        'up': START,
+        'down': STOP,
+        'build': BUILD,
+        'ps': PS,
+        'plan': PLAN,
+        'pull': PULL,
+        'restart': RESTART,
+        'start': START,
+        'stop': STOP,
+        'log': LOG,
+        'logs': LOG,
+        'branch': BRANCH,
+        'branches': BRANCHES,
+        'pack': PACK,
+        'unpack': UNPACK
+    }
