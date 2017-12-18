@@ -177,7 +177,7 @@ class ScriptPlanRunner(AbstractPlanRunner):
                 cmd.append("\"")
                 cmd.append(script)
                 cmd.append("\"")
-                self.run_script_with_check(cmd=cmd, working_directory=self.working_directory)
+                self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=os.environ.copy())
 
     def get_native_scripts(self, plan, script_type):
         """Get scripts """
@@ -197,7 +197,8 @@ class ScriptPlanRunner(AbstractPlanRunner):
         """Add host system to environment"""
         command_array.append("-e")
         command_array.append("HOST_SYSTEM="+platform.system())
-
+        command_array.append("-u")
+        command_array.append("1000")
         command_array.append("-v")
         command_array.append(str(self.working_directory) + ":/usr/local")
         command_array.append("-w")
