@@ -28,6 +28,9 @@ import os
 import shutil
 import sys
 from docopt import docopt
+from .poco_default import PocoDefault
+from .poco_catalog import PocoCatalog
+from .poco_config import PocoConfig
 from .services.catalog_handler import CatalogHandler
 from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
@@ -61,17 +64,14 @@ class Poco(object):
         print(args)
         print('command arguments:')
 
-        import poco_catalog
-        import poco_config
-        import poco_default
-
-        argv = [args['<command>']] + args['<args>']
-        if args['<command>'] == 'catalog':
-            print(docopt(poco_catalog.__doc__, argv=argv))
-        elif args['<command>'] == 'config':
-            print(docopt(poco_config.__doc__, argv=argv))
-        elif args['<command>'] in poco_default.PocoDefault.command_dict.keys():
-            print(docopt(poco_default.PocoDefault.command_dict[args['<command>']], argv=argv))
+        command = args['<command>']
+        argv = [] + args['<args>']
+        if command == 'catalog':
+            print(docopt(PocoCatalog.command_dict[command], argv=argv))
+        elif command == 'config':
+            print(docopt(PocoConfig.command_dict[command], argv=argv))
+        elif command in PocoDefault.command_dict.keys():
+            print(docopt(PocoDefault.command_dict[command], argv=argv))
         else:
             ColorPrint.exit_after_print_messages("%r is not a poco command. See 'poco help'." % args['<command>'])
 

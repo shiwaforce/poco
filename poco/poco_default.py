@@ -1,7 +1,7 @@
 
 class PocoDefault:
 
-    PROJECT_CONFIG="""Usage:
+    PROJECT_CONFIG = """Usage:
   poco project-config [<project>] [<plan>]
 
     -h, --help
