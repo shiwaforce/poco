@@ -3,9 +3,10 @@
 class PocoConfig:
 
     CONFIG = """Usage:
-      poco config add <catalog> <git-url> [<branch>] [<file>]
-      poco config
-      poco config remove <catalog>
+      poco repo add <catalog> <git-url> [<branch>] [<file>]
+      poco repo
+      poco repo ls
+      poco repo (remove|rm) <catalog>
 
     """
 

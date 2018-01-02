@@ -66,8 +66,12 @@ class Poco(object):
 
         command = args['<command>']
         argv = [] + args['<args>']
+        extra_args = args['<args>']
         if command == 'catalog':
-            print(docopt(PocoCatalog.command_dict[command], argv=argv))
+            if len(extra_args) == 0:
+                print(docopt(PocoCatalog.command_dict['catalog'], argv=argv))
+            else:
+                print(docopt(PocoCatalog.command_dict[extra_args[0]], argv=argv))
         elif command == 'config':
             print(docopt(PocoConfig.command_dict[command], argv=argv))
         elif command in PocoDefault.command_dict.keys():

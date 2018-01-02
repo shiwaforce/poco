@@ -13,6 +13,28 @@ class PocoCatalog:
 
     """
 
+    ADD = """Usage:
+      poco catalog add [<target-dir>] [<catalog>]
+
+        -h, --help
+
+        Specific parameters:
+            <target-dir>      Directory that be added to catalogue. Default is the actual directory.
+            <catalog>         Name of the catalogue.
+
+        Add directory to catalogue.
+    """
+
+    INIT = """Usage:
+      poco catalog init
+
+        -h, --help
+
+        Add directory to catalogue.
+    """
+
     command_dict = {
-        'catalog': CATALOG
+        'catalog': CATALOG,
+        'add': ADD,
+
     }
