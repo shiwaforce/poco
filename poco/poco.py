@@ -48,6 +48,7 @@ from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
 from .services.config_handler import ConfigHandler
 from .services.file_utils import FileUtils
+from .services.environment_utils import EnvironmentUtils
 from .services.git_repository import GitRepository
 from .services.project_utils import ProjectUtils
 from .services.console_logger import ColorPrint
@@ -73,7 +74,7 @@ class Poco(object):
 
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.poco'),
                  argv=sys.argv[1:]):
-
+        EnvironmentUtils.check_version(__version__)
         args = docopt(__doc__,
                       version=__version__,
                       options_first=True, argv=argv)
@@ -82,6 +83,7 @@ class Poco(object):
         args = self.command_interpreter(command=args['<command>'], argv=[] + args['<args>'])
         print('command arguments:')
         print(args)
+
 
         """Fill state"""
 
