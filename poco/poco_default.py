@@ -28,11 +28,11 @@ class PocoDefault:
     Specific parameters:
       <project>         Name of the project in the catalog
 
-    Create poco.yml and docker-compose.yml to a project if aren't exists.
+    Create poco.yml and docker-compose.yml in project if aren't exists.
 """
 
     INSTALL = """Usage:
-  poco init [<project>] [<plan>]
+  poco install [<project>] [<plan>]
 
     -h, --help
 
@@ -52,7 +52,7 @@ class PocoDefault:
       <project>         Name of the project in the catalog
       <plan>            Name of the plan in the project
 
-    Starts project with defined plan (or default/first)
+    Starts project with defined plan (or default/first).
 """
     STOP = """Usage:
   poco (stop|down) [<project>] [<plan>]
@@ -63,7 +63,7 @@ class PocoDefault:
       <project>         Name of the project in the catalog
       <plan>            Name of the plan in the project
 
-    Stop project with defined plan (or default/first)
+    Stop project with defined plan (or default/first).
 """
     RESTART = """Usage:
   poco restart [<project>] [<plan>]
@@ -74,7 +74,7 @@ class PocoDefault:
       <project>         Name of the project in the catalog
       <plan>            Name of the plan in the project
 
-    Restart project with defined plan (or default/first)
+    Restart project with defined plan (or default/first).
 """
     LOG = """Usage:
   poco (log|logs) [<project>] [<plan>]
@@ -85,7 +85,7 @@ class PocoDefault:
       <project>         Name of the project in the catalog
       <plan>            Name of the plan in the project
 
-    Print containers logs which depends defined project and plan
+    Print containers logs which depends defined project and plan.
 """
     BUILD = """Usage:
   poco build [<project>] [<plan>]
@@ -96,7 +96,7 @@ class PocoDefault:
       <project>         Name of the project in the catalog
       <plan>            Name of the plan in the project
 
-    Build containers depends defined project and plan
+    Build containers depends defined project and plan.
 """
     PS = """Usage:
   poco ps [<project>] [<plan>]
@@ -107,7 +107,7 @@ class PocoDefault:
       <project>         Name of the project in the catalog
       <plan>            Name of the plan in the project
 
-    Print containers statuses which depends defined project and plan
+    Print containers statuses which depends defined project and plan.
 """
 
     PLAN = """Usage:
@@ -118,7 +118,7 @@ class PocoDefault:
     Specific parameters:
       <project>         Name of the project in the catalog
 
-    Print all available plan for the project
+    Print all available plan for the project.
 """
 
     PULL = """Usage:

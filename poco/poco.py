@@ -12,14 +12,26 @@ Options:
   --developer   Project repository handle by user
   --offline     Offline mode
 
-The most commonly used poco commands are:
-   catalog ls       List all available projects from catalogues
-   up               Start project
-   down             Stop project
-   restart          Restart project
-   log              Print logs from containers that belongs to project
-   plan ls          Print all plan belongs to project
-   catalog init     Create config for example catalog
+The available poco commands are:
+   repo [<subcommand>]      Repository commands, see 'poco help repo' for more.
+   project [<subcommand>]   Project commands, see 'poco help project' for more.
+   up, start                Start project
+   down, stop               Stop project
+   restart                  Restart project
+   plan ls                  Print all plan belongs to project
+   project-config           Print full Docker compose configuration for a project's plan.
+   clean                    Clean all container and image from local Docker repository.
+   init                     Create poco.yml and docker-compose.yml in project if aren't exists.
+   install                  Get projects from remote repository (if its not exists locally yet) and run install scripts.
+   build                    Build containers depends defined project and plan.
+   ps                       Print containers statuses which depends defined project and plan.
+   plan ls                  Print all available plan for the project.
+   pull                     Pull all necessary image for project and plan.
+   log, logs                Print containers logs which depends defined project and plan.
+   branch                   Switch branch on defined project.
+   branches                 List all available git branch for the project.
+   pack                     Pack the selected project's plan configuration with docker images to an archive.
+   unpack                   Unpack archive, install images to local repository.
 
 See 'poco help <command>' for more information on a specific command.
 
@@ -29,8 +41,8 @@ import shutil
 import sys
 from docopt import docopt
 from .poco_default import PocoDefault
-from .poco_catalog import PocoCatalog
-from .poco_config import PocoConfig
+from .poco_repo import PocoRepo
+from .poco_project import PocoProject
 from .services.catalog_handler import CatalogHandler
 from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
@@ -44,7 +56,7 @@ from .services.package_handler import PackageHandler
 from .services.state import StateHolder
 
 
-__version__ = '0.23.0'
+__version__ = '0.24.0'
 
 
 class Poco(object):
@@ -54,6 +66,11 @@ class Poco(object):
     project_utils = None
     command_handler = None
 
+    commands = {
+        'repo': PocoRepo,
+        'project': PocoProject
+    }
+
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.poco'),
                  argv=sys.argv[1:]):
 
@@ -62,22 +79,9 @@ class Poco(object):
                       options_first=True, argv=argv)
         print('global arguments:')
         print(args)
+        args = self.command_interpreter(command=args['<command>'], argv=[] + args['<args>'])
         print('command arguments:')
-
-        command = args['<command>']
-        argv = [] + args['<args>']
-        extra_args = args['<args>']
-        if command == 'catalog':
-            if len(extra_args) == 0:
-                print(docopt(PocoCatalog.command_dict['catalog'], argv=argv))
-            else:
-                print(docopt(PocoCatalog.command_dict[extra_args[0]], argv=argv))
-        elif command == 'config':
-            print(docopt(PocoConfig.command_dict[command], argv=argv))
-        elif command in PocoDefault.command_dict.keys():
-            print(docopt(PocoDefault.command_dict[command], argv=argv))
-        else:
-            ColorPrint.exit_after_print_messages("%r is not a poco command. See 'poco help'." % args['<command>'])
+        print(args)
 
         """Fill state"""
 
@@ -101,6 +105,24 @@ class Poco(object):
         else:
             StateHolder.work_dir = os.getcwd()
             StateHolder.developer_mode = True"""
+
+    def command_interpreter(self, command, argv):
+        args = dict()
+        if command == 'help':
+            argv.append('-h')
+            if len(argv) == 1:
+                docopt(__doc__, options_first=True, argv=argv)
+            self.command_interpreter(argv[0], argv[1:])
+        if command in self.commands.keys():
+            if len(argv) == 0:
+                argv.append("ls")
+            command_obj = self.commands[command]
+            args = docopt(command_obj.command_dict.get(argv[0], command_obj.DEFAULT), argv=[command] + argv)
+        elif command in PocoDefault.command_dict.keys():
+            args = docopt(PocoDefault.command_dict[command], argv=[command] + argv)
+        else:
+            ColorPrint.exit_after_print_messages("%r is not a poco command. See 'poco help'." % command)
+        return args
 
     def run(self):
         try:
