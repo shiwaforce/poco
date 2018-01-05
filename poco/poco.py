@@ -75,21 +75,16 @@ class Poco(object):
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.poco'),
                  argv=sys.argv[1:]):
         EnvironmentUtils.check_version(__version__)
-        args = docopt(__doc__,
-                      version=__version__,
-                      options_first=True, argv=argv)
-        print('global arguments:')
-        print(args)
-        args = self.command_interpreter(command=args['<command>'], argv=[] + args['<args>'])
-        print('command arguments:')
-        print(args)
-
+        StateHolder.args = docopt(__doc__, version=__version__, options_first=True, argv=argv)
+        StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'], argv=[] + StateHolder.args['<args>']))
+        print('arguments:')
+        print(StateHolder.args)
 
         """Fill state"""
 
-        """StateHolder.home_dir = home_dir
-        StateHolder.config_file = os.path.join(StateHolder.home_dir, 'config')
-        StateHolder.args = docopt(__doc__, version=__version__, argv=argv)
+        StateHolder.home_dir = home_dir
+        StateHolder.catalog_config_file = os.path.join(StateHolder.home_dir, 'config')
+        StateHolder.global_config_file = os.path.join(StateHolder.home_dir, '.poco')
         ColorPrint.set_log_level(StateHolder.args)
         if StateHolder.args.get('<project>') is None:
             StateHolder.args['<project>'] = FileUtils.get_directory_name()
@@ -99,14 +94,17 @@ class Poco(object):
         if StateHolder.args.get("--developer"):
             StateHolder.developer_mode = StateHolder.args.get("--developer")
 
-        self.config_handler = ConfigHandler()"""
+        self.config_handler = ConfigHandler()
 
+        self.config_handler.read_configs(StateHolder.global_config_file)
+        #TODO read local config too
         """Parse config if exists """
-        """if ConfigHandler.exists():
-            self.config_handler.read()
+        if ConfigHandler.exists():
+            self.config_handler.read_catalogs()
         else:
             StateHolder.work_dir = os.getcwd()
-            StateHolder.developer_mode = True"""
+            StateHolder.developer_mode = True
+        print(self.config_handler.print_config())
 
     def command_interpreter(self, command, argv):
         args = dict()

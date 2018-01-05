@@ -9,7 +9,7 @@ class Colors:
 
 
 class Doc:
-    CONFIG = """Configuration:
+    CATALOGS_CONFIG = """Configuration:
 
     YAML format.
 
@@ -20,7 +20,6 @@ class Doc:
     file (optional):    catalog file path in the repository or local filesystem - default : poco-catalog.yml
     branch (optional):  branch name - default : master
     ssh-key (optional): ssh file location for git repository - default: ~/.ssh/id_rsa
-    workspace (optional): the directory where the script will checkout the projects - default: ~/workspace
 
     For example:
 
@@ -29,6 +28,20 @@ class Doc:
             url: ssh://git@git.shiwaforce.com/scm/project-catalog/project-catalog.git
             file: poco-catalog.yml
             branch: master
+    """
+
+    CONFIG = """Configuration:
+
+    YAML format.
+
+    workspace (optional): the directory where the script will checkout the projects - default: ~/workspace
+    developer-mode (optional): developer mode true/false, if its true, the projects git repositories will not
+        check update or branch - default: false
+
+    For example:
+
+        workspace: /Users/john.doe/workspace2
+        developer-mode: False
     """
 
     POCO_CATALOG = """Poco catalog.

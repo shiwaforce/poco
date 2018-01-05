@@ -1,11 +1,13 @@
+import os
 
 
 class StateHolder:
 
     home_dir = None
     mode = "Docker"
-    config_file = None
-    work_dir = None
+    catalog_config_file = None
+    global_config_file = None
+    work_dir = os.path.join(os.path.expanduser(path='~'), 'workspace')
     config_parsed = False
 
     '''input arguments'''
