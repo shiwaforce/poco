@@ -3,7 +3,10 @@
 [![pypi](https://img.shields.io/pypi/v/poco.svg)](https://pypi.python.org/pypi/poco)
 [![python](https://img.shields.io/pypi/pyversions/poco.svg)](https://pypi.python.org/pypi/poco)
 
-<img src="https://raw.githubusercontent.com/shiwaforce/poco/command-refactor/logo.jpg" align="center" width="140" height="140" style="display:block; margin: 0 auto;">
+<p align="center">
+  <img width="200" height="200" title="Poco Logo" src="https://raw.githubusercontent.com/shiwaforce/poco/command-refactor/logo.jpg"/>
+</p>
+
 `poco` is a docker-compose missing tool. With it's help you will be able to manage docker projects of the any complexity with ease.
 It is just indispensable tool for the projects with few or more environments.
 You can use `poco` for development and for demo purposes as well.
