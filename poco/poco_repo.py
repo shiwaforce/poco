@@ -18,7 +18,7 @@ class PocoRepo:
 
         -h, --help
 
-        Initialize default environment and an sample catalog.
+        Initialize default environment and sample catalog.
     """
 
     LS = """Usage:
@@ -73,7 +73,7 @@ class PocoRepo:
         -h, --help
 
         Specific parameters:
-            <name>       Name of the catalogue.
+            <name>       Name of the catalog.
 
         List all available branches of catalog's GIT repository.
     """
