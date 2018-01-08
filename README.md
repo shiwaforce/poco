@@ -66,7 +66,7 @@ $ poco repo push
 
 
 ## Commands
-### `poco`
+##### poco:
 <table width="100%">
     <tr>
         <td width="40%"><b>Command</b></td>
@@ -219,7 +219,7 @@ $ poco repo push
     </tr>
 </table>
 
-### `poco repo`
+##### poco repo:
 <table width="100%">
     <tr>
         <td width="40%"><b>Command</b></td>
@@ -294,7 +294,7 @@ $ poco repo push
     </tr>
 </table>
 
-### `poco project`
+##### poco project:
 <table width="100%">
     <tr>
         <td width="40%"><b>Command</b></td>
