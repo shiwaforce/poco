@@ -6,11 +6,11 @@ Usage:
 
 
 Options:
-  -h --help     Show this screen.
-  -v --verbose  Print more text.
-  -q --quiet    Print less text.
-  --developer   Project repository handle by user
-  --offline     Offline mode
+  -h --help       Show this screen.
+  -v --verbose    Print more text.
+  -q --quiet      Print less text.
+  --always-update Project repository handle by user
+  --offline       Offline mode
 
 The available poco commands are:
    catalog [<subcommand>]   Catalogue commands, see 'poco help catalog' for more.
@@ -64,7 +64,6 @@ __version__ = '0.24.0'
 
 class Poco(object):
 
-    config_handler = None
     catalog_handler = None
     project_utils = None
     command_handler = None
@@ -77,39 +76,49 @@ class Poco(object):
 
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.poco'),
                  argv=sys.argv[1:]):
+
         EnvironmentUtils.check_version(__version__)
+
+        StateHolder.home_dir = home_dir
         if len(argv) == 0:
             argv.append('-h')
         StateHolder.args = docopt(__doc__, version=__version__, options_first=True, argv=argv)
-        StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'], argv=[] + StateHolder.args['<args>']))
-        print('arguments:')
-        print(StateHolder.args)
+        StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'],
+                                                         argv=[] + StateHolder.args['<args>']))
 
+        ColorPrint.set_log_level(StateHolder.args)
+        ColorPrint.print_info('arguments:\n' + str(StateHolder.args), 1)
+        self.fill_states()
+
+    @staticmethod
+    def fill_states():
         """Fill state"""
 
-        StateHolder.home_dir = home_dir
         StateHolder.catalog_config_file = os.path.join(StateHolder.home_dir, 'config')
         StateHolder.global_config_file = os.path.join(StateHolder.home_dir, '.poco')
-        ColorPrint.set_log_level(StateHolder.args)
+        StateHolder.name = FileUtils.get_directory_name() if StateHolder.args.get('<project>') is None \
+            else StateHolder.args.get('<project>')
+
+        #TODO move
+        if StateHolder.args.get("--always-update"):
+            StateHolder.offline = StateHolder.args.get("--offline")
+
+        if StateHolder.args.get("--always-update"):
+            StateHolder.always_update = StateHolder.args.get("--always-update")
+
+        config_handler = ConfigHandler()
+        config_handler.read_configs(StateHolder.global_config_file, True)
+        ''' read local config too '''
         if StateHolder.args.get('<project>') is None:
-            StateHolder.args['<project>'] = FileUtils.get_directory_name()
-        StateHolder.name = StateHolder.args.get('<project>')
-        StateHolder.offline = StateHolder.args.get("--offline")
+            StateHolder.work_dir = os.getcwd()
+            config_handler.read_configs(os.path.join(os.getcwd(), '.poco'))
+        else:
+            config_handler.read_configs(os.path.join(StateHolder.work_dir, StateHolder.name, '.poco'))
 
-        if StateHolder.args.get("--developer"):
-            StateHolder.developer_mode = StateHolder.args.get("--developer")
-
-        self.config_handler = ConfigHandler()
-
-        self.config_handler.read_configs(StateHolder.global_config_file)
-        #TODO read local config too
         """Parse config if exists """
         if ConfigHandler.exists():
-            self.config_handler.read_catalogs()
-        else:
-            StateHolder.work_dir = os.getcwd()
-            StateHolder.developer_mode = True
-        print(self.config_handler.print_config())
+            config_handler.read_catalogs()
+        print(config_handler.print_config())
 
     def command_interpreter(self, command, argv):
         args = dict()

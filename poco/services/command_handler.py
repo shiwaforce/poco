@@ -32,14 +32,14 @@ class CommandHandler(object):
         plan = self.project_compose['plan'][self.plan]
         if isinstance(plan, dict):
             if 'kubernetes-file' in plan or 'kubernetes-dir' in plan:
-                StateHolder.mode = "Kubernetes"
+                StateHolder.container_mode = "Kubernetes"
 
         self.script_runner = ScriptPlanRunner(project_compose=self.project_compose,
                                               working_directory=self.working_directory)
 
-        if not StateHolder.skip_docker and StateHolder.mode == "Docker":
+        if not StateHolder.skip_docker and StateHolder.container_mode == "Docker":
             EnvironmentUtils.check_docker()
-        if StateHolder.mode == "Kubernetes":
+        if StateHolder.container_mode == "Kubernetes":
             EnvironmentUtils.check_kubernetes()
 
     def run_script(self, script):
@@ -70,7 +70,7 @@ class CommandHandler(object):
             # script running only if start or up command
             if cmd == 'start' or cmd == 'up':
                 self.script_runner.run(plan=plan, script_type='script')
-        elif StateHolder.mode == 'Kubernetes':
+        elif StateHolder.container_mode == 'Kubernetes':
             runner = KubernetesRunner(working_directory=self.working_directory,
                                       project_utils=self.project_utils,
                                       repo_dir=self.repo_dir)

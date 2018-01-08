@@ -68,7 +68,7 @@ class AbstractTestSuite(unittest.TestCase):
     @staticmethod
     def clean_states():
         StateHolder.home_dir = None
-        StateHolder.mode = "Docker"
+        StateHolder.container_mode = "Docker"
         StateHolder.config_file = None
         StateHolder.work_dir = None
         StateHolder.config_parsed = False
@@ -78,7 +78,7 @@ class AbstractTestSuite(unittest.TestCase):
         StateHolder.catalog_element = None
         StateHolder.name = None
         StateHolder.offline = False
-        StateHolder.developer_mode = False
+        StateHolder.always_update = True
         StateHolder.skip_docker = False
         StateHolder.config_handler = None
         StateHolder.compose_handler = None

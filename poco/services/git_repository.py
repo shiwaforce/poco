@@ -84,7 +84,7 @@ class GitRepository(AbstractRepository):
 
     def is_developer_mode(self):
         return not self.target_dir.startswith(os.path.join(StateHolder.home_dir, 'catalogHome')) \
-               and StateHolder.developer_mode
+               and not StateHolder.always_update
 
     def get_actual_branch(self):
         return str(self.repo.active_branch)

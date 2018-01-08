@@ -9,6 +9,22 @@ from .yaml_handler import YamlHandler
 
 class ConfigHandler(object):
 
+    MODES = {
+        'developer': {
+            'offline': False,
+            'always_update': False
+        },
+        'demo': {
+            'offline': False,
+            'always_update': True
+        },
+        'server': {
+            'offline': True,
+            'always_update': False
+        }
+
+    }
+
     config = None
 
     def __init__(self):
@@ -25,20 +41,23 @@ class ConfigHandler(object):
             StateHolder.config = dict(self.config)
             StateHolder.config_parsed = True
 
-    @staticmethod
-    def read_configs(config_file):
+    def read_configs(self, config_file, can_change_wd=False):
         if not os.path.exists(config_file):
+            ColorPrint.print_info("Config file not exists: " + config_file, 1)
             return
         config = YamlHandler.read(file=config_file, doc=Doc.CONFIG)
 
-        if 'workspace' in config:
+        if can_change_wd and 'workspace' in config:
             StateHolder.work_dir = config.get('workspace')
 
         if not (os.path.exists(path=StateHolder.work_dir)):
             os.makedirs(StateHolder.work_dir)
 
-        if 'developer-mode' in config:
-            StateHolder.developer_mode = ConfigHandler.str2bool(config['developer-mode'])
+        ''' mode and specific parameters '''
+        if 'mode' in config and str(config['mode']).lower() in self.MODES.keys():
+            StateHolder.mode = str(config['mode']).lower()
+            for key in self.MODES[StateHolder.mode].keys():
+                setattr(StateHolder, key, self.MODES[StateHolder.mode][key])
 
     def set_branch(self, branch, config=None):
         """Set catalog actual branch"""
@@ -116,10 +135,11 @@ class ConfigHandler(object):
     def print_config(self):
         config = "Actual config\n"
         config += "-------------\n\n"
-        config += "Working directory " + str(StateHolder.work_dir) + "\n"
-        config += "Offline: " + str(StateHolder.offline) + "\n"
-        config += "Developer mode: " + str(StateHolder.developer_mode) + "\n"
         config += "Project name: " + str(StateHolder.name) + "\n"
+        config += "Working directory : " + str(StateHolder.work_dir) + "\n"
+        config += "Mode: " + str(StateHolder.mode) + "\n"
+        config += "Offline: " + str(StateHolder.offline) + "\n"
+        config += "Always update: " + str(StateHolder.always_update) + "\n"
         if StateHolder.config is not None:
             config += "Config location: " + str(StateHolder.catalog_config_file) + "\n"
             config += "Config:\n"
