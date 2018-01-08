@@ -74,7 +74,7 @@ $ poco repo push
         <td width="30%"><b>Description</b></td>
     </tr>
     <tr>
-        <td><b><code>poco project-config [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
+        <td><b><code>$:~ poco project-config [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
             <p><code>[&lt;plan&gt;]</code> - Name of the project's plan</p>
@@ -84,14 +84,14 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco clean</code></b></td>
+        <td><b><code>$:~ poco clean</code></b></td>
         <td>-</td>
         <td>
             <p>Clean all containers and images from the local Docker repository.</p>
         </td>
     </tr>
     <tr>
-        <td><b><code>poco init [&lt;project&gt;]</code></b></td>
+        <td><b><code>$:~ poco init [&lt;project&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
         </td>
@@ -100,7 +100,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco install [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
+        <td><b><code>$:~ poco install [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
             <p><code>[&lt;plan&gt;]</code> - Name of the project's plan</p>
@@ -110,7 +110,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco (start|up) [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
+        <td><b><code>$:~ poco (start|up) [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
             <p><code>[&lt;plan&gt;]</code> - Name of the project's plan</p>
@@ -120,7 +120,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco (stop|down) [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
+        <td><b><code>$:~ poco (stop|down) [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
             <p><code>[&lt;plan&gt;]</code> - Name of the project's plan</p>
@@ -130,7 +130,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco restart [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
+        <td><b><code>$:~ poco restart [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
             <p><code>[&lt;plan&gt;]</code> - Name of the project's plan</p>
@@ -140,7 +140,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco (log|logs) [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
+        <td><b><code>$:~ poco (log|logs) [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
             <p><code>[&lt;plan&gt;]</code> - Name of the project's plan</p>
@@ -150,7 +150,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco build [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
+        <td><b><code>$:~ poco build [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
             <p><code>[&lt;plan&gt;]</code> - Name of the project's plan</p>
@@ -160,7 +160,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco ps [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
+        <td><b><code>$:~ poco ps [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
             <p><code>[&lt;plan&gt;]</code> - Name of the project's plan</p>
@@ -170,7 +170,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco plan ls [&lt;project&gt;]</code></b></td>
+        <td><b><code>$:~ poco plan ls [&lt;project&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
         </td>
@@ -179,7 +179,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco pull [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
+        <td><b><code>$:~ poco pull [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
             <p><code>[&lt;plan&gt;]</code> - Name of the project's plan</p>
@@ -189,7 +189,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco branches [&lt;project&gt;]</code></b></td>
+        <td><b><code>$:~ poco branches [&lt;project&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
         </td>
@@ -198,7 +198,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco pack [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
+        <td><b><code>$:~ poco pack [&lt;project&gt;] [&lt;plan&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
             <p><code>[&lt;plan&gt;]</code> - Name of the project's plan</p>
@@ -208,7 +208,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco unpack [&lt;project&gt;]</code></b></td>
+        <td><b><code>$:~ poco unpack [&lt;project&gt;]</code></b></td>
         <td>
             <p><code>[&lt;project&gt;]</code> - Name of the project in the catalog</p>
             <p><code>[&lt;plan&gt;]</code> - Name of the project's plan</p>
@@ -227,7 +227,7 @@ $ poco repo push
         <td width="30%"><b>Description</b></td>
     </tr>
     <tr>
-        <td><b><code>poco repo init</code></b></td>
+        <td><b><code>$:~ poco repo init</code></b></td>
         <td>
             -
         </td>
@@ -236,14 +236,14 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco repo ls</code></b></td>
+        <td><b><code>$:~ poco repo ls</code></b></td>
         <td>-</td>
         <td>
             <p>List the configs of catalogs.</p>
         </td>
     </tr>
     <tr>
-        <td><b><code> poco repo (add|modify) &lt;name&gt; &lt;git-url&gt; [&lt;branch&gt;] [&lt;file&gt;]</code></b></td>
+        <td><b><code>$:~  poco repo (add|modify) &lt;name&gt; &lt;git-url&gt; [&lt;branch&gt;] [&lt;file&gt;]</code></b></td>
         <td>
             <p><code>&lt;name&gt;</code> - Name of the catalogue.</p>
             <p><code>&lt;git-url&gt;</code> - URL of catalog's GIT repository.</p>
@@ -255,7 +255,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco repo (remove|rm) &lt;name&gt;</code></b></td>
+        <td><b><code>$:~ poco repo (remove|rm) &lt;name&gt;</code></b></td>
         <td>
             <p><code>&lt;name&gt;</code> - Name of the catalog.</p>
         </td>
@@ -264,7 +264,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco repo branch &lt;branch&gt; [&lt;name&gt;] [-f]</code></b></td>
+        <td><b><code>$:~ poco repo branch &lt;branch&gt; [&lt;name&gt;] [-f]</code></b></td>
         <td>
             <p><code>&lt;branch&gt;</code> - Name of the branch that should be checked out.</p>
             <p><code>[&lt;name&gt;]</code> - Name of the catalog.</p>
@@ -275,7 +275,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco repo branches [&lt;name&gt;]</code></b></td>
+        <td><b><code>$:~ poco repo branches [&lt;name&gt;]</code></b></td>
         <td>
             <p><code>[&lt;name&gt;]</code> - Name of the catalog.</p>
         </td>
@@ -284,7 +284,7 @@ $ poco repo push
         </td>
     </tr>
     <tr>
-        <td><b><code>poco repo push [&lt;name&gt;]</code></b></td>
+        <td><b><code>$:~ poco repo push [&lt;name&gt;]</code></b></td>
         <td>
             <p><code>name</code> - Name of the catalog.</p>
         </td>
