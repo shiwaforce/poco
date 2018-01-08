@@ -7,10 +7,13 @@
   <img width="200" height="200" title="Poco Logo" src="https://raw.githubusercontent.com/shiwaforce/poco/command-refactor/logo.jpg"/>
 </p>
 
-`poco` is a docker-compose missing tool. With it's help you will be able to manage docker projects of the any complexity with ease.
-It is just indispensable tool for the projects with few or more environments.
+`poco` is a docker missing tool. With it's help you will be able to manage docker or kubernetes projects of any complexity with ease. 
+It is just indispensable tool for any kind of projects from small to large.
 You can use `poco` for development and for demo purposes as well.
-Kubernetes is also supported.
+
+
+[Video](https://asciinema.org/a/137172)
+[Example](https://github.com/shiwaforce/poco-example)
 
 ## Requirements
 - Docker, version > 17, if you want use Docker-compose files
@@ -20,41 +23,46 @@ Kubernetes is also supported.
 ## Getting started
 #### Install `poco`:
 ```
-$ pip install poco
+$:~ pip install poco
 ```
 
 #### Create `poco` project:
 ```
-$ mkdir poco-project
-$ cd poco-project
-$ poco init
+$:~ mkdir poco-project
+$:~ cd poco-project
+$:~ poco init
 ```
 `poco.yml` and `docker-compose.yml` example files will be created.
 
 #### Start `poco` project:
 ```
-$ poco start
+$:~ poco start
 ```
 
 #### Create `poco repo`:
 ```
-$ poco repo init
+$:~ poco repo init
 ```
 Sample catalog will be initialised with the default environment
 
 #### Add remote catalog
 ```
-$ poco repo add <name> <git-ssh-url> [<branc>] [<file>]
+$:~ poco repo add <name> <git-ssh-url> [<branc>] [<file>]
 ```
 
 #### Add `poco` project into catalog:
 ```
-$ poco project add [<target-dir>] [<catalog>]
+$:~ poco project add [<target-dir>] [<catalog>]
 ```
 
 #### Publish (push) `poco repo`:
 ```
-$ poco repo push
+$:~ poco repo push
+```
+
+#### Stop `poco` project:
+```
+$:~ poco stop
 ```
 
 
