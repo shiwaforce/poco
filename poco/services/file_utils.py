@@ -76,7 +76,7 @@ class FileUtils:
         return os.path.join(repo_dir, FileUtils.get_relative_path(repo_dir, working_directory), file_name)
 
     @staticmethod
-    def remove_readonly(func, path, excinfo):
+    def remove_readonly(func, path):
         os.chmod(path, stat.S_IWRITE)
         func(path)
 
