@@ -72,6 +72,7 @@ class ConfigHandler(object):
             if type(conf) is not dict:
                 continue
             if conf.get("repositoryType", "file") is "file":
+                # TODO
                 FileUtils.make_empty_file_with_empty_dict(directory=StateHolder.home_dir,
                                                           file=conf.get('file', 'poco-catalog.yml'))
 

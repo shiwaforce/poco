@@ -4,6 +4,7 @@ class PocoProject:
     DEFAULT = """Poco project commands
         Usage:
           poco project add [<target-dir>] [<catalog>]
+          poco project init [<project>]
           poco project ls
           poco project remove <project>
 

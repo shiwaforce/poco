@@ -65,9 +65,14 @@ class CatalogHandler:
             if target_dir != repo_dir:
                 file_prefix = FileUtils.get_relative_path(base_path=repo_dir, target_path=target_dir)
                 repo_name = os.path.basename(repo_dir)
+            # TODO
+            if os.path.exists(file_prefix + "poco.yaml"):
+                file = file_prefix + "poco.yaml"
+            else:
+                file = file_prefix + "poco.yml"
             self.add_to_list(name=os.path.basename(target_dir), handler="git",
                              catalog=StateHolder.args.get('<catalog>'),
-                             url=repo.remotes.origin.url, file=file_prefix + "poco.yml",
+                             url=repo.remotes.origin.url, file=file,
                              repo_name=repo_name)
             ColorPrint.print_info("Project added")
             return
@@ -197,6 +202,7 @@ class CatalogHandler:
     def get_catalog_file(config):
         """Get catalog file"""
         if config is not None:
+            #TODO
             return config.get('file', 'poco-catalog.yml')
         return None
 
