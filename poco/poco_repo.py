@@ -4,29 +4,19 @@ class PocoRepo:
 
     DEFAULT = """Poco repo commands
     Usage:
-      poco repo add <name> <git-url> [<branch>] [<file>]
+      poco repo (add|modify) <name> <git-url> [<branch>] [<file>]
       poco repo branch <branch> [<name>] [-f]
       poco repo branches [<name>]
-      poco repo init
       poco repo ls
       poco repo push [<name>]
       poco repo (remove|rm) <name>
     """
-
-    INIT = """Usage:
-      poco repo init
-
-        -h, --help
-
-        Initialize default environment and an sample catalog.
-    """
-
     LS = """Usage:
       poco repo ls
 
         -h, --help
 
-        List the configs of catalogs.
+        List the configs of repos.
     """
 
     ADD = """Usage:
@@ -35,12 +25,12 @@ class PocoRepo:
         -h, --help
 
         Specific parameters:
-            <name>       Name of the catalogue.
+            <name>          Name of the repository.
             <git-url>       URL of catalog's GIT repository.
             <branch>        Name of the branch that should be checked out. (default : master)
             <file>          Name of the catalog file in the repository. (default: poco-catalog.yml)
 
-        Add/Modify new catalog to the config.
+        Add new/Modify repository to the config.
     """
 
     REMOVE = """Usage:
@@ -51,7 +41,7 @@ class PocoRepo:
         Specific parameters:
             <name>       Name of the catalog.
 
-        Remove catalog from local config.
+        Remove repository from local config.
     """
 
     BRANCH = """Usage:
@@ -90,7 +80,6 @@ class PocoRepo:
     """
 
     command_dict = {
-        'init': INIT,
         'ls': LS,
         'add': ADD,
         'modify': ADD,

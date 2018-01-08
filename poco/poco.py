@@ -13,6 +13,7 @@ Options:
   --offline     Offline mode
 
 The available poco commands are:
+   catalog [<subcommand>]   Catalogue commands, see 'poco help catalog' for more.
    repo [<subcommand>]      Repository commands, see 'poco help repo' for more.
    project [<subcommand>]   Project commands, see 'poco help project' for more.
    up, start                Start project
@@ -43,6 +44,7 @@ from docopt import docopt
 from .poco_default import PocoDefault
 from .poco_repo import PocoRepo
 from .poco_project import PocoProject
+from .poco_catalog import PocoCatalog
 from .services.catalog_handler import CatalogHandler
 from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
@@ -69,12 +71,15 @@ class Poco(object):
 
     commands = {
         'repo': PocoRepo,
-        'project': PocoProject
+        'project': PocoProject,
+        'catalog': PocoCatalog
     }
 
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.poco'),
                  argv=sys.argv[1:]):
         EnvironmentUtils.check_version(__version__)
+        if len(argv) == 0:
+            argv.append('-h')
         StateHolder.args = docopt(__doc__, version=__version__, options_first=True, argv=argv)
         StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'], argv=[] + StateHolder.args['<args>']))
         print('arguments:')
@@ -239,7 +244,13 @@ class Poco(object):
         project_element = self.get_catalog()
         repo = self.get_project_repository()
 
-        file = repo.get_file(project_element.get('file', 'poco.yml') if project_element is not None else 'poco.yml')
+        file = repo.get_file(project_element.get('file')) if project_element is not None else None
+        # TODO
+        if file is None:
+            if os.path.exists('poco.yaml'):
+                file = 'poco.yaml'
+            else:
+                file = 'poco.yml'
 
         if not os.path.exists(file):
             src_file = os.path.join(os.path.dirname(__file__), 'services/resources/poco.yml')

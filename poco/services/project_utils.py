@@ -39,9 +39,11 @@ class ProjectUtils:
 
         if StateHolder.config is None:
             repository = self.add_repository(target_dir=StateHolder.work_dir)
+            # TODO
             file = repository.get_file('poco.yml')
         else:
             repo_handler = self.get_project_repository(project_element=project_element, ssh=ssh)
+            # TODO
             file = repo_handler.get_file(project_element.get('file', 'poco.yml'))
         if not os.path.exists(file):
             if silent:
