@@ -4,7 +4,7 @@ import os
 class StateHolder:
 
     home_dir = None
-    mode = "Docker"
+    container_mode = "Docker"
     catalog_config_file = None
     global_config_file = None
     work_dir = os.path.join(os.path.expanduser(path='~'), 'workspace')
@@ -25,8 +25,11 @@ class StateHolder:
     '''project name'''
     name = None
 
+    mode = None
+
+    ''' submodes '''
     offline = False
-    developer_mode = False
+    always_update = True
 
     '''For not Docker mode'''
     skip_docker = False
