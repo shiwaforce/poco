@@ -15,10 +15,10 @@ class PocoProject:
         -h, --help
 
         Specific parameters:
-            <target-dir>      Directory that be added to catalogue. Default is the actual directory.
-            <catalog>         Name of the catalogue.
+            <target-dir>      Target directory that will be added to the catalog. Default is the current directory.
+            <catalog>         Name of the catalog.
 
-        Add directory to catalogue.
+        Add directory to catalog.
     """
 
     INIT = """Usage:
@@ -27,7 +27,7 @@ class PocoProject:
         -h, --help
 
         Specific parameters:
-          <project>         Name of the project in the catalog
+          <project>         Name of the project that will be added to the catalog
 
         Create poco.yml and docker-compose.yml to a project if aren't exists.
     """
@@ -37,7 +37,7 @@ class PocoProject:
 
         -h, --help
 
-        List all projects from catalogue(s).
+        List all projects from the catalog(s).
     """
 
     REMOVE = """Usage:
@@ -46,9 +46,9 @@ class PocoProject:
         -h, --help
 
         Specific parameters:
-            <project>       Name of the projects what want to remove.
+            <project>       Name of the project that will be removed
 
-        Remove project from catalogue.
+        Remove project from the catalog.
     """
 
     command_dict = {

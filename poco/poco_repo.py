@@ -18,7 +18,7 @@ class PocoRepo:
 
         -h, --help
 
-        Initalize default environment and an sample catalogue.
+        Initialize default environment and an sample catalog.
     """
 
     LS = """Usage:
@@ -26,7 +26,7 @@ class PocoRepo:
 
         -h, --help
 
-        List the configs of catalogues.
+        List the configs of catalogs.
     """
 
     ADD = """Usage:
@@ -36,11 +36,11 @@ class PocoRepo:
 
         Specific parameters:
             <catalog>       Name of the catalogue.
-            <git-url>       URL for catalogue's GIT repository.
-            <branch>        Name of the branch what we want to set. (default : master)
-            <file>          Name of the catalogue file in the repository. (default: poco-catalog.yml)
+            <git-url>       URL of catalog's GIT repository.
+            <branch>        Name of the branch that should be checked out. (default : master)
+            <file>          Name of the catalog file in the repository. (default: poco-catalog.yml)
 
-        Add new catalogue to the config.
+        Add new catalog to the config.
     """
 
     REMOVE = """Usage:
@@ -49,9 +49,9 @@ class PocoRepo:
         -h, --help
 
         Specific parameters:
-            <catalog>       Name of the catalogue.
+            <catalog>       Name of the catalog.
 
-        Remove catalogue from local config.
+        Remove catalog from local config.
     """
 
     BRANCH = """Usage:
@@ -60,11 +60,11 @@ class PocoRepo:
         -h, --help
 
         Specific parameters:
-            <branch>        Name of the branch what we want to set.
-            <catalog>       Name of the catalogue.
+            <branch>        Name of the that should be checked out.
+            <catalog>       Name of the catalog.
             -f              Force switch.
 
-        Switch catalogue branch if its using GIT.
+        Switch catalog branch if it is using GIT.
     """
 
     BRANCHES = """Usage:
@@ -73,9 +73,9 @@ class PocoRepo:
         -h, --help
 
         Specific parameters:
-            <catalog>       Name of the catalogue.
+            <catalog>       Name of the catalog.
 
-        List all available branch in catalogue's GIT repository.
+        List all available branches of catalog's GIT repository.
     """
 
     PUSH = """Usage:
@@ -84,9 +84,9 @@ class PocoRepo:
         -h, --help
 
         Specific parameters:
-            <catalog>       Name of the catalogue.
+            <catalog>       Name of the catalog.
 
-        Push changes into catalogue's remote GIT repository
+        Push changes into catalog's remote GIT repository
     """
 
     command_dict = {

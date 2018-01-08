@@ -8,7 +8,7 @@ class PocoDefault:
 
     Specific parameters:
       <project>         Name of the project in the catalog
-      <plan>            Name of the plan in the project
+      <plan>            Name of the project's plan
 
     Print full Docker compose configuration for a project's plan.
 """
@@ -17,7 +17,7 @@ class PocoDefault:
 
     -h, --help
 
-    Clean all container and image from local Docker repository.
+    Clean all containers and images from the local Docker repository.
 """
 
     INIT = """Usage:
@@ -28,7 +28,7 @@ class PocoDefault:
     Specific parameters:
       <project>         Name of the project in the catalog
 
-    Create poco.yml and docker-compose.yml in project if aren't exists.
+    Initialize poco project, poco.yml and docker-compose.yml will be created if they don't exist.
 """
 
     INSTALL = """Usage:
@@ -38,9 +38,9 @@ class PocoDefault:
 
     Specific parameters:
       <project>         Name of the project in the catalog
-      <plan>            Name of the plan in the project
+      <plan>            Name of the project's plan
 
-    Get projects from remote repository (if its not exists locally yet) and run install scripts.
+    Clone projects from a remote repository, run install scripts.
 """
 
     START = """Usage:
@@ -50,9 +50,9 @@ class PocoDefault:
 
     Specific parameters:
       <project>         Name of the project in the catalog
-      <plan>            Name of the plan in the project
+      <plan>            Name of the project's plan
 
-    Starts project with defined plan (or default/first).
+    Start poco project with the default or defined plan.
 """
     STOP = """Usage:
   poco (stop|down) [<project>] [<plan>]
@@ -61,9 +61,9 @@ class PocoDefault:
 
     Specific parameters:
       <project>         Name of the project in the catalog
-      <plan>            Name of the plan in the project
+      <plan>            Name of the project's plan
 
-    Stop project with defined plan (or default/first).
+    Stop project with the default or defined plan.
 """
     RESTART = """Usage:
   poco restart [<project>] [<plan>]
@@ -72,9 +72,9 @@ class PocoDefault:
 
     Specific parameters:
       <project>         Name of the project in the catalog
-      <plan>            Name of the plan in the project
+      <plan>            Name of the project's plan
 
-    Restart project with defined plan (or default/first).
+    Restart project with the default or defined plan.
 """
     LOG = """Usage:
   poco (log|logs) [<project>] [<plan>]
@@ -83,9 +83,9 @@ class PocoDefault:
 
     Specific parameters:
       <project>         Name of the project in the catalog
-      <plan>            Name of the plan in the project
+      <plan>            Name of the project's plan
 
-    Print containers logs which depends defined project and plan.
+    Print docker containers logs of the current project with the default or defined plan.
 """
     BUILD = """Usage:
   poco build [<project>] [<plan>]
@@ -94,7 +94,7 @@ class PocoDefault:
 
     Specific parameters:
       <project>         Name of the project in the catalog
-      <plan>            Name of the plan in the project
+      <plan>            Name of the project's plan
 
     Build containers depends defined project and plan.
 """
@@ -105,7 +105,7 @@ class PocoDefault:
 
     Specific parameters:
       <project>         Name of the project in the catalog
-      <plan>            Name of the plan in the project
+      <plan>            Name of the project's plan
 
     Print containers statuses which depends defined project and plan.
 """
@@ -118,7 +118,7 @@ class PocoDefault:
     Specific parameters:
       <project>         Name of the project in the catalog
 
-    Print all available plan for the project.
+    Print all available plans of the project.
 """
 
     PULL = """Usage:
@@ -128,9 +128,9 @@ class PocoDefault:
 
     Specific parameters:
       <project>         Name of the project in the catalog
-      <plan>            Name of the plan in the project
+      <plan>            Name of the project's plan
 
-    Pull all necessary image for project and plan.
+    Pull all necessary images for the project with the defined or default plan.
 """
 
     BRANCH = """Usage:
@@ -143,7 +143,7 @@ class PocoDefault:
       <branch>          Name of the git branch
       -f                Git force parameter
 
-    Switch branch on defined project.
+    Switch branch on a defined project.
 """
     BRANCHES = """Usage:
   poco branches [<project>]
@@ -153,7 +153,7 @@ class PocoDefault:
     Specific parameters:
       <project>         Name of the project in the catalog
 
-    List all available git branch for the project.
+    List all available git branches of the project.
 """
     PACK = """Usage:
   poco pack [<project>] [<plan>]
@@ -162,13 +162,13 @@ class PocoDefault:
 
     Specific parameters:
       <project>         Name of the project in the catalog
-      <plan>            Name of the plan in the project
+      <plan>            Name of the project's plan
 
-    Pack the selected project's plan configuration with docker images to an archive.
+    Pack the selected project's plan configuration with docker images into an archive.
 """
 
     UNPACK = """Usage:
-  poco branches [<project>]
+  poco unpack [<project>]
 
   -h, --help
 
