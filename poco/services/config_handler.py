@@ -56,8 +56,8 @@ class ConfigHandler(object):
         ''' mode and specific parameters '''
         if 'mode' in config and str(config['mode']).lower() in self.MODES.keys():
             StateHolder.mode = str(config['mode']).lower()
-            for key in self.MODES[StateHolder.mode].keys():
-                setattr(StateHolder, key, self.MODES[StateHolder.mode][key])
+            for key, value in self.MODES[StateHolder.mode].items():
+                setattr(StateHolder, key, value)
 
     def set_branch(self, branch, config=None):
         """Set catalog actual branch"""
@@ -101,6 +101,7 @@ class ConfigHandler(object):
             self.init()
             return
 
+        # TODO
         if StateHolder.has_args('config'):
             if StateHolder.config is None:
                 ColorPrint.exit_after_print_messages('catalog config commands works only with config file.\n '

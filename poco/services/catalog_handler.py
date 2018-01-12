@@ -43,21 +43,21 @@ class CatalogHandler:
         if StateHolder.has_args('catalog', 'ls'):
             self.print_ls()
             return
-        if StateHolder.has_args('catalog', 'branches'):
+        if StateHolder.has_args('repo', 'branches'):
             self.get_catalog_repository(StateHolder.args.get('<catalog>')).print_branches()
             return
-        if StateHolder.has_args('catalog', 'branch'):
+        if StateHolder.has_args('repo', 'branch'):
             branch = StateHolder.args.get('<branch>')
             catalog = StateHolder.args.get('<catalog>')
             self.get_catalog_repository(catalog=catalog).set_branch(branch=branch, force=StateHolder.args.get("-f"))
             StateHolder.config_handler.set_branch(branch=branch, config=catalog)
             ColorPrint.print_info("Branch changed")
             return
-        if StateHolder.has_args('catalog', 'push'):
+        if StateHolder.has_args('repo', 'push'):
             self.push(StateHolder.args.get('<catalog>'))
             ColorPrint.print_info("Push completed")
             return
-        if StateHolder.has_args('catalog', 'add'):
+        if StateHolder.has_args('repo', 'add'):
             target_dir = FileUtils.get_normalized_dir(StateHolder.args.get('<target-dir>'))
             repo, repo_dir = FileUtils.get_git_repo(target_dir)
             file_prefix = ""
@@ -77,7 +77,7 @@ class CatalogHandler:
             ColorPrint.print_info("Project added")
             return
 
-        if StateHolder.has_args('catalog', 'remove'):
+        if StateHolder.has_args('repo', 'remove'):
             self.remove_from_list()
             ColorPrint.print_info("Project removed")
             return

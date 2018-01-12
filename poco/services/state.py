@@ -37,6 +37,7 @@ class StateHolder:
     ''' handlers '''
     config_handler = None
     compose_handler = None
+    catalog_handler = None
 
     @staticmethod
     def has_args(*args):

@@ -1,3 +1,5 @@
+from .services.state import StateHolder
+
 
 class PocoCatalog:
 
@@ -28,3 +30,9 @@ class PocoCatalog:
         'init': INIT,
         'ls': LS
     }
+
+    @staticmethod
+    def handle():
+        if StateHolder.has_args('init'):
+            StateHolder.config_handler.handle_command()
+            return

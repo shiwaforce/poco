@@ -100,7 +100,7 @@ class Poco(object):
             else StateHolder.args.get('<project>')
 
         #TODO move
-        if StateHolder.args.get("--always-update"):
+        if StateHolder.args.get("--offline"):
             StateHolder.offline = StateHolder.args.get("--offline")
 
         if StateHolder.args.get("--always-update"):
@@ -115,10 +115,9 @@ class Poco(object):
         else:
             config_handler.read_configs(os.path.join(StateHolder.work_dir, StateHolder.name, '.poco'))
 
-        """Parse config if exists """
-        if ConfigHandler.exists():
+        """Parse config if need - not project parameter """
+        if ConfigHandler.exists() and StateHolder.args.get('<project>') is not None:
             config_handler.read_catalogs()
-        print(config_handler.print_config())
 
     def command_interpreter(self, command, argv):
         args = dict()
@@ -140,114 +139,107 @@ class Poco(object):
 
     def run(self):
         try:
-            ColorPrint.print_info(self.config_handler.print_config(), 1)
-
-            """Handling top level commands"""
-            if StateHolder.has_args('clean'):
-                CleanHandler().clean()
-                ColorPrint.exit_after_print_messages(message="Clean complete", msg_type="info")
-                return
-
-            if StateHolder.has_args('catalog') and StateHolder.has_least_one_arg('init', 'config'):
-                self.config_handler.handle_command()
-                return
-
-            """Parse catalog"""
-            if StateHolder.config is not None:
-                self.catalog_handler = CatalogHandler()
-
-            """Init project utils"""
-            self.project_utils = ProjectUtils()
-
-            if not StateHolder.has_args('catalog') and StateHolder.has_args('init'):
-                self.init()
-                CommandHandler(project_utils=self.project_utils).run_script("init_script")
-                return
-
+            ColorPrint.print_info(StateHolder.config_handler.print_config(), 1)
             if StateHolder.has_args('catalog'):
-                if StateHolder.config is None:
-                    ColorPrint.exit_after_print_messages('catalog commands works only with config file.\n '
-                                                         'Run "catalog init" command to create one.')
-                if StateHolder.has_args('remove'):
-                    if StateHolder.name in StateHolder.catalogs:
-                        if self.get_compose_file(silent=True) is not None:
-                            self.init_compose_handler()
-                            CommandHandler(project_utils=self.project_utils).run_script("remove_script")
-                self.catalog_handler.handle_command()
-                return
-
-            if StateHolder.has_args('branches'):
-                self.get_project_repository().print_branches()
-                return
-
-            if StateHolder.has_args('branch'):
-                branch = StateHolder.args.get('<branch>')
-                repo = self.get_project_repository()
-                repo.set_branch(branch=branch, force=StateHolder.args.get("-f"))
-                project_descriptor = self.catalog_handler.get()
-                project_descriptor['branch'] = branch
-                self.catalog_handler.set(modified=project_descriptor)
-                ColorPrint.print_info(message="Branch changed")
-                return
-
-            if StateHolder.has_args('install'):
-                self.get_project_repository()
-                ColorPrint.print_info("Project installed")
-                return
-
-            if StateHolder.has_args('plan', 'ls'):
-                self.init_compose_handler()
-                StateHolder.compose_handler.get_plan_list()
-                return
-
-            if StateHolder.has_args('unpack'):
-                PackageHandler().unpack()
-                return
-
-            self.init_compose_handler()
-            self.command_handler = CommandHandler(project_utils=self.project_utils)
-
-            if StateHolder.has_args('config'):
-                self.command_handler.run('config')
-
-            if StateHolder.has_args('build'):
-                self.run_checkouts()
-                self.command_handler.run('build')
-                ColorPrint.print_info("Project built")
-
-            if StateHolder.has_least_one_arg('up', 'start'):
-                self.run_checkouts()
-                self.command_handler.run('up')
-
-            if StateHolder.has_args('restart'):
-                self.run_checkouts()
-                self.command_handler.run('restart')
-
-            if StateHolder.has_args('down'):
-                self.command_handler.run('down')
-                ColorPrint.print_info("Project stopped")
-
-            if StateHolder.has_args('ps'):
-                self.run_checkouts()
-                self.command_handler.run('ps')
-
-            if StateHolder.has_args('pull'):
-                self.run_checkouts()
-                self.command_handler.run('pull')
-                ColorPrint.print_info("Project pull complete")
-
-            if StateHolder.has_args('stop'):
-                self.command_handler.run('stop')
-
-            if StateHolder.has_least_one_arg('logs', 'log'):
-                self.command_handler.run('logs')
-                return
-
-            if StateHolder.has_args('pack'):
-                self.command_handler.run('pack')
-
+                PocoCatalog.handle()
+            elif StateHolder.has_args('repo'):
+                PocoRepo.handle()
+            elif StateHolder.has_args('project'):
+                PocoProject.handle()
+            else:
+                self.run_default()
         except Exception as ex:
             ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
+
+    def run_default(self):
+
+        """Handling top level commands"""
+        if StateHolder.has_args('clean'):
+            CleanHandler().clean()
+            ColorPrint.exit_after_print_messages(message="Clean complete", msg_type="info")
+            return
+
+        """Parse catalog"""
+        if StateHolder.config is not None:
+            self.catalog_handler = CatalogHandler()
+
+        """Init project utils"""
+        self.project_utils = ProjectUtils()
+
+        if StateHolder.has_args('init'):
+            self.init()
+            CommandHandler(project_utils=self.project_utils).run_script("init_script")
+            return
+
+        if StateHolder.has_args('branches'):
+            self.get_project_repository().print_branches()
+            return
+
+        if StateHolder.has_args('branch'):
+            branch = StateHolder.args.get('<branch>')
+            repo = self.get_project_repository()
+            repo.set_branch(branch=branch, force=StateHolder.args.get("-f"))
+            project_descriptor = self.catalog_handler.get()
+            project_descriptor['branch'] = branch
+            self.catalog_handler.set(modified=project_descriptor)
+            ColorPrint.print_info(message="Branch changed")
+            return
+
+        if StateHolder.has_args('install'):
+            self.get_project_repository()
+            ColorPrint.print_info("Project installed")
+            return
+
+        if StateHolder.has_args('plan', 'ls'):
+            self.init_compose_handler()
+            StateHolder.compose_handler.get_plan_list()
+            return
+
+        if StateHolder.has_args('unpack'):
+            PackageHandler().unpack()
+            return
+
+        self.init_compose_handler()
+        self.command_handler = CommandHandler(project_utils=self.project_utils)
+
+        if StateHolder.has_args('config'):
+            self.command_handler.run('config')
+
+        if StateHolder.has_args('build'):
+            self.run_checkouts()
+            self.command_handler.run('build')
+            ColorPrint.print_info("Project built")
+
+        if StateHolder.has_least_one_arg('up', 'start'):
+            self.run_checkouts()
+            self.command_handler.run('up')
+
+        if StateHolder.has_args('restart'):
+            self.run_checkouts()
+            self.command_handler.run('restart')
+
+        if StateHolder.has_args('down'):
+            self.command_handler.run('down')
+            ColorPrint.print_info("Project stopped")
+
+        if StateHolder.has_args('ps'):
+            self.run_checkouts()
+            self.command_handler.run('ps')
+
+        if StateHolder.has_args('pull'):
+            self.run_checkouts()
+            self.command_handler.run('pull')
+            ColorPrint.print_info("Project pull complete")
+
+        if StateHolder.has_args('stop'):
+            self.command_handler.run('stop')
+
+        if StateHolder.has_least_one_arg('logs', 'log'):
+            self.command_handler.run('logs')
+            return
+
+        if StateHolder.has_args('pack'):
+            self.command_handler.run('pack')
 
     def init(self):
         project_element = self.get_catalog()
@@ -326,7 +318,7 @@ class Poco(object):
 
 def main():
     poco = Poco()
-    # poco.run()
+    poco.run()
 
 if __name__ == '__main__':
     sys.exit(main())

@@ -1,3 +1,6 @@
+from .services.state import StateHolder
+from .services.console_logger import ColorPrint
+from .services.catalog_handler import CatalogHandler
 
 
 class PocoRepo:
@@ -89,3 +92,18 @@ class PocoRepo:
         'branches': BRANCHES,
         'push': PUSH
     }
+
+    @staticmethod
+    def handle():
+        if StateHolder.config is None:
+            ColorPrint.exit_after_print_messages('repo commands works only with config file.\n '
+                                                 'Run "catalog init" command to create one.')
+        StateHolder.catalog_handler = CatalogHandler()
+        if StateHolder.has_args('remove'):
+            if StateHolder.name in StateHolder.catalogs:
+                pass
+                #if self.get_compose_file(silent=True) is not None:
+                #    self.init_compose_handler()
+                #    CommandHandler(project_utils=self.project_utils).run_script("remove_script")
+            StateHolder.catalog_handler.handle_command()
+            return

@@ -58,3 +58,7 @@ class PocoProject:
         'init': INIT,
         'remove': REMOVE
     }
+
+    @staticmethod
+    def handle():
+        pass
