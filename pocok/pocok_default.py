@@ -1,8 +1,8 @@
 
-class PocoDefault:
+class PocokDefault:
 
     PROJECT_CONFIG = """Usage:
-  poco project-config [<project>] [<plan>]
+  pocok project-config [<project>] [<plan>]
 
     -h, --help
 
@@ -13,7 +13,7 @@ class PocoDefault:
     Print full Docker compose configuration for a project's plan.
 """
     CLEAN = """Usage:
-  poco clean
+  pocok clean
 
     -h, --help
 
@@ -21,18 +21,18 @@ class PocoDefault:
 """
 
     INIT = """Usage:
-  poco init [<project>]
+  pocok init [<project>]
 
     -h, --help
 
     Specific parameters:
       <project>         Name of the project in the catalog
 
-    Initialize poco project, poco.yml and docker-compose.yml will be created if they don't exist.
+    Initialize pocok project, pocok.yml and docker-compose.yml will be created if they don't exist.
 """
 
     INSTALL = """Usage:
-  poco install [<project>] [<plan>]
+  pocok install [<project>] [<plan>]
 
     -h, --help
 
@@ -44,7 +44,7 @@ class PocoDefault:
 """
 
     START = """Usage:
-  poco (start|up) [<project>] [<plan>]
+  pocok (start|up) [<project>] [<plan>]
 
   -h, --help
 
@@ -52,10 +52,10 @@ class PocoDefault:
       <project>         Name of the project in the catalog
       <plan>            Name of the project's plan
 
-    Start poco project with the default or defined plan.
+    Start pocok project with the default or defined plan.
 """
     STOP = """Usage:
-  poco (stop|down) [<project>] [<plan>]
+  pocok (stop|down) [<project>] [<plan>]
 
   -h, --help
 
@@ -66,7 +66,7 @@ class PocoDefault:
     Stop project with the default or defined plan.
 """
     RESTART = """Usage:
-  poco restart [<project>] [<plan>]
+  pocok restart [<project>] [<plan>]
 
   -h, --help
 
@@ -77,7 +77,7 @@ class PocoDefault:
     Restart project with the default or defined plan.
 """
     LOG = """Usage:
-  poco (log|logs) [<project>] [<plan>]
+  pocok (log|logs) [<project>] [<plan>]
 
   -h, --help
 
@@ -88,7 +88,7 @@ class PocoDefault:
     Print docker containers logs of the current project with the default or defined plan.
 """
     BUILD = """Usage:
-  poco build [<project>] [<plan>]
+  pocok build [<project>] [<plan>]
 
   -h, --help
 
@@ -99,7 +99,7 @@ class PocoDefault:
     Build containers depends defined project and plan.
 """
     PS = """Usage:
-  poco ps [<project>] [<plan>]
+  pocok ps [<project>] [<plan>]
 
   -h, --help
 
@@ -111,7 +111,7 @@ class PocoDefault:
 """
 
     PLAN = """Usage:
-  poco plan ls [<project>]
+  pocok plan ls [<project>]
 
   -h, --help
 
@@ -122,7 +122,7 @@ class PocoDefault:
 """
 
     PULL = """Usage:
-  poco pull [<project>] [<plan>]
+  pocok pull [<project>] [<plan>]
 
   -h, --help
 
@@ -134,7 +134,7 @@ class PocoDefault:
 """
 
     BRANCH = """Usage:
-  poco branch <project> <branch> [-f]
+  pocok branch <project> <branch> [-f]
 
   -h, --help
 
@@ -146,7 +146,7 @@ class PocoDefault:
     Switch branch on a defined project.
 """
     BRANCHES = """Usage:
-  poco branches [<project>]
+  pocok branches [<project>]
 
   -h, --help
 
@@ -156,7 +156,7 @@ class PocoDefault:
     List all available git branches of the project.
 """
     PACK = """Usage:
-  poco pack [<project>] [<plan>]
+  pocok pack [<project>] [<plan>]
 
   -h, --help
 
@@ -168,7 +168,7 @@ class PocoDefault:
 """
 
     UNPACK = """Usage:
-  poco unpack [<project>]
+  pocok unpack [<project>]
 
   -h, --help
 

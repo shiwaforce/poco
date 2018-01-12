@@ -17,29 +17,29 @@ class AbstractTestSuite(unittest.TestCase):
     LOCAL_CONFIG = {
         'default': {
             'repositoryType': 'file',
-            'file': 'poco-catalog.yml',
+            'file': 'pocok-catalog.yml',
         }
     }
 
     REMOTE_CONFIG = {
       'default': {
         'repositoryType': 'git',
-        'file': 'poco-catalog.yml',
-        'server': 'https://github.com/shiwaforce/poco-example.git',
+        'file': 'pocok-catalog.yml',
+        'server': 'https://github.com/shiwaforce/pocok-example.git',
         'branch': 'master'
         }
     }
 
     STACK_LIST_SAMPLE = {
         'nginx': {
-            'file': 'nginx/poco-compose.yml',
-            'git': 'https://github.com/shiwaforce/poco-example.git',
-            'repository_dir': 'poco-example'
+            'file': 'nginx/pocok-compose.yml',
+            'git': 'https://github.com/shiwaforce/pocok-example.git',
+            'repository_dir': 'pocok-example'
         },
         'mysql': {
-            'file': 'mysql/poco-compose.yml',
-            'git': 'https://github.com/shiwaforce/poco-example.git',
-            'repository_dir': 'poco-example'
+            'file': 'mysql/pocok-compose.yml',
+            'git': 'https://github.com/shiwaforce/pocok-example.git',
+            'repository_dir': 'pocok-example'
         }
     }
 
@@ -54,9 +54,9 @@ class AbstractTestSuite(unittest.TestCase):
             sys.stdout, sys.stderr = old_out, old_err
 
     def setUp(self):
-        self.tmpdir = tempfile.mkdtemp(prefix='poco-home')
+        self.tmpdir = tempfile.mkdtemp(prefix='pocok-home')
         self.config_file = os.path.join(self.tmpdir, 'config')
-        self.local_stack_list = os.path.join(self.tmpdir, 'poco-catalog.yml')
+        self.local_stack_list = os.path.join(self.tmpdir, 'pocok-catalog.yml')
         self.ws_dir = os.path.join(self.tmpdir, 'ws')
         os.makedirs(self.ws_dir)
 

@@ -33,7 +33,7 @@ class EnvironmentUtils:
         newest_version = "0.0.0"
 
         # check pip
-        p = Popen("pip install poco==", stdout=PIPE, stderr=PIPE, shell=True)
+        p = Popen("pip install pocok==", stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
         if not len(err) == 0:
             newest_version = EnvironmentUtils.parse_version(str(err))
@@ -41,12 +41,12 @@ class EnvironmentUtils:
             # maybe installed from source
             return
         if version < newest_version:
-            ColorPrint.print_warning("New version of poco is available (%r). \n "
-                                     "Please upgrade with: pip install -U poco" % newest_version)
+            ColorPrint.print_warning("New version of pocok is available (%r). \n "
+                                     "Please upgrade with: pip install -U pocok" % newest_version)
 
     @staticmethod
     def parse_version(pip_content):
-        if "(from versions: " in pip_content:
+        if "(from versions: " in pip_content and not "Could not find a version" in pip_content:
             return pip_content.strip().splitlines()[0].split(",")[-1].strip(') ')
         return "0.0.0"
 

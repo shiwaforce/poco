@@ -1,17 +1,17 @@
 
-class PocoProject:
+class PocokProject:
 
-    DEFAULT = """Poco project commands
+    DEFAULT = """Pocok project commands
         Usage:
-          poco project add [<target-dir>] [<catalog>]
-          poco project init [<project>]
-          poco project ls
-          poco project remove <project>
+          pocok project add [<target-dir>] [<catalog>]
+          pocok project init [<project>]
+          pocok project ls
+          pocok project remove <project>
 
         """
 
     ADD = """Usage:
-      poco project add [<target-dir>] [<catalog>]
+      pocok project add [<target-dir>] [<catalog>]
 
         -h, --help
 
@@ -23,18 +23,18 @@ class PocoProject:
     """
 
     INIT = """Usage:
-      poco project init [<project>]
+      pocok project init [<project>]
 
         -h, --help
 
         Specific parameters:
           <project>         Name of the project that will be added to the catalog
 
-        Create poco.yml and docker-compose.yml to a project if aren't exists.
+        Create pocok.yml and docker-compose.yml to a project if aren't exists.
     """
 
     LS = """Usage:
-      poco project ls
+      pocok project ls
 
         -h, --help
 
@@ -42,7 +42,7 @@ class PocoProject:
     """
 
     REMOVE = """Usage:
-    poco project remove <project>
+    pocok project remove <project>
 
         -h, --help
 

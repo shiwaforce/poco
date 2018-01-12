@@ -64,7 +64,7 @@ class GitRepository(AbstractRepository):
             ColorPrint.exit_after_print_messages(message="It is not an git repository: " + self.target_dir)
         if self.repo.is_dirty(untracked_files=True):
             self.repo.index.add(["*"])
-            self.repo.index.commit("Change from poco")
+            self.repo.index.commit("Change from pocok")
             self.repo.git.push()
 
     def pull(self):

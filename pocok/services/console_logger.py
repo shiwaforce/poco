@@ -13,11 +13,11 @@ class Doc:
 
     YAML format.
 
-    If default section is empty, the poco-catalog.yml file must be exists in config directory
+    If default section is empty, the pocok-catalog.yml file must be exists in config directory
 
     repositoryType (optional):  git | svn | file
     url (optional): must be a valid GIT or SVN url
-    file (optional):    catalog file path in the repository or local filesystem - default : poco-catalog.yml
+    file (optional):    catalog file path in the repository or local filesystem - default : pocok-catalog.yml
     branch (optional):  branch name - default : master
     ssh-key (optional): ssh file location for git repository - default: ~/.ssh/id_rsa
 
@@ -26,7 +26,7 @@ class Doc:
         default:
             repositoryType: git
             url: ssh://git@git.shiwaforce.com/scm/project-catalog/project-catalog.git
-            file: poco-catalog.yml
+            file: pocok-catalog.yml
             branch: master
     """
 
@@ -44,12 +44,12 @@ class Doc:
         developer-mode: False
     """
 
-    POCO_CATALOG = """Poco catalog.
+    POCOK_CATALOG = """Pocok catalog.
 
         YAML format.
 
-        Generate a sample poco file for project, please run:
-            poco init
+        Generate a sample pocok file for project, please run:
+            pocok init
 
         Configuration:
             keys: The name of the projects
@@ -57,9 +57,9 @@ class Doc:
             git (optional): must be a valid GIT url for the project
             svn (optional): must be a valid SVN url for the project
             branch (optional): branch name - default : master
-            file(optional): path to the poco file. - Default : poco.yml
+            file(optional): path to the pocok file. - Default : pocok.yml
                 If you not define repository, it will relative to config file
-                If the path is a directory, then will extended the path the default filename : poco.yml
+                If the path is a directory, then will extended the path the default filename : pocok.yml
 
         For example:
 
@@ -75,7 +75,7 @@ class Doc:
             file: another/directory/anoter_compose.yml
         """
 
-    POCO = """Poco.
+    POCOK = """Pocok.
 
         YAML format.
 

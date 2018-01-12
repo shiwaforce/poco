@@ -1,0 +1,5 @@
+default:
+  branch: master
+  file: pocok-catalog.yml
+  repositoryType: git
+  server: https://github.com/shiwaforce/pocok-example.git

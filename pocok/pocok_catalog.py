@@ -1,17 +1,17 @@
 from .services.state import StateHolder
 
 
-class PocoCatalog:
+class PocokCatalog:
 
-    DEFAULT = """Poco catalog commands
+    DEFAULT = """Pocok catalog commands
     Usage:
-      poco catalog init
-      poco catalog ls
+      pocok catalog init
+      pocok catalog ls
 
     """
 
     INIT = """Usage:
-      poco catalog init
+      pocok catalog init
 
         -h, --help
 
@@ -19,7 +19,7 @@ class PocoCatalog:
     """
 
     LS = """Usage:
-      poco catalog ls
+      pocok catalog ls
 
         -h, --help
 

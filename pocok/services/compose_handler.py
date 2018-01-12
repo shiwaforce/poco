@@ -32,7 +32,7 @@ class ComposeHandler:
 
                 if 'plan' not in self.compose_project:
                     ColorPrint.exit_after_print_messages(
-                        message="'plan' section must exists in compose file (poco.yml) ",
+                        message="'plan' section must exists in compose file (pocok.yml) ",
                         doc=Doc.COMPOSE_DOC)
                 if not isinstance(self.compose_project['plan'], dict):
                     ColorPrint.exit_after_print_messages(

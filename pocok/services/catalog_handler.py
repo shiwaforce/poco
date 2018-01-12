@@ -66,10 +66,10 @@ class CatalogHandler:
                 file_prefix = FileUtils.get_relative_path(base_path=repo_dir, target_path=target_dir)
                 repo_name = os.path.basename(repo_dir)
             # TODO
-            if os.path.exists(file_prefix + "poco.yaml"):
-                file = file_prefix + "poco.yaml"
+            if os.path.exists(file_prefix + "pocok.yaml"):
+                file = file_prefix + "pocok.yaml"
             else:
-                file = file_prefix + "poco.yml"
+                file = file_prefix + "pocok.yml"
             self.add_to_list(name=os.path.basename(target_dir), handler="git",
                              catalog=StateHolder.args.get('<catalog>'),
                              url=repo.remotes.origin.url, file=file,
@@ -189,7 +189,7 @@ class CatalogHandler:
         """Get catalog URL if its an remote repository"""
         if config is not None and "server" in config:
             return config['server']
-        return EnvironmentUtils.get_variable('POCO_CATALOG')
+        return EnvironmentUtils.get_variable('POCOK_CATALOG')
 
     @staticmethod
     def get_branch(config):
@@ -203,7 +203,7 @@ class CatalogHandler:
         """Get catalog file"""
         if config is not None:
             #TODO
-            return config.get('file', 'poco-catalog.yml')
+            return config.get('file', 'pocok-catalog.yml')
         return None
 
     @staticmethod

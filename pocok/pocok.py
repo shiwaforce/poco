@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-"""SF Program compose.
+"""Pocok project compose.
 
 Usage:
-  poco [--version] [-h|--help] [-v|--verbose] [-q|--quiet] [--developer] [--offline] <command> [<args>...]
+  pocok [--version] [-h|--help] [-v|--verbose] [-q|--quiet] [--developer] [--offline] <command> [<args>...]
 
 
 Options:
@@ -12,17 +12,17 @@ Options:
   --always-update Project repository handle by user
   --offline       Offline mode
 
-The available poco commands are:
-   catalog [<subcommand>]   Catalogue commands, see 'poco help catalog' for more.
-   repo [<subcommand>]      Repository commands, see 'poco help repo' for more.
-   project [<subcommand>]   Project commands, see 'poco help project' for more.
+The available pocok commands are:
+   catalog [<subcommand>]   Catalogue commands, see 'pocok help catalog' for more.
+   repo [<subcommand>]      Repository commands, see 'pocok help repo' for more.
+   project [<subcommand>]   Project commands, see 'pocok help project' for more.
    up, start                Start project
    down, stop               Stop project
    restart                  Restart project
    plan ls                  Print all plan belongs to project
    project-config           Print full Docker compose configuration for a project's plan.
    clean                    Clean all container and image from local Docker repository.
-   init                     Create poco.yml and docker-compose.yml in project if aren't exists.
+   init                     Create pocok.yml and docker-compose.yml in project if aren't exists.
    install                  Get projects from remote repository (if its not exists locally yet) and run install scripts.
    build                    Build containers depends defined project and plan.
    ps                       Print containers statuses which depends defined project and plan.
@@ -34,17 +34,17 @@ The available poco commands are:
    pack                     Pack the selected project's plan configuration with docker images to an archive.
    unpack                   Unpack archive, install images to local repository.
 
-See 'poco help <command>' for more information on a specific command.
+See 'pocok help <command>' for more information on a specific command.
 
 """
 import os
 import shutil
 import sys
 from docopt import docopt
-from .poco_default import PocoDefault
-from .poco_repo import PocoRepo
-from .poco_project import PocoProject
-from .poco_catalog import PocoCatalog
+from .pocok_default import PocokDefault
+from .pocok_repo import PocokRepo
+from .pocok_project import PocokProject
+from .pocok_catalog import PocokCatalog
 from .services.catalog_handler import CatalogHandler
 from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
@@ -62,19 +62,19 @@ from .services.state import StateHolder
 __version__ = '0.24.0'
 
 
-class Poco(object):
+class Pocok(object):
 
     catalog_handler = None
     project_utils = None
     command_handler = None
 
     commands = {
-        'repo': PocoRepo,
-        'project': PocoProject,
-        'catalog': PocoCatalog
+        'repo': PocokRepo,
+        'project': PocokProject,
+        'catalog': PocokCatalog
     }
 
-    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.poco'),
+    def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.pocok'),
                  argv=sys.argv[1:]):
 
         EnvironmentUtils.check_version(__version__)
@@ -95,7 +95,7 @@ class Poco(object):
         """Fill state"""
 
         StateHolder.catalog_config_file = os.path.join(StateHolder.home_dir, 'config')
-        StateHolder.global_config_file = os.path.join(StateHolder.home_dir, '.poco')
+        StateHolder.global_config_file = os.path.join(StateHolder.home_dir, '.pocok')
         StateHolder.name = FileUtils.get_directory_name() if StateHolder.args.get('<project>') is None \
             else StateHolder.args.get('<project>')
 
@@ -111,9 +111,9 @@ class Poco(object):
         ''' read local config too '''
         if StateHolder.args.get('<project>') is None:
             StateHolder.work_dir = os.getcwd()
-            config_handler.read_configs(os.path.join(os.getcwd(), '.poco'))
+            config_handler.read_configs(os.path.join(os.getcwd(), '.pocok'))
         else:
-            config_handler.read_configs(os.path.join(StateHolder.work_dir, StateHolder.name, '.poco'))
+            config_handler.read_configs(os.path.join(StateHolder.work_dir, StateHolder.name, '.pocok'))
 
         """Parse config if need - not project parameter """
         if ConfigHandler.exists() and StateHolder.args.get('<project>') is not None:
@@ -131,21 +131,21 @@ class Poco(object):
                 argv.append("ls")
             command_obj = self.commands[command]
             args = docopt(command_obj.command_dict.get(argv[0], command_obj.DEFAULT), argv=[command] + argv)
-        elif command in PocoDefault.command_dict.keys():
-            args = docopt(PocoDefault.command_dict[command], argv=[command] + argv)
+        elif command in PocokDefault.command_dict.keys():
+            args = docopt(PocokDefault.command_dict[command], argv=[command] + argv)
         else:
-            ColorPrint.exit_after_print_messages("%r is not a poco command. See 'poco help'." % command)
+            ColorPrint.exit_after_print_messages("%r is not a pocok command. See 'pocok help'." % command)
         return args
 
     def run(self):
         try:
             ColorPrint.print_info(StateHolder.config_handler.print_config(), 1)
             if StateHolder.has_args('catalog'):
-                PocoCatalog.handle()
+                PocokCatalog.handle()
             elif StateHolder.has_args('repo'):
-                PocoRepo.handle()
+                PocokRepo.handle()
             elif StateHolder.has_args('project'):
-                PocoProject.handle()
+                PocokProject.handle()
             else:
                 self.run_default()
         except Exception as ex:
@@ -248,13 +248,13 @@ class Poco(object):
         file = repo.get_file(project_element.get('file')) if project_element is not None else None
         # TODO
         if file is None:
-            if os.path.exists('poco.yaml'):
-                file = 'poco.yaml'
+            if os.path.exists('pocok.yaml'):
+                file = 'pocok.yaml'
             else:
-                file = 'poco.yml'
+                file = 'pocok.yml'
 
         if not os.path.exists(file):
-            src_file = os.path.join(os.path.dirname(__file__), 'services/resources/poco.yml')
+            src_file = os.path.join(os.path.dirname(__file__), 'services/resources/pocok.yml')
             shutil.copyfile(src=src_file, dst=file)
             default_compose = os.path.join(os.path.dirname(file), 'docker-compose.yml')
             if not os.path.exists(default_compose):
@@ -317,8 +317,8 @@ class Poco(object):
 
 
 def main():
-    poco = Poco()
-    poco.run()
+    pocok = Pocok()
+    pocok.run()
 
 if __name__ == '__main__':
     sys.exit(main())

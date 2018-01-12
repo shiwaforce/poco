@@ -3,19 +3,19 @@ from .services.console_logger import ColorPrint
 from .services.catalog_handler import CatalogHandler
 
 
-class PocoRepo:
+class PocokRepo:
 
-    DEFAULT = """Poco repo commands
+    DEFAULT = """Pocok repo commands
     Usage:
-      poco repo (add|modify) <name> <git-url> [<branch>] [<file>]
-      poco repo branch <branch> [<name>] [-f]
-      poco repo branches [<name>]
-      poco repo ls
-      poco repo push [<name>]
-      poco repo (remove|rm) <name>
+      pocok repo (add|modify) <name> <git-url> [<branch>] [<file>]
+      pocok repo branch <branch> [<name>] [-f]
+      pocok repo branches [<name>]
+      pocok repo ls
+      pocok repo push [<name>]
+      pocok repo (remove|rm) <name>
     """
     LS = """Usage:
-      poco repo ls
+      pocok repo ls
 
         -h, --help
 
@@ -23,7 +23,7 @@ class PocoRepo:
     """
 
     ADD = """Usage:
-      poco repo (add|modify) <name> <git-url> [<branch>] [<file>]
+      pocok repo (add|modify) <name> <git-url> [<branch>] [<file>]
 
         -h, --help
 
@@ -31,13 +31,13 @@ class PocoRepo:
             <name>          Name of the repository.
             <git-url>       URL of catalog's GIT repository.
             <branch>        Name of the branch that should be checked out. (default : master)
-            <file>          Name of the catalog file in the repository. (default: poco-catalog.yml)
+            <file>          Name of the catalog file in the repository. (default: pocok-catalog.yml)
 
         Add new/Modify repository to the config.
     """
 
     REMOVE = """Usage:
-      poco repo (remove|rm) <name>
+      pocok repo (remove|rm) <name>
 
         -h, --help
 
@@ -48,7 +48,7 @@ class PocoRepo:
     """
 
     BRANCH = """Usage:
-        poco repo branch <branch> [<name>] [-f]
+        pocok repo branch <branch> [<name>] [-f]
 
         -h, --help
 
@@ -61,7 +61,7 @@ class PocoRepo:
     """
 
     BRANCHES = """Usage:
-        poco repo branches [<name>]
+        pocok repo branches [<name>]
 
         -h, --help
 
@@ -72,7 +72,7 @@ class PocoRepo:
     """
 
     PUSH = """Usage:
-        poco repo push [<name>]
+        pocok repo push [<name>]
 
         -h, --help
 

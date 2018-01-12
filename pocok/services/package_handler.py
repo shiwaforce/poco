@@ -28,10 +28,10 @@ class PackageHandler(object):
         if not os.path.exists(os.path.join(self.working_directory, "tmp_archive")):
             os.mkdir(os.path.join(self.working_directory, "tmp_archive"))
 
-        target_file = os.path.join(self.working_directory, StateHolder.name + ".poco")
+        target_file = os.path.join(self.working_directory, StateHolder.name + ".pocok")
         images_file = os.path.join(self.working_directory, "tmp_archive", StateHolder.name + ".tar")
         compose_file = os.path.join(self.working_directory, "tmp_archive", "docker-compose.yml")
-        poco_file = os.path.join(self.working_directory, "tmp_archive", "poco.yml")
+        poco_file = os.path.join(self.working_directory, "tmp_archive", "pocok.yml")
         images = self.get_images(files)
 
         cmd = self.get_compose_base_cmd(docker_files=files)
@@ -42,7 +42,7 @@ class PackageHandler(object):
         with open(compose_file, 'w') as stream:
             stream.write(res.replace(str(self.working_directory), "."))
 
-        src_file = os.path.join(os.path.dirname(__file__), 'resources/poco.yml')
+        src_file = os.path.join(os.path.dirname(__file__), 'resources/pocok.yml')
         shutil.copyfile(src=src_file, dst=poco_file)
 
         cmd = list()
@@ -66,20 +66,20 @@ class PackageHandler(object):
         EnvironmentUtils.check_docker()
         poco_file = None
         for file in next(os.walk(os.getcwd()))[2]:
-            if file.endswith(".poco"):
+            if file.endswith(".pocok"):
                 poco_file = file
                 tar = tarfile.open(file)
                 tar.extractall()
                 tar.close()
                 break
         if poco_file is None:
-            ColorPrint.exit_after_print_messages(message=".poco file not exists in current directory")
+            ColorPrint.exit_after_print_messages(message=".pocok file not exists in current directory")
 
         cmd = list()
         cmd.append("docker")
         cmd.append("load")
         cmd.append("-i")
-        cmd.append(poco_file.rstrip("poco") + "tar")
+        cmd.append(poco_file.rstrip("pocok") + "tar")
         self.run_script(cmd=cmd)
 
     @staticmethod
