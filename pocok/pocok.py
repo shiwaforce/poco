@@ -13,7 +13,7 @@ Options:
   --offline       Offline mode
 
 The available pocok commands are:
-   catalog [<subcommand>]   Catalogue commands, see 'pocok help catalog' for more.
+   catalog                  List the available projects in repos.
    repo [<subcommand>]      Repository commands, see 'pocok help repo' for more.
    project [<subcommand>]   Project commands, see 'pocok help project' for more.
    up, start                Start project
@@ -44,7 +44,6 @@ from docopt import docopt
 from .pocok_default import PocokDefault
 from .pocok_repo import PocokRepo
 from .pocok_project import PocokProject
-from .pocok_catalog import PocokCatalog
 from .services.catalog_handler import CatalogHandler
 from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
@@ -70,8 +69,7 @@ class Pocok(object):
 
     commands = {
         'repo': PocokRepo,
-        'project': PocokProject,
-        'catalog': PocokCatalog
+        'project': PocokProject
     }
 
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.pocok'),
@@ -83,6 +81,7 @@ class Pocok(object):
         if len(argv) == 0:
             argv.append('-h')
         StateHolder.args = docopt(__doc__, version=__version__, options_first=True, argv=argv)
+        self.fill_pre_states()
         StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'],
                                                          argv=[] + StateHolder.args['<args>']))
 
@@ -91,20 +90,13 @@ class Pocok(object):
         self.fill_states()
 
     @staticmethod
-    def fill_states():
+    def fill_pre_states():
         """Fill state"""
 
         StateHolder.catalog_config_file = os.path.join(StateHolder.home_dir, 'config')
         StateHolder.global_config_file = os.path.join(StateHolder.home_dir, '.pocok')
         StateHolder.name = FileUtils.get_directory_name() if StateHolder.args.get('<project>') is None \
             else StateHolder.args.get('<project>')
-
-        #TODO move
-        if StateHolder.args.get("--offline"):
-            StateHolder.offline = StateHolder.args.get("--offline")
-
-        if StateHolder.args.get("--always-update"):
-            StateHolder.always_update = StateHolder.args.get("--always-update")
 
         config_handler = ConfigHandler()
         config_handler.read_configs(StateHolder.global_config_file, True)
@@ -119,12 +111,21 @@ class Pocok(object):
         if ConfigHandler.exists() and StateHolder.args.get('<project>') is not None:
             config_handler.read_catalogs()
 
+    @staticmethod
+    def fill_states():
+        #TODO move
+        if StateHolder.args.get("--offline"):
+            StateHolder.offline = StateHolder.args.get("--offline")
+
+        if StateHolder.args.get("--always-update"):
+            StateHolder.always_update = StateHolder.args.get("--always-update")
+
     def command_interpreter(self, command, argv):
         args = dict()
         if command == 'help':
             argv.append('-h')
             if len(argv) == 1:
-                docopt(__doc__, options_first=True, argv=argv)
+                docopt(__doc__ + self.add_cta(), options_first=True, argv=argv)
             self.command_interpreter(argv[0], argv[1:])
         if command in self.commands.keys():
             if len(argv) == 0:
@@ -140,9 +141,7 @@ class Pocok(object):
     def run(self):
         try:
             ColorPrint.print_info(StateHolder.config_handler.print_config(), 1)
-            if StateHolder.has_args('catalog'):
-                PocokCatalog.handle()
-            elif StateHolder.has_args('repo'):
+            if StateHolder.has_args('repo'):
                 PocokRepo.handle()
             elif StateHolder.has_args('project'):
                 PocokProject.handle()
@@ -284,6 +283,36 @@ class Pocok(object):
             return os.getcwd()
         return self.project_utils.get_target_dir(self.catalog_handler.get())
 
+    def add_cta(self):
+        if not StateHolder.config_parsed and self.local_files_exits() and self.not_complete_local():
+            return "You have some local files for virtualize your project. Run 'pocok init'."
+        if not StateHolder.config_parsed and not self.local_files_exits():
+            return "If you want some sample project run " \
+                   "'pocok repo add sample https://github.com/shiwaforce/poco-example'"
+        return ""
+
+    @staticmethod
+    def not_complete_local():
+        '''TODO its not completed'''
+        actual_dir = os.getcwd()
+
+        if os.path.exists(os.path.join(actual_dir, 'pocok.yml')) or os.path.exists(os.path.join(actual_dir, 'pocok.yaml')):
+            if os.path.exists(os.path.join(actual_dir, 'docker-compose.yml')) \
+                    or os.path.exists(os.path.join(actual_dir, 'docker-compose.yaml')):
+                return False
+        return True
+
+    @staticmethod
+    def local_files_exits():
+        actual_dir = os.getcwd()
+        ''' TODO handle extension'''
+        files = ['pocok.yml', 'pocok.yaml', 'docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']
+
+        for file in files:
+            if os.path.exists(os.path.join(actual_dir, file)):
+                return True
+        return False
+
     @staticmethod
     def run_checkouts():
         for checkout in StateHolder.compose_handler.get_checkouts():
@@ -314,7 +343,6 @@ class Pocok(object):
             paths = paths[1:]
 
         return structure[node] if node in structure else default
-
 
 def main():
     pocok = Pocok()

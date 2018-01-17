@@ -11,6 +11,14 @@ class PocokDefault:
 
     Print full Docker compose configuration for a project's plan.
 """
+    CATALOG = """Usage:
+  pocok catalog ls
+
+    -h, --help
+
+    List the available projects in repos.
+"""
+
     CLEAN = """Usage:
   pocok clean
 
@@ -167,6 +175,7 @@ class PocokDefault:
 
     command_dict = {
         'project-config': PROJECT_CONFIG,
+        'catalog': CATALOG,
         'clean': CLEAN,
         'init': INIT,
         'install': INSTALL,
