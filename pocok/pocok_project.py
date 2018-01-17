@@ -23,12 +23,12 @@ class PocokProject:
     """
 
     INIT = """Usage:
-      pocok project init [<project>]
+      pocok project init [<name>]
 
         -h, --help
 
         Specific parameters:
-          <project>         Name of the project that will be added to the catalog
+          <name>         Name of the project that will be added to the catalog
 
         Create pocok.yml and docker-compose.yml to a project if aren't exists.
     """
@@ -42,12 +42,12 @@ class PocokProject:
     """
 
     REMOVE = """Usage:
-    pocok project remove <project>
+    pocok project remove <name>
 
         -h, --help
 
         Specific parameters:
-            <project>       Name of the project that will be removed
+            <name>       Name of the project that will be removed
 
         Remove project from the catalog.
     """

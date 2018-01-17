@@ -2,13 +2,12 @@
 class PocokDefault:
 
     PROJECT_CONFIG = """Usage:
-  pocok project-config [<project>] [<plan>]
+  pocok project-config [<project/plan>]
 
     -h, --help
 
     Specific parameters:
-      <project>         Name of the project in the catalog
-      <plan>            Name of the project's plan
+      <project/plan>         Name of the project in the catalog and/or name of the project's plan
 
     Print full Docker compose configuration for a project's plan.
 """
@@ -32,80 +31,73 @@ class PocokDefault:
 """
 
     INSTALL = """Usage:
-  pocok install [<project>] [<plan>]
+  pocok install [<project/plan>]
 
     -h, --help
 
     Specific parameters:
-      <project>         Name of the project in the catalog
-      <plan>            Name of the project's plan
+      <project/plan>         Name of the project in the catalog and/or name of the project's plan
 
     Clone projects from a remote repository, run install scripts.
 """
 
     START = """Usage:
-  pocok (start|up) [<project>] [<plan>]
+  pocok (start|up) [<project/plan>]
 
   -h, --help
 
     Specific parameters:
-      <project>         Name of the project in the catalog
-      <plan>            Name of the project's plan
+      <project/plan>         Name of the project in the catalog and/or name of the project's plan
 
     Start pocok project with the default or defined plan.
 """
     STOP = """Usage:
-  pocok (stop|down) [<project>] [<plan>]
+  pocok (stop|down) [<project/plan>]
 
   -h, --help
 
     Specific parameters:
-      <project>         Name of the project in the catalog
-      <plan>            Name of the project's plan
+      <project/plan>         Name of the project in the catalog and/or name of the project's plan
 
     Stop project with the default or defined plan.
 """
     RESTART = """Usage:
-  pocok restart [<project>] [<plan>]
+  pocok restart [<project/plan>]
 
   -h, --help
 
     Specific parameters:
-      <project>         Name of the project in the catalog
-      <plan>            Name of the project's plan
+      <project/plan>         Name of the project in the catalog and/or name of the project's plan
 
     Restart project with the default or defined plan.
 """
     LOG = """Usage:
-  pocok (log|logs) [<project>] [<plan>]
+  pocok (log|logs) [<project/plan>]
 
   -h, --help
 
     Specific parameters:
-      <project>         Name of the project in the catalog
-      <plan>            Name of the project's plan
+      <project/plan>         Name of the project in the catalog and/or name of the project's plan
 
     Print docker containers logs of the current project with the default or defined plan.
 """
     BUILD = """Usage:
-  pocok build [<project>] [<plan>]
+  pocok build [<project/plan>]
 
   -h, --help
 
     Specific parameters:
-      <project>         Name of the project in the catalog
-      <plan>            Name of the project's plan
+      <project/plan>         Name of the project in the catalog and/or name of the project's plan
 
     Build containers depends defined project and plan.
 """
     PS = """Usage:
-  pocok ps [<project>] [<plan>]
+  pocok ps [<project/plan>]
 
   -h, --help
 
     Specific parameters:
-      <project>         Name of the project in the catalog
-      <plan>            Name of the project's plan
+      <project/plan>         Name of the project in the catalog and/or name of the project's plan
 
     Print containers statuses which depends defined project and plan.
 """
@@ -122,13 +114,12 @@ class PocokDefault:
 """
 
     PULL = """Usage:
-  pocok pull [<project>] [<plan>]
+  pocok pull [<project/plan>]
 
   -h, --help
 
     Specific parameters:
-      <project>         Name of the project in the catalog
-      <plan>            Name of the project's plan
+      <project/plan>         Name of the project in the catalog and/or name of the project's plan
 
     Pull all necessary images for the project with the defined or default plan.
 """
@@ -156,13 +147,12 @@ class PocokDefault:
     List all available git branches of the project.
 """
     PACK = """Usage:
-  pocok pack [<project>] [<plan>]
+  pocok pack [<project/plan>]
 
   -h, --help
 
     Specific parameters:
-      <project>         Name of the project in the catalog
-      <plan>            Name of the project's plan
+      <project/plan>         Name of the project in the catalog and/or name of the project's plan
 
     Pack the selected project's plan configuration with docker images into an archive.
 """
