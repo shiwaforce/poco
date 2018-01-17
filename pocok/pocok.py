@@ -284,29 +284,24 @@ class Pocok(object):
         return self.project_utils.get_target_dir(self.catalog_handler.get())
 
     def add_cta(self):
-        if not StateHolder.config_parsed and self.local_files_exits() and self.not_complete_local():
+        if self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
+            return "You have local files to run. Run 'pocok up'."
+        if not StateHolder.config_parsed and \
+                self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']) \
+                and not self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
             return "You have some local files for virtualize your project. Run 'pocok init'."
-        if not StateHolder.config_parsed and not self.local_files_exits():
+        if not StateHolder.config_parsed and not \
+                self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']):
             return "If you want some sample project run " \
                    "'pocok repo add sample https://github.com/shiwaforce/poco-example'"
+        if StateHolder.config_parsed:
+            return "You have an catalog. If you want to see available projects, run 'pocok catalog'"
         return ""
 
     @staticmethod
-    def not_complete_local():
-        '''TODO its not completed'''
-        actual_dir = os.getcwd()
-
-        if os.path.exists(os.path.join(actual_dir, 'pocok.yml')) or os.path.exists(os.path.join(actual_dir, 'pocok.yaml')):
-            if os.path.exists(os.path.join(actual_dir, 'docker-compose.yml')) \
-                    or os.path.exists(os.path.join(actual_dir, 'docker-compose.yaml')):
-                return False
-        return True
-
-    @staticmethod
-    def local_files_exits():
+    def one_of_local_files_exits(files):
         actual_dir = os.getcwd()
         ''' TODO handle extension'''
-        files = ['pocok.yml', 'pocok.yaml', 'docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']
 
         for file in files:
             if os.path.exists(os.path.join(actual_dir, file)):
