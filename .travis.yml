@@ -22,8 +22,7 @@ script:
 #- "python setup.py test"
 - "py.test --cov poco"
 after_script:
-  - "cat ./.coverage"
-  - "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
+  - "./cc-test-reporter after-build -t "coverage.py" --exit-code $TRAVIS_TEST_RESULT"
 deploy:
   provider: pypi
   user: swf.operations
