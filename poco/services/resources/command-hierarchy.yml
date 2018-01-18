@@ -10,19 +10,19 @@
   },
   up: {
     before: true,
-    docker: ["build", "pull", "config", ["up", "-d"], "logs", "ps"],
+    docker: ["build", "config", ["up", "-d"], "logs", "ps"],
     kubernetes: ["apply"],
     after: true
   },
   start: {
     before: true,
-    docker: ["build", "pull", "config", ["up", "-d"], "logs", "ps"],
+    docker: ["build", "config", ["up", "-d"], "logs", "ps"],
     kubernetes: ["apply"],
     after: true
   },
   restart: {
     before: true,
-    docker: ["stop", "ps", "build", "pull", "config", ["up", "-d"], "logs", "ps"],
+    docker: ["stop", "ps", "build", "config", ["up", "-d"], "logs", "ps"],
     kubernetes: ["apply"],
     after: true
   },

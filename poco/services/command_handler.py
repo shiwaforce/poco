@@ -83,6 +83,8 @@ class CommandHandler(object):
                                       working_directory=self.working_directory,
                                       project_utils=self.project_utils,
                                       repo_dir=self.repo_dir)
+            if StateHolder.developer_mode and cmd in ['up', 'start']: # Pull before start in developer mode
+                runner.run(plan=plan, commands='pull', envs=self.get_environment_variables(plan=plan))
             for cmd in command_list['docker']:
                 runner.run(plan=plan, commands=cmd,
                            envs=self.get_environment_variables(plan=plan))
