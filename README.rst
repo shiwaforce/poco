@@ -10,6 +10,15 @@ Poco
 .. image:: https://img.shields.io/pypi/pyversions/poco.svg
     :target: https://pypi.python.org/pypi/poco
 
+.. image:: https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/test_coverage
+   :target: https://codeclimate.com/github/shiwaforce/poco/test_coverage
+   :alt: Test Coverage
+
+.. image:: https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/maintainability
+   :target: https://codeclimate.com/github/shiwaforce/poco/maintainability
+   :alt: Maintainability
+
+
 .. image:: logo.jpg
     :height: 200px
     :width: 200px
