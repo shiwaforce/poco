@@ -1,3 +1,6 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=9d39e517e2a74afe27c5d9b783a86db53babf6c3bd498fab51605c661be3c271
 language: python
 python:
 - '2.7'
@@ -11,8 +14,14 @@ install:
 - "pip install docopt==0.6.2"
 - "pip install pytest-cov"
 - "pip install docker-compose>=1.11.2"
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
 script:
 - "python setup.py test"
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 deploy:
   provider: pypi
   user: swf.operations
