@@ -20,8 +20,9 @@ before_script:
   - "./cc-test-reporter before-build"
 script:
 #- "python setup.py test"
-- "py.test --cov"
+- "py.test --cov poco"
 after_script:
+  - "ls -l"
   - "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
 deploy:
   provider: pypi
