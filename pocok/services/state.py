@@ -7,13 +7,14 @@ class StateHolder:
     container_mode = "Docker"
     catalog_config_file = None
     global_config_file = None
-    work_dir = os.path.join(os.path.expanduser(path='~'), 'workspace')
+    base_work_dir = os.path.join(os.path.expanduser(path='~'), 'workspace')
+    work_dir = None
     config_parsed = False
 
     '''input arguments'''
     args = dict()
 
-    ''' full content of config file without work_dir and developer-mode'''
+    ''' full content of catalogue's config file'''
     config = None
 
     ''' full contents of catalog files '''
@@ -24,6 +25,8 @@ class StateHolder:
 
     '''project name'''
     name = None
+
+    plan = None
 
     mode = None
 

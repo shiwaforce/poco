@@ -1,6 +1,7 @@
 from .services.state import StateHolder
 from .services.console_logger import ColorPrint
 from .services.catalog_handler import CatalogHandler
+from .services.config_handler import ConfigHandler
 
 
 class PocokRepo:
@@ -95,10 +96,14 @@ class PocokRepo:
 
     @staticmethod
     def handle():
+        if StateHolder.has_args('ls'):
+            ColorPrint.exit_after_print_messages(message=ConfigHandler.print_config(), msg_type="info")
+
         if StateHolder.config is None:
             ColorPrint.exit_after_print_messages('repo commands works only with config file.\n '
                                                  'Run "catalog init" command to create one.')
         StateHolder.catalog_handler = CatalogHandler()
+
         if StateHolder.has_args('remove'):
             if StateHolder.name in StateHolder.catalogs:
                 pass

@@ -2,7 +2,7 @@
 class PocokDefault:
 
     PROJECT_CONFIG = """Usage:
-  pocok project-config [<project/plan>]
+  pocok config [<project/plan>]
 
     -h, --help
 
@@ -174,7 +174,7 @@ class PocokDefault:
 """
 
     command_dict = {
-        'project-config': PROJECT_CONFIG,
+        'config': PROJECT_CONFIG,
         'catalog': CATALOG,
         'clean': CLEAN,
         'init': INIT,

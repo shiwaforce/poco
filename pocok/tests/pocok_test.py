@@ -1,36 +1,48 @@
 import git
 import os
 import yaml
+import pocok.pocok as pocok;
 from .abstract_test import AbstractTestSuite
-from pocok.pocok import Pocok
 from pocok.services.state import StateHolder
 
 
 class ComposeTestSuite(AbstractTestSuite):
 
     def test_without_command(self):
-        with self.assertRaises(SystemExit) as context:
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=[""])
-            pocok.run()
-        self.assertIsNotNone(context.exception)
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                runnable = pocok.Pocok(home_dir=self.tmpdir, argv=[])
+                runnable.run()
+            self.assertIsNotNone(context.exception)
+        self.assertEqual(out.getvalue().strip(), pocok.__doc__.strip())
 
-"""
+    def test_help_command(self):
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                runnable = pocok.Pocok(home_dir=self.tmpdir, argv=["help"])
+                runnable.run()
+            self.assertIsNotNone(context.exception)
+        self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
+        self.assertIn("'pocok repo add sample https://github.com/shiwaforce/poco-example'\n"
+                      "Run if you want some sample project", out.getvalue())
+
     def test_wrong_parameters(self):
-        with self.assertRaises(DocoptExit) as context:
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["notexistcommand"])
-            pocok.run()
-        self.assertIsNotNone(context.exception)
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                runnable = pocok.Pocok(home_dir=self.tmpdir, argv=["notexistcommand"])
+                runnable.run()
+            self.assertIsNotNone(context.exception)
+        self.assertIn("is not a pocok command. See 'pocok help'.", out.getvalue().strip())
 
     def test_config_without_config(self):
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
-                pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "config"])
-                pocok.run()
+                runnable = pocok.Pocok(home_dir=self.tmpdir, argv=["repo", "ls"])
+                runnable.run()
             self.assertIsNotNone(context.exception)
-        self.assertIn("catalog config commands works only with config file.", out.getvalue().strip())
+        self.assertIn("Actual config\n-------------\n", out.getvalue().strip())
 
+"""
     def test_config(self):
         self.init_with_remote_catalog()
         with self.captured_output() as (out, err):

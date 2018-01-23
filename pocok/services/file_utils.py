@@ -100,3 +100,12 @@ class FileUtils:
                     repo_dir=base_dir, working_directory=work_dir, file_name=key))
         return file_list
 
+    @staticmethod
+    def get_exists_file_full_name(dir, base, extensions):
+        if not isinstance(extensions, list):
+            extensions = list(extensions)
+
+        for ext in extensions:
+            file = os.path.join(dir, base, '.', ext)
+            if os.path.exists(file):
+                return file

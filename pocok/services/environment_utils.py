@@ -46,8 +46,11 @@ class EnvironmentUtils:
 
     @staticmethod
     def parse_version(pip_content):
-        if "(from versions: " in pip_content and not "Could not find a version" in pip_content:
-            return pip_content.strip().splitlines()[0].split(",")[-1].strip(') ')
+        if "(from versions: " in pip_content:
+            first_line = pip_content.strip().splitlines()[0]
+            versions = first_line.split(",")
+            if not len(versions[-1]) == len(first_line):
+                return versions[-1].strip(') ')
         return "0.0.0"
 
     @staticmethod

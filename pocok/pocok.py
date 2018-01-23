@@ -20,7 +20,7 @@ The available pocok commands are:
    down, stop               Stop project
    restart                  Restart project
    plan ls                  Print all plan belongs to project
-   project-config           Print full Docker compose configuration for a project's plan.
+   config                   Print full Docker compose configuration for a project's plan.
    clean                    Clean all container and image from local Docker repository.
    init                     Create pocok.yml and docker-compose.yml in project if aren't exists.
    install                  Get projects from remote repository (if its not exists locally yet) and run install scripts.
@@ -45,10 +45,9 @@ from .pocok_default import PocokDefault
 from .pocok_repo import PocokRepo
 from .pocok_project import PocokProject
 from .services.catalog_handler import CatalogHandler
+from .services.config_handler import ConfigHandler
 from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
-from .services.config_handler import ConfigHandler
-from .services.file_utils import FileUtils
 from .services.environment_utils import EnvironmentUtils
 from .services.git_repository import GitRepository
 from .services.project_utils import ProjectUtils
@@ -56,6 +55,7 @@ from .services.console_logger import ColorPrint
 from .services.command_handler import CommandHandler
 from .services.package_handler import PackageHandler
 from .services.state import StateHolder
+from .services.state_utils import StateUtils
 
 
 __version__ = '0.24.0'
@@ -81,44 +81,13 @@ class Pocok(object):
         if len(argv) == 0:
             argv.append('-h')
         StateHolder.args = docopt(__doc__, version=__version__, options_first=True, argv=argv)
-        self.fill_pre_states()
+        StateUtils.fill_pre_states()
         StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'],
                                                          argv=[] + StateHolder.args['<args>']))
 
         ColorPrint.set_log_level(StateHolder.args)
         ColorPrint.print_info('arguments:\n' + str(StateHolder.args), 1)
-        self.fill_states()
-
-    @staticmethod
-    def fill_pre_states():
-        """Fill state"""
-
-        StateHolder.catalog_config_file = os.path.join(StateHolder.home_dir, 'config')
-        StateHolder.global_config_file = os.path.join(StateHolder.home_dir, '.pocok')
-        StateHolder.name = FileUtils.get_directory_name() if StateHolder.args.get('<project>') is None \
-            else StateHolder.args.get('<project>')
-
-        config_handler = ConfigHandler()
-        config_handler.read_configs(StateHolder.global_config_file, True)
-        ''' read local config too '''
-        if StateHolder.args.get('<project>') is None:
-            StateHolder.work_dir = os.getcwd()
-            config_handler.read_configs(os.path.join(os.getcwd(), '.pocok'))
-        else:
-            config_handler.read_configs(os.path.join(StateHolder.work_dir, StateHolder.name, '.pocok'))
-
-        """Parse config if need - not project parameter """
-        if ConfigHandler.exists() and StateHolder.args.get('<project>') is not None:
-            config_handler.read_catalogs()
-
-    @staticmethod
-    def fill_states():
-        #TODO move
-        if StateHolder.args.get("--offline"):
-            StateHolder.offline = StateHolder.args.get("--offline")
-
-        if StateHolder.args.get("--always-update"):
-            StateHolder.always_update = StateHolder.args.get("--always-update")
+        StateUtils.fill_states()
 
     def command_interpreter(self, command, argv):
         args = dict()
@@ -286,15 +255,15 @@ class Pocok(object):
     def add_cta(self):
         if self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
             return "You have local files to run. Run 'pocok up'."
-        if not StateHolder.config_parsed and \
+        if not ConfigHandler.exists() and \
                 self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']) \
                 and not self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
             return "You have some local files for virtualize your project. Run 'pocok init'."
-        if not StateHolder.config_parsed and not \
+        if not ConfigHandler.exists() and not \
                 self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']):
-            return "If you want some sample project run " \
-                   "'pocok repo add sample https://github.com/shiwaforce/poco-example'"
-        if StateHolder.config_parsed:
+            return "'pocok repo add sample https://github.com/shiwaforce/poco-example'\n" \
+                   "Run if you want some sample project"
+        if ConfigHandler.exists():
             return "You have an catalog. If you want to see available projects, run 'pocok catalog'"
         return ""
 
