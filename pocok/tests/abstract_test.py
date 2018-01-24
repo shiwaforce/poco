@@ -118,3 +118,18 @@ class AbstractTestSuite(unittest.TestCase):
     def run_pocok_command(self, *args):
         runnable = pocok.Pocok(home_dir=self.tmpdir, argv=list(args))
         runnable.run()
+
+    def init_empty_compose_file(self):
+        compose_file = dict()
+        compose_file['services'] = dict()
+        with open(os.path.join(self.ws_dir, 'docker-compose.yaml'), 'w+') as stream:
+            yaml.dump(data=compose_file, stream=stream, default_flow_style=False,
+                      default_style='', indent=4)
+
+    def init_pocok_file(self):
+        pocok_file = dict()
+        pocok_file['plan'] = dict()
+        pocok_file['plan']['default'] = 'docker-compose.yaml'
+        with open(os.path.join(self.ws_dir, 'pocok.yaml'), 'w+') as stream:
+            yaml.dump(data=pocok_file, stream=stream, default_flow_style=False,
+                      default_style='', indent=4)

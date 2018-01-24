@@ -40,17 +40,23 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertIn(pocok.Pocok.CTA_STRINGS['have_cat'], out.getvalue())
 
     def test_help_command_with_pocok_file(self):
-        compose_file = dict()
-        compose_file['services'] = dict()
-        with open(os.path.join(self.ws_dir, 'docker-compose.yaml'), 'w+') as stream:
-            yaml.dump(data=compose_file, stream=stream, default_flow_style=False,
-                      default_style='', indent=4)
+        self.init_empty_compose_file()
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
                 self.run_pocok_command("help")
             self.assertIsNotNone(context.exception)
         self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
         self.assertIn(pocok.Pocok.CTA_STRINGS['have_file'], out.getvalue())
+
+    def test_help_command_with_everything(self):
+        self.init_empty_compose_file()
+        self.init_pocok_file()
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("help")
+            self.assertIsNotNone(context.exception)
+        self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
+        self.assertIn(pocok.Pocok.CTA_STRINGS['have_all'], out.getvalue())
 
     def test_wrong_parameters(self):
         with self.captured_output() as (out, err):

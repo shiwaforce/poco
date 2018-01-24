@@ -20,22 +20,11 @@ class CatalogHandler:
             conf = StateHolder.config[key]
             repo = self.get_repository_type(conf)
 
-            if StateHolder.offline and repo in ('git', 'svn'):
-                repository = FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key))
-            elif 'git' == repo:
-                repository = GitRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
-                                           url=self.get_url(conf),
-                                           branch=self.get_branch(conf), git_ssh_identity_file=conf.get("ssh-key"))
-            elif 'svn' == repo:
-                repository = SvnRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
-                                           url=self.get_url(conf))
-            else:
-                repository = FileRepository(target_dir=StateHolder.home_dir)
+            repository = CatalogHandler.get_repository(conf, repo)
 
             if self.default_repository is None or key == 'default':
                 self.default_repository = CatalogData(config=conf, repository=repository)
             self.catalog_repositories[key] = CatalogData(config=conf, repository=repository)
-
         self.parse_catalog()
 
     def handle_command(self):
@@ -105,14 +94,6 @@ class CatalogHandler:
             self.catalog_repositories[catalog].repository.write_yaml_file(self.get_catalog_file(
                 self.catalog_repositories[catalog].config), string_format)
 
-    @staticmethod
-    def get():
-        """Get project parameters form catalog, if it is exists"""
-        for catalog in StateHolder.catalogs:
-            if StateHolder.name in StateHolder.catalogs[catalog]:
-                return StateHolder.catalogs[catalog].get(StateHolder.name)
-        ColorPrint.exit_after_print_messages(message="Project with name: %s not exist" % StateHolder.name)
-
     def set(self, modified):
         """Set project parameters and write, if it is exists"""
         for catalog in StateHolder.catalogs:
@@ -158,6 +139,32 @@ class CatalogHandler:
         if catalog is None:
             catalog = self.get_default_catalog()
             self.catalog_repositories[catalog].repository.push()
+
+    @staticmethod
+    def get():
+        """Get project parameters form catalog, if it is exists"""
+        for catalog in StateHolder.catalogs:
+            if StateHolder.name in StateHolder.catalogs[catalog]:
+                return StateHolder.catalogs[catalog].get(StateHolder.name)
+        ColorPrint.exit_after_print_messages(message="Project with name: %s not exist" % StateHolder.name)
+
+    @staticmethod
+    def get_repository(key, repo):
+        conf = StateHolder.config[key]
+        if StateHolder.offline and repo in ('git', 'svn'):
+            repository = FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key))
+        elif 'git' == repo:
+            repository = GitRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
+                                       url=CatalogHandler.get_url(conf),
+                                       branch=CatalogHandler.get_branch(conf),
+                                       git_ssh_identity_file=conf.get("ssh-key"))
+        elif 'svn' == repo:
+            repository = SvnRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
+                                       url=CatalogHandler.get_url(conf))
+        else:
+            repository = FileRepository(target_dir=StateHolder.home_dir)
+        return repository
+
 
     @staticmethod
     def get_default_catalog():

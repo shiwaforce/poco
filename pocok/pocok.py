@@ -262,18 +262,19 @@ class Pocok(object):
         return self.project_utils.get_target_dir(self.catalog_handler.get())
 
     def add_cta(self):
+        res = ""
         if self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
-            return
-        if not ConfigHandler.exists() and \
+            res = Pocok.CTA_STRINGS['have_all']
+        elif not ConfigHandler.exists() and \
                 self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']) \
                 and not self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
-            return Pocok.CTA_STRINGS['have_file']
-        if not ConfigHandler.exists() and not \
+            res = Pocok.CTA_STRINGS['have_file']
+        elif not ConfigHandler.exists() and not \
                 self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']):
-            return Pocok.CTA_STRINGS['default']
-        if ConfigHandler.exists():
-            return Pocok.CTA_STRINGS['have_cat']
-        return ""
+            res = Pocok.CTA_STRINGS['default']
+        elif ConfigHandler.exists():
+            res = Pocok.CTA_STRINGS['have_cat']
+        return res
 
     @staticmethod
     def one_of_local_files_exits(files):
