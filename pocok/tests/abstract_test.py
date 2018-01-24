@@ -65,12 +65,14 @@ class AbstractTestSuite(unittest.TestCase):
         self.local_stack_list = os.path.join(self.tmpdir, 'pocok-catalog.yml')
         self.ws_dir = os.path.join(self.tmpdir, 'ws')
         os.makedirs(self.ws_dir)
+        self.orig_dir = os.getcwd()
         os.chdir(self.ws_dir)
 
         self.clean_states()
         StateHolder.base_work_dir = self.ws_dir
 
     def tearDown(self):
+        os.chdir(self.orig_dir)
         shutil.rmtree(self.tmpdir, onerror=FileUtils.remove_readonly)
 
     @staticmethod
