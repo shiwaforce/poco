@@ -2,10 +2,11 @@
 """Pocok project compose.
 
 Usage:
-  pocok [--version] [-h|--help] [-v|--verbose] [-q|--quiet] [--developer] [--offline] <command> [<args>...]
+  pocok [options] <command> [<args>...]
 
 
 Options:
+  --version       Print version of Pocok
   -h --help       Show this screen.
   -v --verbose    Print more text.
   -q --quiet      Print less text.
@@ -72,6 +73,15 @@ class Pocok(object):
         'project': PocokProject
     }
 
+    CTA_STRINGS = {
+        "default": "'pocok repo add sample https://github.com/shiwaforce/poco-example'\n"
+                   "Run if you want some sample project",
+        "have_file": "'pocok init'\nYou have some local files for virtualize your project. "
+                     "Run above for full functionality.",
+        "have_cat": "You have an catalog. If you want to see available projects, run:\n'pocok catalog'",
+        "have_all": "You have local files to run, only one command left:\n'pocok up'"
+    }
+
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.pocok'),
                  argv=sys.argv[1:]):
 
@@ -84,7 +94,6 @@ class Pocok(object):
         StateUtils.fill_pre_states()
         StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'],
                                                          argv=[] + StateHolder.args['<args>']))
-
         ColorPrint.set_log_level(StateHolder.args)
         ColorPrint.print_info('arguments:\n' + str(StateHolder.args), 1)
         StateUtils.fill_states()
@@ -254,24 +263,22 @@ class Pocok(object):
 
     def add_cta(self):
         if self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
-            return "You have local files to run. Run 'pocok up'."
+            return
         if not ConfigHandler.exists() and \
                 self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']) \
                 and not self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
-            return "You have some local files for virtualize your project. Run 'pocok init'."
+            return Pocok.CTA_STRINGS['have_file']
         if not ConfigHandler.exists() and not \
                 self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']):
-            return "'pocok repo add sample https://github.com/shiwaforce/poco-example'\n" \
-                   "Run if you want some sample project"
+            return Pocok.CTA_STRINGS['default']
         if ConfigHandler.exists():
-            return "You have an catalog. If you want to see available projects, run 'pocok catalog'"
+            return Pocok.CTA_STRINGS['have_cat']
         return ""
 
     @staticmethod
     def one_of_local_files_exits(files):
         actual_dir = os.getcwd()
         ''' TODO handle extension'''
-
         for file in files:
             if os.path.exists(os.path.join(actual_dir, file)):
                 return True

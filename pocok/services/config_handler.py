@@ -50,7 +50,9 @@ class ConfigHandler(object):
         config = YamlHandler.read(file=config_file, doc=Doc.CONFIG)
 
         if check_wd:
-            StateHolder.base_work_dir = config.get('workspace')
+            workspace = config.get('workspace')
+            if workspace is not None:
+                StateHolder.base_work_dir = workspace
             if not (os.path.exists(path=StateHolder.base_work_dir)):
                 os.makedirs(StateHolder.work_dir)
 
@@ -139,7 +141,8 @@ class ConfigHandler(object):
         config = "Actual config\n"
         config += "-------------\n\n"
         config += "Project name: " + str(StateHolder.name) + "\n"
-        config += "Working directory : " + str(StateHolder.work_dir) + "\n"
+        config += "Working directory: " \
+                  + str(StateHolder.work_dir if StateHolder.work_dir is not None else StateHolder.base_work_dir) + "\n"
         config += "Mode: " + str(StateHolder.mode) + "\n"
         config += "Offline: " + str(StateHolder.offline) + "\n"
         config += "Always update: " + str(StateHolder.always_update) + "\n"

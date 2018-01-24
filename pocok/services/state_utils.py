@@ -20,12 +20,16 @@ class StateUtils(object):
 
         if '<project/plan>' in StateHolder.args:
             StateUtils.calculate_name_and_work_dir()
+        elif '<project>' in StateHolder.args:
+            proj_arg = StateHolder.args.get('<project>')
+            StateHolder.name = proj_arg if proj_arg is not None else FileUtils.get_directory_name()
 
         """ Always parse catalog """
         if ConfigHandler.exists():
             config_handler.read_catalogs()
 
-        StateUtils.read_project_config()
+        if StateHolder.name is not None:
+            StateUtils.read_project_config()
 
         if StateHolder.args.get("--offline"):
             StateHolder.offline = StateHolder.args.get("--offline")

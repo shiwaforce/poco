@@ -3,41 +3,40 @@ import os
 
 class StateHolder:
 
+    # Globals
     home_dir = None
-    container_mode = "Docker"
     catalog_config_file = None
     global_config_file = None
-    base_work_dir = os.path.join(os.path.expanduser(path='~'), 'workspace')
-    work_dir = None
-    config_parsed = False
 
-    '''input arguments'''
+    # input arguments
     args = dict()
 
-    ''' full content of catalogue's config file'''
-    config = None
+    # Working directory
+    base_work_dir = os.path.join(os.path.expanduser(path='~'), 'workspace')
+    work_dir = None
 
-    ''' full contents of catalog files '''
-    catalogs = None
+    # Config section
+    config_parsed = False
+    config = None  # full content of catalogue's config file
 
-    ''' content of requested catalog '''
-    catalog_element = None
+    # Catalog section
+    catalogs = None  # full contents of catalog files
+    catalog_element = None  # content of requested catalog
 
-    '''project name'''
-    name = None
-
-    plan = None
-
+    # Mode and mode properties
     mode = None
-
-    ''' submodes '''
     offline = False
     always_update = True
 
-    '''For not Docker mode'''
-    skip_docker = False
+    # Project properties
+    name = None
+    plan = None
 
-    ''' handlers '''
+    # Virtualization type
+    container_mode = "Docker"
+    test_mode = False # Not running scrips and virtualization types
+
+    # Handlers
     config_handler = None
     compose_handler = None
     catalog_handler = None

@@ -11,47 +11,86 @@ class ComposeTestSuite(AbstractTestSuite):
     def test_without_command(self):
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
-                runnable = pocok.Pocok(home_dir=self.tmpdir, argv=[])
-                runnable.run()
+                self.run_pocok_command()
             self.assertIsNotNone(context.exception)
         self.assertEqual(out.getvalue().strip(), pocok.__doc__.strip())
+
+    def test_version(self):
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("--version")
+            self.assertIsNotNone(context.exception)
+        self.assertIn(pocok.__version__, out.getvalue().strip())
 
     def test_help_command(self):
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
-                runnable = pocok.Pocok(home_dir=self.tmpdir, argv=["help"])
-                runnable.run()
+                self.run_pocok_command("help")
             self.assertIsNotNone(context.exception)
         self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
-        self.assertIn("'pocok repo add sample https://github.com/shiwaforce/poco-example'\n"
-                      "Run if you want some sample project", out.getvalue())
+        self.assertIn(pocok.Pocok.CTA_STRINGS['default'], out.getvalue())
+
+    def test_help_command_with_catalog(self):
+        self.init_with_local_catalog()
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("help")
+            self.assertIsNotNone(context.exception)
+        self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
+        self.assertIn(pocok.Pocok.CTA_STRINGS['have_cat'], out.getvalue())
+
+    def test_help_command_with_pocok_file(self):
+        compose_file = dict()
+        compose_file['services'] = dict()
+        with open(os.path.join(self.ws_dir, 'docker-compose.yaml'), 'w+') as stream:
+            yaml.dump(data=compose_file, stream=stream, default_flow_style=False,
+                      default_style='', indent=4)
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("help")
+            self.assertIsNotNone(context.exception)
+        self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
+        self.assertIn(pocok.Pocok.CTA_STRINGS['have_file'], out.getvalue())
 
     def test_wrong_parameters(self):
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
-                runnable = pocok.Pocok(home_dir=self.tmpdir, argv=["notexistcommand"])
-                runnable.run()
+                self.run_pocok_command("notexistcommand")
             self.assertIsNotNone(context.exception)
         self.assertIn("is not a pocok command. See 'pocok help'.", out.getvalue().strip())
 
     def test_config_without_config(self):
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
-                runnable = pocok.Pocok(home_dir=self.tmpdir, argv=["repo", "ls"])
-                runnable.run()
+                self.run_pocok_command("repo", "ls")
             self.assertIsNotNone(context.exception)
         self.assertIn("Actual config\n-------------\n", out.getvalue().strip())
+
+    def test_config_with_config(self):
+        self.init_with_remote_catalog()
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("repo", "ls")
+            self.assertIsNotNone(context.exception)
+        out_string = out.getvalue().strip()
+        self.assertIn("Actual config\n-------------\n", out_string)
+        self.assertIn("Mode: developer", out_string)
+        self.assertIn("Working directory: " + str(self.ws_dir), out_string)
+        self.assertIn("Config location: " + str(self.config_file), out_string)
+        self.assertIn(yaml.dump(AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='', indent=4)
+                      .strip(), out_string)
 
 """
     def test_config(self):
         self.init_with_remote_catalog()
         with self.captured_output() as (out, err):
             StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "config"])
-            pocok.run()
+            runnable = pocok.Pocok(home_dir=self.tmpdir, argv=["catalog", "config"])
+            runnable.run()
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn(yaml.dump(data=AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='',
                                 indent=4).strip(), out.getvalue().strip())
+
 
     def test_add_and_remove_config(self):
         self.init_with_remote_catalog()

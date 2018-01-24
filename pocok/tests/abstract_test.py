@@ -5,6 +5,7 @@ import shutil
 import tempfile
 import yaml
 from contextlib import contextmanager
+import pocok.pocok as pocok;
 from ..services.file_utils import FileUtils
 from ..services.state import StateHolder
 try:
@@ -21,13 +22,17 @@ class AbstractTestSuite(unittest.TestCase):
         }
     }
 
-    REMOTE_CONFIG = {
+    REMOTE_CONFIG = {  # TODO rename to pocok
       'default': {
         'repositoryType': 'git',
-        'file': 'pocok-catalog.yml',
-        'server': 'https://github.com/shiwaforce/pocok-example.git',
+        'file': 'poco-catalog.yml',
+        'server': 'https://github.com/shiwaforce/poco-example.git',
         'branch': 'master'
         }
+    }
+
+    POCOK_CONFIG = {
+        'mode': 'developer'
     }
 
     STACK_LIST_SAMPLE = {
@@ -56,11 +61,14 @@ class AbstractTestSuite(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp(prefix='pocok-home')
         self.config_file = os.path.join(self.tmpdir, 'config')
+        self.pocok_file = os.path.join(self.tmpdir, '.pocok')
         self.local_stack_list = os.path.join(self.tmpdir, 'pocok-catalog.yml')
         self.ws_dir = os.path.join(self.tmpdir, 'ws')
         os.makedirs(self.ws_dir)
+        os.chdir(self.ws_dir)
 
         self.clean_states()
+        StateHolder.base_work_dir = self.ws_dir
 
     def tearDown(self):
         shutil.rmtree(self.tmpdir, onerror=FileUtils.remove_readonly)
@@ -84,20 +92,27 @@ class AbstractTestSuite(unittest.TestCase):
         StateHolder.compose_handler = None
 
     def init_with_local_catalog(self):
-        data = self.add_workspace_dir(AbstractTestSuite.LOCAL_CONFIG)
         with open(self.config_file, 'w+') as stream:
-            yaml.dump(data=data, stream=stream, default_flow_style=False, default_style='',
+            yaml.dump(data=AbstractTestSuite.REMOTE_CONFIG, stream=stream, default_flow_style=False, default_style='',
                       indent=4)
         with open(self.local_stack_list, 'w+') as stream:
             yaml.dump(data=AbstractTestSuite.STACK_LIST_SAMPLE, stream=stream, default_flow_style=False,
                       default_style='', indent=4)
+        self.init_pocok_config()
 
     def init_with_remote_catalog(self):
-        data = self.add_workspace_dir(AbstractTestSuite.REMOTE_CONFIG)
         with open(self.config_file, 'w+') as stream:
-            yaml.dump(data=data, stream=stream, default_flow_style=False, default_style='',
+            yaml.dump(data=AbstractTestSuite.REMOTE_CONFIG, stream=stream, default_flow_style=False, default_style='',
+                      indent=4)
+        self.init_pocok_config()
+
+    def init_pocok_config(self):
+        with open(self.pocok_file, 'w+') as stream:
+            config = self.POCOK_CONFIG
+            config["workspace"] = self.ws_dir
+            yaml.dump(data=AbstractTestSuite.POCOK_CONFIG, stream=stream, default_flow_style=False, default_style='',
                       indent=4)
 
-    def add_workspace_dir(self, config):
-        config["workspace"] = self.ws_dir
-        return config
+    def run_pocok_command(self, *args):
+        runnable = pocok.Pocok(home_dir=self.tmpdir, argv=list(args))
+        runnable.run()
