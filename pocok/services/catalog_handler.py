@@ -20,7 +20,7 @@ class CatalogHandler:
             conf = StateHolder.config[key]
             repo = self.get_repository_type(conf)
 
-            repository = CatalogHandler.get_repository(conf, repo)
+            repository = CatalogHandler.get_repository(key, repo)
 
             if self.default_repository is None or key == 'default':
                 self.default_repository = CatalogData(config=conf, repository=repository)
@@ -29,9 +29,6 @@ class CatalogHandler:
 
     def handle_command(self):
 
-        if StateHolder.has_args('catalog', 'ls'):
-            self.print_ls()
-            return
         if StateHolder.has_args('repo', 'branches'):
             self.get_catalog_repository(StateHolder.args.get('<catalog>')).print_branches()
             return
@@ -77,6 +74,8 @@ class CatalogHandler:
 
         for key in self.catalog_repositories.keys():
             conf = self.catalog_repositories[key].config
+            if conf is None:
+                continue
             catalog_file = self.get_catalog_file(conf)
             lst = self.catalog_repositories[key].repository.get_yaml_file(file=catalog_file, create=True)
             if lst is None:
@@ -215,10 +214,14 @@ class CatalogHandler:
 
     @staticmethod
     def print_ls():
-
         """Get catalog list"""
         lst = StateHolder.catalogs
-        if len(lst) > 0:
+        empty = True
+        for cat in lst.keys():
+            if len(lst[cat].keys()) > 0:
+                empty = False
+                break
+        if not empty:
             ColorPrint.print_with_lvl(message="-------------------", lvl=-1)
             ColorPrint.print_with_lvl(message="Available projects:", lvl=-1)
             ColorPrint.print_with_lvl(message="-------------------", lvl=-1)

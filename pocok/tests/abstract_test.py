@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import yaml
 from contextlib import contextmanager
-import pocok.pocok as pocok;
+import pocok.pocok as pocok
 from ..services.file_utils import FileUtils
 from ..services.state import StateHolder
 try:
@@ -103,21 +103,21 @@ class AbstractTestSuite(unittest.TestCase):
 
     def init_with_local_catalog(self, params=None):
         with open(self.config_file, 'w+') as stream:
-            yaml.dump(data=AbstractTestSuite.REMOTE_CONFIG, stream=stream, default_flow_style=False, default_style='',
+            yaml.dump(data=AbstractTestSuite.LOCAL_CONFIG, stream=stream, default_flow_style=False, default_style='',
                       indent=4)
-        with open(self.local_stack_list, 'w') as stream:
+        with open(self.local_stack_list, 'w+') as stream:
             yaml.dump(data=AbstractTestSuite.STACK_LIST_SAMPLE, stream=stream, default_flow_style=False,
                       default_style='', indent=4)
         self.init_pocok_config(params)
 
     def init_with_remote_catalog(self, params=None):
-        with open(self.config_file, 'w') as stream:
+        with open(self.config_file, 'w+') as stream:
             yaml.dump(data=AbstractTestSuite.REMOTE_CONFIG, stream=stream, default_flow_style=False, default_style='',
                       indent=4)
         self.init_pocok_config(params)
 
     def init_pocok_config(self, params):
-        with open(self.pocok_file, 'w') as stream:
+        with open(self.pocok_file, 'w+') as stream:
             config = copy.deepcopy(self.POCOK_CONFIG)
             config["workspace"] = self.ws_dir
             if params is not None:
@@ -133,7 +133,7 @@ class AbstractTestSuite(unittest.TestCase):
     def init_empty_compose_file(self):
         compose_file = dict()
         compose_file['services'] = dict()
-        with open(os.path.join(self.ws_dir, 'docker-compose.yaml'), 'w') as stream:
+        with open(os.path.join(self.ws_dir, 'docker-compose.yaml'), 'w+') as stream:
             yaml.dump(data=compose_file, stream=stream, default_flow_style=False,
                       default_style='', indent=4)
 
@@ -141,6 +141,6 @@ class AbstractTestSuite(unittest.TestCase):
         pocok_file = dict()
         pocok_file['plan'] = dict()
         pocok_file['plan']['default'] = 'docker-compose.yaml'
-        with open(os.path.join(self.ws_dir, 'pocok.yaml'), 'w') as stream:
+        with open(os.path.join(self.ws_dir, 'pocok.yaml'), 'w+') as stream:
             yaml.dump(data=pocok_file, stream=stream, default_flow_style=False,
                       default_style='', indent=4)

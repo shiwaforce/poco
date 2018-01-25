@@ -4,6 +4,7 @@ import yaml
 import pocok.pocok as pocok;
 from .abstract_test import AbstractTestSuite
 from pocok.services.state import StateHolder
+from pocok.services.cta_utils import CTAUtils
 
 
 class ComposeTestSuite(AbstractTestSuite):
@@ -28,7 +29,7 @@ class ComposeTestSuite(AbstractTestSuite):
                 self.run_pocok_command("help")
             self.assertIsNotNone(context.exception)
         self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
-        self.assertIn(pocok.Pocok.CTA_STRINGS['default'], out.getvalue())
+        self.assertIn(CTAUtils.CTA_STRINGS['default'], out.getvalue())
 
     def test_help_command_with_catalog(self):
         self.init_with_local_catalog()
@@ -37,7 +38,7 @@ class ComposeTestSuite(AbstractTestSuite):
                 self.run_pocok_command("help")
             self.assertIsNotNone(context.exception)
         self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
-        self.assertIn(pocok.Pocok.CTA_STRINGS['have_cat'], out.getvalue())
+        self.assertIn(CTAUtils.CTA_STRINGS['have_cat'], out.getvalue())
 
     def test_help_command_with_pocok_file(self):
         self.init_empty_compose_file()
@@ -46,7 +47,7 @@ class ComposeTestSuite(AbstractTestSuite):
                 self.run_pocok_command("help")
             self.assertIsNotNone(context.exception)
         self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
-        self.assertIn(pocok.Pocok.CTA_STRINGS['have_file'], out.getvalue())
+        self.assertIn(CTAUtils.CTA_STRINGS['have_file'], out.getvalue())
 
     def test_help_command_with_everything(self):
         self.init_empty_compose_file()
@@ -56,7 +57,7 @@ class ComposeTestSuite(AbstractTestSuite):
                 self.run_pocok_command("help")
             self.assertIsNotNone(context.exception)
         self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
-        self.assertIn(pocok.Pocok.CTA_STRINGS['have_all'], out.getvalue())
+        self.assertIn(CTAUtils.CTA_STRINGS['have_all'], out.getvalue())
 
     def test_wrong_parameters(self):
         with self.captured_output() as (out, err):
@@ -66,6 +67,13 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertIn("is not a pocok command. See 'pocok help'.", out.getvalue().strip())
 
     def test_config_without_config(self):
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("repo")
+            self.assertIsNotNone(context.exception)
+        self.assertIn("Actual config\n-------------\n", out.getvalue().strip())
+
+    def test_config_without_config_another(self):
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
                 self.run_pocok_command("repo", "ls")
@@ -106,6 +114,8 @@ class ComposeTestSuite(AbstractTestSuite):
         extra_config = dict()
         extra_config['mode'] = 'server'
         self.init_with_remote_catalog(extra_config)
+        os.mkdir(os.path.join(self.tmpdir,'catalogHome'))
+        os.mkdir(os.path.join(self.tmpdir, 'catalogHome', 'default'))
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
                 self.run_pocok_command("repo", "ls")
@@ -131,18 +141,36 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertIn("Config location: " + str(self.config_file), out_string)
         self.assertIn(yaml.dump(AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='', indent=4)
                       .strip(), out_string)
-"""
-    def test_config(self):
+
+    def test_catalog_without_catalog(self):
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("catalog")
+            self.assertIsNotNone(context.exception)
+        self.assertEqual(0, len(err.getvalue()))
+        self.assertIn(CTAUtils.CTA_STRINGS['default'], out.getvalue().strip())
+        self.assertIn("You have not catalog yet.", out.getvalue().strip())
+
+    def test_catalog_with_empty_catalog(self):
+        with open(self.config_file, 'w+') as stream:
+            data = dict()
+            data['default'] = dict()
+            yaml.dump(data=data, stream=stream, default_flow_style=False, default_style='',
+                      indent=4)
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("catalog")
+        self.assertEqual(0, len(err.getvalue()))
+        self.assertIn("Project catalog is empty. You can add projects with 'project-catalog add' command",
+                      out.getvalue().strip())
+
+    def test_catalog(self):
         self.init_with_remote_catalog()
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            runnable = pocok.Pocok(home_dir=self.tmpdir, argv=["catalog", "config"])
-            runnable.run()
+            self.run_pocok_command("catalog")
         self.assertEqual(0, len(err.getvalue()))
-        self.assertIn(yaml.dump(data=AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='',
-                                indent=4).strip(), out.getvalue().strip())
+        self.assertIn("Available projects:", out.getvalue().strip())
 
-
+"""
     def test_add_and_remove_config(self):
         self.init_with_remote_catalog()
         with self.captured_output() as (out, err):

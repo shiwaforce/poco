@@ -45,10 +45,10 @@ from docopt import docopt
 from .pocok_default import PocokDefault
 from .pocok_repo import PocokRepo
 from .pocok_project import PocokProject
-from .services.catalog_handler import CatalogHandler
 from .services.config_handler import ConfigHandler
 from .services.clean_handler import CleanHandler
 from .services.compose_handler import ComposeHandler
+from .services.cta_utils import CTAUtils
 from .services.environment_utils import EnvironmentUtils
 from .services.git_repository import GitRepository
 from .services.project_utils import ProjectUtils
@@ -71,15 +71,6 @@ class Pocok(object):
     commands = {
         'repo': PocokRepo,
         'project': PocokProject
-    }
-
-    CTA_STRINGS = {
-        "default": "'pocok repo add sample https://github.com/shiwaforce/poco-example'\n"
-                   "Run if you want some sample project",
-        "have_file": "'pocok init'\nYou have some local files for virtualize your project. "
-                     "Run above for full functionality.",
-        "have_cat": "You have an catalog. If you want to see available projects, run:\n'pocok catalog'",
-        "have_all": "You have local files to run, only one command left:\n'pocok up'"
     }
 
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.pocok'),
@@ -124,21 +115,16 @@ class Pocok(object):
             elif StateHolder.has_args('project'):
                 PocokProject.handle()
             else:
-                self.run_default()
+                PocokDefault.handle()
         except Exception as ex:
             ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
 
     def run_default(self):
-
         """Handling top level commands"""
         if StateHolder.has_args('clean'):
             CleanHandler().clean()
             ColorPrint.exit_after_print_messages(message="Clean complete", msg_type="info")
             return
-
-        """Parse catalog"""
-        if StateHolder.config is not None:
-            self.catalog_handler = CatalogHandler()
 
         """Init project utils"""
         self.project_utils = ProjectUtils()
@@ -264,16 +250,16 @@ class Pocok(object):
     def add_cta(self):
         res = ""
         if self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
-            res = Pocok.CTA_STRINGS['have_all']
+            res = CTAUtils.CTA_STRINGS['have_all']
         elif not ConfigHandler.exists() and \
                 self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']) \
                 and not self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
-            res = Pocok.CTA_STRINGS['have_file']
+            res = CTAUtils.CTA_STRINGS['have_file']
         elif not ConfigHandler.exists() and not \
                 self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']):
-            res = Pocok.CTA_STRINGS['default']
+            res = CTAUtils.CTA_STRINGS['default']
         elif ConfigHandler.exists():
-            res = Pocok.CTA_STRINGS['have_cat']
+            res = CTAUtils.CTA_STRINGS['have_cat']
         return res
 
     @staticmethod

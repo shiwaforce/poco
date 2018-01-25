@@ -1,3 +1,8 @@
+from .services.console_logger import ColorPrint
+from .services.state import StateHolder
+from .services.cta_utils import CTAUtils
+from .services.catalog_handler import CatalogHandler
+
 
 class PocokDefault:
 
@@ -12,7 +17,7 @@ class PocokDefault:
     Print full Docker compose configuration for a project's plan.
 """
     CATALOG = """Usage:
-  pocok catalog ls
+  pocok catalog
 
     -h, --help
 
@@ -195,3 +200,13 @@ class PocokDefault:
         'pack': PACK,
         'unpack': UNPACK
     }
+
+    @staticmethod
+    def handle():
+        if StateHolder.has_args('catalog'):
+            if StateHolder.catalog_handler is None:
+                ColorPrint.print_warning("You have not catalog yet.", lvl=-1)
+                ColorPrint.exit_after_print_messages(message=CTAUtils.CTA_STRINGS['default'], msg_type="info")
+            else:
+                CatalogHandler.print_ls()
+            return

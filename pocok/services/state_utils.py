@@ -23,13 +23,15 @@ class StateUtils(object):
         elif '<project>' in StateHolder.args:
             proj_arg = StateHolder.args.get('<project>')
             StateHolder.name = proj_arg if proj_arg is not None else FileUtils.get_directory_name()
+        else:
+            StateHolder.work_dir = StateHolder.base_work_dir
 
         """ Always parse catalog """
         if ConfigHandler.exists():
             config_handler.read_catalogs()
 
-        if StateHolder.name is not None:
-            StateUtils.read_project_config()
+        if StateHolder.config is not None:
+            StateUtils.read_project_config_and_catalog()
 
         if StateHolder.args.get("--offline"):
             StateHolder.offline = StateHolder.args.get("--offline")
@@ -74,10 +76,10 @@ class StateUtils(object):
                 return False
 
     @staticmethod
-    def read_project_config():
-        if StateHolder.config is not None:
-            catalog_handler = CatalogHandler()
-            catalog = catalog_handler.get()
+    def read_project_config_and_catalog():
+        StateHolder.catalog_handler = CatalogHandler()
+        if StateHolder.name is not None:
+            catalog = StateHolder.catalog_handler.get()
             StateHolder.config_handler.read_configs(
                 os.path.join(StateHolder.work_dir, catalog.get('repository_dir', StateHolder.name), '.pocok'))
         else:
