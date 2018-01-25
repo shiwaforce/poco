@@ -80,12 +80,57 @@ class ComposeTestSuite(AbstractTestSuite):
             self.assertIsNotNone(context.exception)
         out_string = out.getvalue().strip()
         self.assertIn("Actual config\n-------------\n", out_string)
-        self.assertIn("Mode: developer", out_string)
+        self.assertIn("Mode: developer\nOffline: False\nAlways update: False", out_string)
         self.assertIn("Working directory: " + str(self.ws_dir), out_string)
         self.assertIn("Config location: " + str(self.config_file), out_string)
         self.assertIn(yaml.dump(AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='', indent=4)
                       .strip(), out_string)
 
+    def test_config_with_config_and_demo_mode(self):
+        extra_config = dict()
+        extra_config['mode'] = 'demo'
+        self.init_with_remote_catalog(extra_config)
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("repo", "ls")
+            self.assertIsNotNone(context.exception)
+        out_string = out.getvalue().strip()
+        self.assertIn("Actual config\n-------------\n", out_string)
+        self.assertIn("Mode: demo\nOffline: False\nAlways update: True", out_string)
+        self.assertIn("Working directory: " + str(self.ws_dir), out_string)
+        self.assertIn("Config location: " + str(self.config_file), out_string)
+        self.assertIn(yaml.dump(AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='', indent=4)
+                      .strip(), out_string)
+
+    def test_config_with_config_and_server_mode(self):
+        extra_config = dict()
+        extra_config['mode'] = 'server'
+        self.init_with_remote_catalog(extra_config)
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("repo", "ls")
+            self.assertIsNotNone(context.exception)
+        out_string = out.getvalue().strip()
+        self.assertIn("Actual config\n-------------\n", out_string)
+        self.assertIn("Mode: server\nOffline: True\nAlways update: False", out_string)
+        self.assertIn("Working directory: " + str(self.ws_dir), out_string)
+        self.assertIn("Config location: " + str(self.config_file), out_string)
+        self.assertIn(yaml.dump(AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='', indent=4)
+                      .strip(), out_string)
+
+    def test_config_with_config_and_options(self):
+        self.init_with_remote_catalog()
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("--offline", "--always-update", "repo", "ls")
+            self.assertIsNotNone(context.exception)
+        out_string = out.getvalue().strip()
+        self.assertIn("Actual config\n-------------\n", out_string)
+        self.assertIn("Mode: developer\nOffline: True\nAlways update: True", out_string)
+        self.assertIn("Working directory: " + str(self.ws_dir), out_string)
+        self.assertIn("Config location: " + str(self.config_file), out_string)
+        self.assertIn(yaml.dump(AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='', indent=4)
+                      .strip(), out_string)
 """
     def test_config(self):
         self.init_with_remote_catalog()

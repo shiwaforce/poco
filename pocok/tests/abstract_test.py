@@ -1,4 +1,5 @@
 import unittest
+import copy
 import os
 import sys
 import shutil
@@ -15,6 +16,7 @@ except ImportError:
 
 
 class AbstractTestSuite(unittest.TestCase):
+
     LOCAL_CONFIG = {
         'default': {
             'repositoryType': 'file',
@@ -77,42 +79,51 @@ class AbstractTestSuite(unittest.TestCase):
 
     @staticmethod
     def clean_states():
+
         StateHolder.home_dir = None
-        StateHolder.container_mode = "Docker"
-        StateHolder.config_file = None
+        StateHolder.catalog_config_file = None
+        StateHolder.global_config_file = None
+        StateHolder.args = dict()
+        StateHolder.base_work_dir = os.path.join(os.path.expanduser(path='~'), 'workspace')
         StateHolder.work_dir = None
         StateHolder.config_parsed = False
-        StateHolder.args = dict()
         StateHolder.config = None
         StateHolder.catalogs = None
         StateHolder.catalog_element = None
-        StateHolder.name = None
+        StateHolder.mode = None
         StateHolder.offline = False
         StateHolder.always_update = True
-        StateHolder.skip_docker = False
+        StateHolder.name = None
+        StateHolder.plan = None
+        StateHolder.container_mode = "Docker"
+        StateHolder.test_mode = False
         StateHolder.config_handler = None
         StateHolder.compose_handler = None
+        StateHolder.catalog_handler = None
 
-    def init_with_local_catalog(self):
+    def init_with_local_catalog(self, params=None):
         with open(self.config_file, 'w+') as stream:
             yaml.dump(data=AbstractTestSuite.REMOTE_CONFIG, stream=stream, default_flow_style=False, default_style='',
                       indent=4)
-        with open(self.local_stack_list, 'w+') as stream:
+        with open(self.local_stack_list, 'w') as stream:
             yaml.dump(data=AbstractTestSuite.STACK_LIST_SAMPLE, stream=stream, default_flow_style=False,
                       default_style='', indent=4)
-        self.init_pocok_config()
+        self.init_pocok_config(params)
 
-    def init_with_remote_catalog(self):
-        with open(self.config_file, 'w+') as stream:
+    def init_with_remote_catalog(self, params=None):
+        with open(self.config_file, 'w') as stream:
             yaml.dump(data=AbstractTestSuite.REMOTE_CONFIG, stream=stream, default_flow_style=False, default_style='',
                       indent=4)
-        self.init_pocok_config()
+        self.init_pocok_config(params)
 
-    def init_pocok_config(self):
-        with open(self.pocok_file, 'w+') as stream:
-            config = self.POCOK_CONFIG
+    def init_pocok_config(self, params):
+        with open(self.pocok_file, 'w') as stream:
+            config = copy.deepcopy(self.POCOK_CONFIG)
             config["workspace"] = self.ws_dir
-            yaml.dump(data=AbstractTestSuite.POCOK_CONFIG, stream=stream, default_flow_style=False, default_style='',
+            if params is not None:
+                if isinstance(params, dict):
+                    config.update(params)
+            yaml.dump(data=config, stream=stream, default_flow_style=False, default_style='',
                       indent=4)
 
     def run_pocok_command(self, *args):
@@ -122,7 +133,7 @@ class AbstractTestSuite(unittest.TestCase):
     def init_empty_compose_file(self):
         compose_file = dict()
         compose_file['services'] = dict()
-        with open(os.path.join(self.ws_dir, 'docker-compose.yaml'), 'w+') as stream:
+        with open(os.path.join(self.ws_dir, 'docker-compose.yaml'), 'w') as stream:
             yaml.dump(data=compose_file, stream=stream, default_flow_style=False,
                       default_style='', indent=4)
 
@@ -130,6 +141,6 @@ class AbstractTestSuite(unittest.TestCase):
         pocok_file = dict()
         pocok_file['plan'] = dict()
         pocok_file['plan']['default'] = 'docker-compose.yaml'
-        with open(os.path.join(self.ws_dir, 'pocok.yaml'), 'w+') as stream:
+        with open(os.path.join(self.ws_dir, 'pocok.yaml'), 'w') as stream:
             yaml.dump(data=pocok_file, stream=stream, default_flow_style=False,
                       default_style='', indent=4)

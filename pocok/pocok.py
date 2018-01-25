@@ -6,12 +6,12 @@ Usage:
 
 
 Options:
-  --version       Print version of Pocok
-  -h --help       Show this screen.
-  -v --verbose    Print more text.
-  -q --quiet      Print less text.
-  --always-update Project repository handle by user
-  --offline       Offline mode
+  --version         Print version of Pocok
+  -h --help         Show this screen.
+  -v --verbose      Print more text.
+  -q --quiet        Print less text.
+  --always-update   Project repository handle by user
+  --offline         Offline mode
 
 The available pocok commands are:
    catalog                  List the available projects in repos.
