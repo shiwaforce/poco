@@ -129,7 +129,7 @@ class ComposeTestSuite(AbstractTestSuite):
                       .strip(), out_string)
 
     def test_config_with_config_and_options(self):
-        self.init_with_remote_catalog()
+        self.init_with_local_catalog()
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
                 self.run_pocok_command("--offline", "--always-update", "repo", "ls")
@@ -139,7 +139,7 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertIn("Mode: developer\nOffline: True\nAlways update: True", out_string)
         self.assertIn("Working directory: " + str(self.ws_dir), out_string)
         self.assertIn("Config location: " + str(self.config_file), out_string)
-        self.assertIn(yaml.dump(AbstractTestSuite.REMOTE_CONFIG, default_flow_style=False, default_style='', indent=4)
+        self.assertIn(yaml.dump(AbstractTestSuite.LOCAL_CONFIG, default_flow_style=False, default_style='', indent=4)
                       .strip(), out_string)
 
     def test_catalog_without_catalog(self):
@@ -170,64 +170,65 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn("Available projects:", out.getvalue().strip())
 
-"""
-    def test_add_and_remove_config(self):
+    def test_add_modify_and_remove_config(self):
         self.init_with_remote_catalog()
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "config", "add", "teszt", "ssh://teszt.teszt/teszt"])
-            pocok.run()
+            self.run_pocok_command("repo", "add", "test", "https://github.com/shiwaforce/poco-example",
+                                   "master", "poco-catalog.yaml")
         self.assertEqual(0, len(err.getvalue()))
         data = dict()
-        data["teszt"] = dict()
-        data["teszt"]["repositoryType"] = "git"
-        data["teszt"]["server"] = "ssh://teszt.teszt/teszt"
+        data["test"] = dict()
+        data["test"]["branch"] = "master"
+        data["test"]["file"] = "poco-catalog.yaml"
+        data["test"]["repositoryType"] = "git"
+        data["test"]["server"] = "https://github.com/shiwaforce/poco-example"
 
         self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
                       out.getvalue().strip())
         self.clean_states()
+
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "config", "remove", "teszt"])
-            pocok.run()
+            self.run_pocok_command("repo", "modify", "test", "https://test.test2/test", "test2", "test2.yml")
+
+        data["test"]["branch"] = "test2"
+        data["test"]["file"] = "test2.yml"
+        data["test"]["server"] = "https://test.test2/test"
+
+        self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
+                      out.getvalue().strip())
+        self.clean_states()
+
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("--offline", "repo", "remove", "test")
         self.assertEqual(0, len(err.getvalue()))
-        self.assertNotIn("teszt", out.getvalue().strip())
+        self.assertNotIn("test", out.getvalue().strip())
 
-    def test_list_with_local_config(self):
-        self.init_with_local_catalog()
+    def test_add_if_catalog_not_exists(self):
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "ls"])
-            pocok.run()
-        self.assertEqual(0, len(err.getvalue().strip()))
-        for key in AbstractTestSuite.STACK_LIST_SAMPLE.keys():
-            self.assertTrue(key in out.getvalue().strip())
+            self.run_pocok_command("repo", "add", "test", "https://github.com/shiwaforce/poco-example",
+                                   "master", "poco-catalog.yaml")
+            self.assertEqual(0, len(err.getvalue()))
+            data = dict()
+            data["test"] = dict()
+            data["test"]["branch"] = "master"
+            data["test"]["file"] = "poco-catalog.yaml"
+            data["test"]["repositoryType"] = "git"
+            data["test"]["server"] = "https://github.com/shiwaforce/poco-example"
 
-    def test_list_with_remote_config(self):
-        self.init_with_remote_catalog()
-        with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "ls"])
-            pocok.run()
-        self.assertEqual(0, len(err.getvalue().strip()))
-        for key in AbstractTestSuite.STACK_LIST_SAMPLE.keys():
-            self.assertTrue(key in out.getvalue().strip())
+            self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
+                          out.getvalue().strip())
 
     def test_branches_with_local_config(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "branches"])
-            pocok.run()
+            self.run_pocok_command("repo", "branches")
         self.assertEqual(0, len(err.getvalue().strip()))
         self.assertIn('Branch is not supported in this repository.', out.getvalue().strip())
 
     def test_branches_with_remote_config(self):
         self.init_with_remote_catalog()
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "branches"])
-            pocok.run()
+            self.run_pocok_command("repo", "branches")
         self.assertEqual(0, len(err.getvalue().strip()))
         self.assertIn('Available branches in', out.getvalue().strip())
         self.assertIn('master', out.getvalue().strip())
@@ -235,28 +236,23 @@ class ComposeTestSuite(AbstractTestSuite):
     def test_switch_branch_with_local_config(self):
         self.init_with_local_catalog()
         with self.assertRaises(SystemExit) as context:
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "branch", "master"])
-            pocok.run()
+            self.run_pocok_command("repo", "branch", "master")
         self.assertEqual(1, context.exception.code)
 
     def test_switch_branch_with_remote_config(self):
         self.init_with_remote_catalog()
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "branch", "master"])
-            pocok.run()
+            self.run_pocok_command("repo", "branch", "master")
         self.assertIn("Branch changed", out.getvalue())
 
     def test_push_with_local_config(self):
         self.init_with_local_catalog()
-        StateHolder.skip_docker = True
-        pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "push"])
         with self.captured_output() as (out, err):
-            pocok.run()
+            self.run_pocok_command("repo", "push")
         self.assertEqual(0, len(err.getvalue().strip()))
         self.assertIn("Push completed", out.getvalue())
 
+"""
     def test_add_and_remove(self):
         self.init_with_local_catalog()
         test_dir = os.path.join(self.tmpdir, "test-directory")

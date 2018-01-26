@@ -109,3 +109,8 @@ class FileUtils:
             file = os.path.join(dir, base, '.', ext)
             if os.path.exists(file):
                 return file
+
+    @staticmethod
+    def get_parameter_or_directory_name(param):
+        arg = StateHolder.args.get(param)
+        return arg if arg is not None else FileUtils.get_directory_name()

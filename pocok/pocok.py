@@ -107,17 +107,18 @@ class Pocok(object):
             ColorPrint.exit_after_print_messages("%r is not a pocok command. See 'pocok help'." % command)
         return args
 
-    def run(self):
-        try:
-            ColorPrint.print_info(StateHolder.config_handler.print_config(), 1)
-            if StateHolder.has_args('repo'):
-                PocokRepo.handle()
-            elif StateHolder.has_args('project'):
-                PocokProject.handle()
-            else:
-                PocokDefault.handle()
-        except Exception as ex:
-            ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
+    @staticmethod
+    def run():
+        #try:
+        ColorPrint.print_info(StateHolder.config_handler.print_config(), 1)
+        if StateHolder.has_args('repo'):
+            PocokRepo.handle()
+        elif StateHolder.has_args('project'):
+            PocokProject.handle()
+        else:
+            PocokDefault.handle()
+        #except Exception as ex:
+        #    ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
 
     def run_default(self):
         """Handling top level commands"""
@@ -301,6 +302,7 @@ class Pocok(object):
             paths = paths[1:]
 
         return structure[node] if node in structure else default
+
 
 def main():
     pocok = Pocok()

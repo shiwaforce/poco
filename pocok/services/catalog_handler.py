@@ -39,29 +39,6 @@ class CatalogHandler:
             StateHolder.config_handler.set_branch(branch=branch, config=catalog)
             ColorPrint.print_info("Branch changed")
             return
-        if StateHolder.has_args('repo', 'push'):
-            self.push(StateHolder.args.get('<catalog>'))
-            ColorPrint.print_info("Push completed")
-            return
-        if StateHolder.has_args('repo', 'add'):
-            target_dir = FileUtils.get_normalized_dir(StateHolder.args.get('<target-dir>'))
-            repo, repo_dir = FileUtils.get_git_repo(target_dir)
-            file_prefix = ""
-            repo_name = None
-            if target_dir != repo_dir:
-                file_prefix = FileUtils.get_relative_path(base_path=repo_dir, target_path=target_dir)
-                repo_name = os.path.basename(repo_dir)
-            # TODO
-            if os.path.exists(file_prefix + "pocok.yaml"):
-                file = file_prefix + "pocok.yaml"
-            else:
-                file = file_prefix + "pocok.yml"
-            self.add_to_list(name=os.path.basename(target_dir), handler="git",
-                             catalog=StateHolder.args.get('<catalog>'),
-                             url=repo.remotes.origin.url, file=file,
-                             repo_name=repo_name)
-            ColorPrint.print_info("Project added")
-            return
 
         if StateHolder.has_args('repo', 'remove'):
             self.remove_from_list()
@@ -133,11 +110,6 @@ class CatalogHandler:
             ColorPrint.exit_after_print_messages(message="Catalog not exists : " + str(catalog))
         else:
             return self.catalog_repositories[catalog].repository
-
-    def push(self, catalog):
-        if catalog is None:
-            catalog = self.get_default_catalog()
-            self.catalog_repositories[catalog].repository.push()
 
     @staticmethod
     def get():

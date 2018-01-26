@@ -21,8 +21,7 @@ class StateUtils(object):
         if '<project/plan>' in StateHolder.args:
             StateUtils.calculate_name_and_work_dir()
         elif '<project>' in StateHolder.args:
-            proj_arg = StateHolder.args.get('<project>')
-            StateHolder.name = proj_arg if proj_arg is not None else FileUtils.get_directory_name()
+            StateHolder.name = FileUtils.get_parameter_or_directory_name('<project>')
         else:
             StateHolder.work_dir = StateHolder.base_work_dir
 
@@ -30,14 +29,14 @@ class StateUtils(object):
         if ConfigHandler.exists():
             config_handler.read_catalogs()
 
-        if StateHolder.config is not None:
-            StateUtils.read_project_config_and_catalog()
-
         if StateHolder.args.get("--offline"):
             StateHolder.offline = StateHolder.args.get("--offline")
 
         if StateHolder.args.get("--always-update"):
             StateHolder.always_update = StateHolder.args.get("--always-update")
+
+        if StateHolder.config is not None:
+            StateUtils.read_project_config_and_catalog()
 
     @staticmethod
     def calculate_name_and_work_dir():
