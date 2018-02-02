@@ -79,6 +79,7 @@ class Pocok(object):
         EnvironmentUtils.check_version(__version__)
 
         StateHolder.home_dir = home_dir
+        argv = Pocok.handle_alternatives(argv)
         if len(argv) == 0:
             argv.append('-h')
         StateHolder.args = docopt(__doc__, version=__version__, options_first=True, argv=argv)
@@ -105,6 +106,13 @@ class Pocok(object):
             args = docopt(PocokDefault.command_dict[command], argv=[command] + argv)
         else:
             ColorPrint.exit_after_print_messages("%r is not a pocok command. See 'pocok help'." % command)
+        return args
+
+    @staticmethod
+    def handle_alternatives(args):
+        if 'project' in args and ('ls' in args or len(args) == 1):
+            return ['catalog']
+
         return args
 
     @staticmethod

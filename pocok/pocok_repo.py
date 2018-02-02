@@ -106,7 +106,8 @@ class PocokRepo:
         if StateHolder.config is None:
             ColorPrint.exit_after_print_messages('repo commands works only with config file.\n '
                                                  'Run "catalog init" command to create one.')
-        StateHolder.catalog_handler = CatalogHandler()
+        if StateHolder.default_catalog_repository is None:
+            CatalogHandler.load()
 
         if StateHolder.has_least_one_arg('remove', 'rm'):
             if StateHolder.name in StateHolder.catalogs:
@@ -122,7 +123,7 @@ class PocokRepo:
             ConfigHandler.set_branch(StateHolder.args.get('<branch>'), StateHolder.args.get('<name>'))
             ColorPrint.print_info("Branch changed")
         elif StateHolder.has_least_one_arg('branches', 'push'):
-            repository = StateHolder.catalog_handler.get_catalog_repository(StateHolder.args.get('<name>'))
+            repository = CatalogHandler.get_catalog_repository(StateHolder.args.get('<name>'))
             if StateHolder.has_args('branches'):
                 repository.print_branches()
             else:

@@ -1,7 +1,7 @@
 import git
 import os
 import yaml
-import pocok.pocok as pocok;
+import pocok.pocok as pocok
 from .abstract_test import AbstractTestSuite
 from pocok.services.state import StateHolder
 from pocok.services.cta_utils import CTAUtils
@@ -155,8 +155,7 @@ class ComposeTestSuite(AbstractTestSuite):
         with open(self.config_file, 'w+') as stream:
             data = dict()
             data['default'] = dict()
-            yaml.dump(data=data, stream=stream, default_flow_style=False, default_style='',
-                      indent=4)
+            yaml.dump(data=data, stream=stream, default_flow_style=False, default_style='', indent=4)
         with self.captured_output() as (out, err):
             self.run_pocok_command("catalog")
         self.assertEqual(0, len(err.getvalue()))
@@ -168,7 +167,16 @@ class ComposeTestSuite(AbstractTestSuite):
         with self.captured_output() as (out, err):
             self.run_pocok_command("catalog")
         self.assertEqual(0, len(err.getvalue()))
-        self.assertIn("Available projects:", out.getvalue().strip())
+        catalog = out.getvalue().strip()
+        self.assertIn("Available projects:", catalog)
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("project")
+        self.assertEqual(0, len(err.getvalue()))
+        self.assertEqual(catalog, out.getvalue().strip())
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("project", "ls")
+        self.assertEqual(0, len(err.getvalue()))
+        self.assertEqual(catalog, out.getvalue().strip())
 
     def test_add_modify_and_remove_config(self):
         self.init_with_remote_catalog()
@@ -252,39 +260,78 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertEqual(0, len(err.getvalue().strip()))
         self.assertIn("Push completed", out.getvalue())
 
-"""
+    def test_failed_add(self):
+        self.init_with_local_catalog()
+        test_dir = os.path.join(self.tmpdir, "test-directory")
+        os.makedirs(test_dir)
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("project", "add", test_dir)
+            self.assertIsNotNone(context.exception)
+        self.assertIn("Target directory or parents are not a valid git repository", out.getvalue().strip())
+
+    def test_failed_add_without_pocok_file(self):
+        self.init_with_local_catalog()
+        test_dir = os.path.join(self.tmpdir, "test-directory")
+        os.makedirs(test_dir)
+        git.Repo.clone_from(url=AbstractTestSuite.STACK_LIST_SAMPLE['nginx']['git'], to_path=test_dir)
+        # TODO rename
+        os.remove(os.path.join(test_dir, 'nginx', 'poco-compose.yml'))
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("project", "add", test_dir)
+            self.assertIsNotNone(context.exception)
+        self.assertIn("Directory not contains Pocok file!", out.getvalue().strip())
+
+    # TODO remove later
+    def test_add_with_poco_backward_file(self):
+        self.init_with_local_catalog()
+        test_dir = os.path.join(self.tmpdir, "test-directory")
+        os.makedirs(test_dir)
+        git.Repo.clone_from(url=AbstractTestSuite.STACK_LIST_SAMPLE['nginx']['git'], to_path=test_dir)
+        os.rename(os.path.join(test_dir, 'nginx', 'poco-compose.yml'), os.path.join(test_dir, 'poco.yml'))
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("project", "add", test_dir)
+        self.assertIn("Your configuration file ("+str(test_dir)+
+                      "/poco.yml) is deprecated! Use 'pocok.yaml/yml' instead.", out.getvalue().strip())
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("catalog")
+        self.assertEqual(0, len(err.getvalue().strip()))
+        for key in AbstractTestSuite.STACK_LIST_SAMPLE.keys():
+            self.assertTrue(key in out.getvalue().strip())
+        self.assertIn("test-directory", out.getvalue())
+
     def test_add_and_remove(self):
         self.init_with_local_catalog()
         test_dir = os.path.join(self.tmpdir, "test-directory")
         os.makedirs(test_dir)
         git.Repo.clone_from(url=AbstractTestSuite.STACK_LIST_SAMPLE['nginx']['git'], to_path=test_dir)
-        StateHolder.skip_docker = True
-        pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "add", test_dir])
+        os.rename(os.path.join(test_dir, 'nginx', 'poco-compose.yml'), os.path.join(test_dir, 'pocok.yml'))
         with self.captured_output() as (out, err):
-            pocok.run()
+            self.run_pocok_command("project", "add", test_dir)
+        self.assertEqual(0, len(err.getvalue().strip()))
         self.assertIn("Project added", out.getvalue())
+        self.clean_states()
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "ls"])
-            pocok.run()
-            self.assertEqual(0, len(err.getvalue().strip()))
+            self.run_pocok_command("catalog")
+        self.assertEqual(0, len(err.getvalue().strip()))
         for key in AbstractTestSuite.STACK_LIST_SAMPLE.keys():
             self.assertTrue(key in out.getvalue().strip())
         self.assertIn("test-directory", out.getvalue())
+        self.clean_states()
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "remove", "test-directory"])
-            pocok.run()
+            self.run_pocok_command("project", "remove", "test-directory")
+        self.assertEqual(0, len(err.getvalue().strip()))
         self.assertIn("Project removed", out.getvalue())
+        self.clean_states()
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "ls"])
-            pocok.run()
-            self.assertEqual(0, len(err.getvalue().strip()))
+            self.run_pocok_command("catalog")
+        self.assertEqual(0, len(err.getvalue().strip()))
         for key in AbstractTestSuite.STACK_LIST_SAMPLE.keys():
             self.assertTrue(key in out.getvalue().strip())
         self.assertNotIn("test-directory", out.getvalue())
 
+"""
     def test_plan_list(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):

@@ -114,3 +114,21 @@ class FileUtils:
     def get_parameter_or_directory_name(param):
         arg = StateHolder.args.get(param)
         return arg if arg is not None else FileUtils.get_directory_name()
+
+    # TODO remove later
+    @staticmethod
+    def get_backward_compatible_pocok_file(directory=None):
+        filenames = ["pocok.yaml", "pocok.yml"]
+        old_filenames = ["poco.yaml", "poco.yml"]
+        directory = os.getcwd() if directory is None else directory
+        file_lists = os.listdir(directory)
+
+        for file in filenames:
+            if file in file_lists:
+                return file
+        for file in old_filenames:
+            if file in file_lists:
+                ColorPrint.print_info("Your configuration file (" + directory + "/" +
+                                      file + ") is deprecated! Use 'pocok.yaml/yml' instead.")
+                return file
+        ColorPrint.exit_after_print_messages("Directory not contains Pocok file!")

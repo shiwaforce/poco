@@ -39,7 +39,12 @@ class StateHolder:
     # Handlers
     config_handler = None
     compose_handler = None
-    catalog_handler = None
+
+    # Catalog repositories
+    catalog_repositories = dict()
+    default_catalog_repository = None
+
+    # Catalog
 
     @staticmethod
     def has_args(*args):

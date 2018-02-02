@@ -40,12 +40,12 @@ class AbstractTestSuite(unittest.TestCase):
     STACK_LIST_SAMPLE = {
         'nginx': {
             'file': 'nginx/pocok-compose.yml',
-            'git': 'https://github.com/shiwaforce/pocok-example.git',
+            'git': 'https://github.com/shiwaforce/poco-example.git',
             'repository_dir': 'pocok-example'
         },
         'mysql': {
             'file': 'mysql/pocok-compose.yml',
-            'git': 'https://github.com/shiwaforce/pocok-example.git',
+            'git': 'https://github.com/shiwaforce/poco-example.git',
             'repository_dir': 'pocok-example'
         }
     }
@@ -99,7 +99,9 @@ class AbstractTestSuite(unittest.TestCase):
         StateHolder.test_mode = False
         StateHolder.config_handler = None
         StateHolder.compose_handler = None
-        StateHolder.catalog_handler = None
+
+        StateHolder.catalog_repositories = dict()
+        StateHolder.default_catalog_repository = None
 
     def init_with_local_catalog(self, params=None):
         with open(self.config_file, 'w+') as stream:

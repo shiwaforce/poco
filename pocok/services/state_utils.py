@@ -22,6 +22,7 @@ class StateUtils(object):
             StateUtils.calculate_name_and_work_dir()
         elif '<project>' in StateHolder.args:
             StateHolder.name = FileUtils.get_parameter_or_directory_name('<project>')
+            StateHolder.work_dir = StateHolder.base_work_dir
         else:
             StateHolder.work_dir = StateHolder.base_work_dir
 
@@ -76,9 +77,9 @@ class StateUtils(object):
 
     @staticmethod
     def read_project_config_and_catalog():
-        StateHolder.catalog_handler = CatalogHandler()
+        CatalogHandler.load()
         if StateHolder.name is not None:
-            catalog = StateHolder.catalog_handler.get()
+            catalog = CatalogHandler.get()
             StateHolder.config_handler.read_configs(
                 os.path.join(StateHolder.work_dir, catalog.get('repository_dir', StateHolder.name), '.pocok'))
         else:
