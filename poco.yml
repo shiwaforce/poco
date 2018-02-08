@@ -1,0 +1,36 @@
+version: '3.0'
+maintainer: "operation@shiwaforce.com"
+
+environment:
+  include: docker/conf/default/conf.env
+
+plan:
+  demo:
+    docker-compose-file:
+      - docker/dc-db.yml
+      - docker/dc-demo.yml
+  sitebuild:
+    - docker/dc-backend-built.yml
+    - docker/dc-proxy.yml
+    - docker/dc-sitebuild.yml
+  ramajana:
+    environment:
+      include: docker/conf/ramajana/conf.env
+    docker-compose-file:
+      - docker/dc-db.yml
+      - docker/dc-ramajana.yml
+  java:
+    environment:
+      include: docker/conf/plan-java/conf.env
+    docker-compose-file:
+      - docker/dc-proxy.yml
+      - docker/dc-sitebuild.yml
+  shiwa:
+    environment:
+      include: docker/conf/default/shiwa.env
+    docker-compose-file:
+      - docker/dc-proxy.yml
+      - docker/dc-db.yml
+      - docker/dc-backend.yml
+      - docker/dc-shiwa.yml
+      - docker/dc-sitebuild.yml

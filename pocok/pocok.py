@@ -14,307 +14,203 @@ Options:
   --offline         Offline mode
 
 The available pocok commands are:
-   catalog                  List the available projects in repos.
-   repo [<subcommand>]      Repository commands, see 'pocok help repo' for more.
-   project [<subcommand>]   Project commands, see 'pocok help project' for more.
-   up, start                Start project
-   down, stop               Stop project
-   restart                  Restart project
-   plan ls                  Print all plan belongs to project
-   config                   Print full Docker compose configuration for a project's plan.
-   clean                    Clean all container and image from local Docker repository.
-   init                     Create pocok.yml and docker-compose.yml in project if aren't exists.
-   install                  Get projects from remote repository (if its not exists locally yet) and run install scripts.
-   build                    Build containers depends defined project and plan.
-   ps                       Print containers statuses which depends defined project and plan.
-   plan ls                  Print all available plan for the project.
-   pull                     Pull all necessary image for project and plan.
-   log, logs                Print containers logs which depends defined project and plan.
-   branch                   Switch branch on defined project.
-   branches                 List all available git branch for the project.
-   pack                     Pack the selected project's plan configuration with docker images to an archive.
-   unpack                   Unpack archive, install images to local repository.
-
-See 'pocok help <command>' for more information on a specific command.
-
 """
+import inspect
+import importlib
+import pkgutil
 import os
-import shutil
 import sys
 from docopt import docopt
-from .pocok_default import PocokDefault
-from .pocok_repo import PocokRepo
-from .pocok_project import PocokProject
-from .services.config_handler import ConfigHandler
-from .services.clean_handler import CleanHandler
-from .services.compose_handler import ComposeHandler
+from .commands.abstract_command import AbstractCommand
 from .services.cta_utils import CTAUtils
 from .services.environment_utils import EnvironmentUtils
-from .services.git_repository import GitRepository
-from .services.project_utils import ProjectUtils
 from .services.console_logger import ColorPrint
-from .services.command_handler import CommandHandler
-from .services.package_handler import PackageHandler
 from .services.state import StateHolder
 from .services.state_utils import StateUtils
 
-
+END_STRING = """See 'pocok help <command>' for more information on a specific command."""
 __version__ = '0.24.0'
 
 
 class Pocok(object):
 
-    catalog_handler = None
-    project_utils = None
-    command_handler = None
-
-    commands = {
-        'repo': PocokRepo,
-        'project': PocokProject
-    }
+    command_classes = dict()
+    active_object = None
 
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.pocok'),
                  argv=sys.argv[1:]):
-
         EnvironmentUtils.check_version(__version__)
 
         StateHolder.home_dir = home_dir
-        argv = Pocok.handle_alternatives(argv)
+        self.argv = argv
+        self.collect_commands()
+
+    def start_flow(self):
+
+        """PHASE ZERO - validate command """
+        self.check_command()
+
+        counter = 0
+        if self.active_object is None:
+            ColorPrint.exit_after_print_messages("Something went wrong. Command class not found for command: "
+                                                 + sys.argv[1:])
+
+        while counter < 10:  # for tests
+            counter += 1
+            if not self.active_object.prepared_states:
+                self.active_object.prepare_states()
+                continue
+            if not self.active_object.resolved_dependencies:
+                self.active_object.resolve_dependencies()
+                continue
+            if not self.active_object.executed:
+                self.active_object.execute()
+                continue
+            break
+
+        if not counter < 10:
+            ColorPrint.exit_after_print_messages("Can't complete the command running. States: \n"
+                                                 "\tPrepare states: " + str(self.active_object.prepared_states) +
+                                                 "\tResolve dependencies: "
+                                                 + str(self.active_object.resolved_dependencies) +
+                                                 "\tExecuted: " + str(self.active_object.executed))
+
+    def check_command(self):
+        argv = Pocok.handle_alternatives(self.argv)  # TODO move to new structure
         if len(argv) == 0:
             argv.append('-h')
-        StateHolder.args = docopt(__doc__, version=__version__, options_first=True, argv=argv)
-        StateUtils.fill_pre_states()
+        StateHolder.args = docopt(self.get_full_doc(), version=__version__, options_first=True, argv=argv)
         StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'],
                                                          argv=[] + StateHolder.args['<args>']))
         ColorPrint.set_log_level(StateHolder.args)
         ColorPrint.print_info('arguments:\n' + str(StateHolder.args), 1)
+
+    def fill_states(self):
         StateUtils.fill_states()
 
+    def get_full_doc(self):
+        doc = __doc__
+        commands = []
+        for sub_cmd in self.command_classes.keys():
+            if sub_cmd is None:
+                [Pocok.build_command(commands=commands, cls=cls) for cls in self.command_classes[None]]
+                continue
+            sub = "  " + sub_cmd + " [<subcommand>]"
+            doc += sub + (42-len(sub)) * " " + "See 'pocok help " + sub_cmd + "' for more."
+        doc += "\n" + "".join(commands) + "\n" + END_STRING
+        return doc
+
     def command_interpreter(self, command, argv):
-        args = dict()
         if command == 'help':
             argv.append('-h')
             if len(argv) == 1:
-                docopt(__doc__ + self.add_cta(), options_first=True, argv=argv)
+                docopt(self.get_full_doc() + "\n" + CTAUtils.get_cta(), argv=argv)
             self.command_interpreter(argv[0], argv[1:])
-        if command in self.commands.keys():
+        if command in self.command_classes.keys():
             if len(argv) == 0:
-                argv.append("ls")
-            command_obj = self.commands[command]
-            args = docopt(command_obj.command_dict.get(argv[0], command_obj.DEFAULT), argv=[command] + argv)
-        elif command in PocokDefault.command_dict.keys():
-            args = docopt(PocokDefault.command_dict[command], argv=[command] + argv)
+                argv.append("ls")  # TODO move to alternative handling if need
+            args = self.get_args(command=command, classes=self.command_classes[command], argv=argv)
+            if args is None:
+                docopt(self.build_sub_commands_help(command, classes=self.command_classes[command]),
+                       argv=[command] + argv)
         else:
-            ColorPrint.exit_after_print_messages("%r is not a pocok command. See 'pocok help'." % command)
+            args = self.get_args(command=None, classes=self.command_classes[None], argv=[command] + argv)
+            if args is None:
+                ColorPrint.exit_after_print_messages("%r is not a pocok command. See 'pocok help'." % command)
         return args
+
+    @staticmethod
+    def build_command(commands, cls):
+        sub_command = getattr(cls, 'sub_command')
+        command = getattr(cls, 'command')
+        description = getattr(cls, 'description')
+
+        if command is None:
+            ColorPrint.print_info("Command class not contains command: " + cls, lvl=1)
+            return
+        if isinstance(command, list):
+            cmd = "(" + "|".join(command) + ")"
+        else:
+            cmd = command
+        if sub_command is not None:
+            cmd = "pocok " + sub_command + " " + cmd
+        cmd += (40 - len(cmd)) * " "
+        commands.append("  " + cmd + description + "\n")
+
+    def get_args(self, command, classes, argv):
+        for cls in classes:
+            cmd = getattr(cls, 'command')
+            if not isinstance(cmd, list):
+                cmd = [cmd]
+            if argv[0] in cmd:
+                self.active_object = cls()
+                return docopt(Pocok.build_command_help(cls), argv=[command] + argv if command is not None else argv)
+
+    @staticmethod
+    def build_command_help(cls):
+        sub_command = getattr(cls, 'sub_command')
+        cmd = getattr(cls, 'command')
+        if isinstance(cmd, list):
+            cmd = "(" + "|".join(cmd) + ")"
+        if sub_command is not None:
+            cmd = sub_command + " " + cmd
+        args = getattr(cls, 'args')
+        desc = getattr(cls, 'description')
+        doc = "Usage:\n  pocok " + cmd
+        if args is not None:
+            doc += " " + " ".join(args)
+        doc += "\n\n  -h, --help"
+        if args is not None:
+            descriptions = getattr(cls, 'args_descriptions')
+            doc += "\n\n  Specific parameters:\n"
+            for arg in args:
+                des = descriptions[arg] if arg in descriptions else " "
+                doc += "    " + arg + (40 - len(arg)) * " " + des + "\n"
+        doc += "\n  " + desc
+        return doc
+
+    @staticmethod
+    def build_sub_commands_help(sub_command, classes):
+        doc = "Pocok " + sub_command + " commands\n\nUsage:\n"
+        commands = []
+        [Pocok.build_command(commands=commands, cls=cls) for cls in classes]
+        return doc + "".join(commands)
 
     @staticmethod
     def handle_alternatives(args):
         if 'project' in args and ('ls' in args or len(args) == 1):
             return ['catalog']
-
         return args
 
-    @staticmethod
-    def run():
-        #try:
-        ColorPrint.print_info(StateHolder.config_handler.print_config(), 1)
-        if StateHolder.has_args('repo'):
-            PocokRepo.handle()
-        elif StateHolder.has_args('project'):
-            PocokProject.handle()
-        else:
-            PocokDefault.handle()
-        #except Exception as ex:
-        #    ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
+    def collect_commands(self):
+        try:
+            command_packages = importlib.import_module('pocok.commands', package='pocok')
+            for importer, modname, ispkg in pkgutil.iter_modules(command_packages.__path__):
+                if not ispkg:
+                    mod = importlib.import_module('pocok.commands.' + modname, 'pocok')
+                    for name, cls in inspect.getmembers(mod,
+                                                        lambda member: inspect.isclass(member)
+                                                        and member.__module__ == mod.__name__):
+                        self.check_base_class(cls)
+        except ImportError as ex:
+            ColorPrint.exit_after_print_messages("Commands import error: " + str(ex.args))
 
-    def run_default(self):
-        """Handling top level commands"""
-        if StateHolder.has_args('clean'):
-            CleanHandler().clean()
-            ColorPrint.exit_after_print_messages(message="Clean complete", msg_type="info")
-            return
-
-        """Init project utils"""
-        self.project_utils = ProjectUtils()
-
-        if StateHolder.has_args('init'):
-            self.init()
-            CommandHandler(project_utils=self.project_utils).run_script("init_script")
-            return
-
-        if StateHolder.has_args('branches'):
-            self.get_project_repository().print_branches()
-            return
-
-        if StateHolder.has_args('branch'):
-            branch = StateHolder.args.get('<branch>')
-            repo = self.get_project_repository()
-            repo.set_branch(branch=branch, force=StateHolder.args.get("-f"))
-            project_descriptor = self.catalog_handler.get()
-            project_descriptor['branch'] = branch
-            self.catalog_handler.set(modified=project_descriptor)
-            ColorPrint.print_info(message="Branch changed")
-            return
-
-        if StateHolder.has_args('install'):
-            self.get_project_repository()
-            ColorPrint.print_info("Project installed")
-            return
-
-        if StateHolder.has_args('plan', 'ls'):
-            self.init_compose_handler()
-            StateHolder.compose_handler.get_plan_list()
-            return
-
-        if StateHolder.has_args('unpack'):
-            PackageHandler().unpack()
-            return
-
-        self.init_compose_handler()
-        self.command_handler = CommandHandler(project_utils=self.project_utils)
-
-        if StateHolder.has_args('config'):
-            self.command_handler.run('config')
-
-        if StateHolder.has_args('build'):
-            self.run_checkouts()
-            self.command_handler.run('build')
-            ColorPrint.print_info("Project built")
-
-        if StateHolder.has_least_one_arg('up', 'start'):
-            self.run_checkouts()
-            self.command_handler.run('up')
-
-        if StateHolder.has_args('restart'):
-            self.run_checkouts()
-            self.command_handler.run('restart')
-
-        if StateHolder.has_args('down'):
-            self.command_handler.run('down')
-            ColorPrint.print_info("Project stopped")
-
-        if StateHolder.has_args('ps'):
-            self.run_checkouts()
-            self.command_handler.run('ps')
-
-        if StateHolder.has_args('pull'):
-            self.run_checkouts()
-            self.command_handler.run('pull')
-            ColorPrint.print_info("Project pull complete")
-
-        if StateHolder.has_args('stop'):
-            self.command_handler.run('stop')
-
-        if StateHolder.has_least_one_arg('logs', 'log'):
-            self.command_handler.run('logs')
-            return
-
-        if StateHolder.has_args('pack'):
-            self.command_handler.run('pack')
-
-    def init(self):
-        project_element = self.get_catalog()
-        repo = self.get_project_repository()
-
-        file = repo.get_file(project_element.get('file')) if project_element is not None else None
-        # TODO
-        if file is None:
-            if os.path.exists('pocok.yaml'):
-                file = 'pocok.yaml'
-            else:
-                file = 'pocok.yml'
-
-        if not os.path.exists(file):
-            src_file = os.path.join(os.path.dirname(__file__), 'services/resources/pocok.yml')
-            shutil.copyfile(src=src_file, dst=file)
-            default_compose = os.path.join(os.path.dirname(file), 'docker-compose.yml')
-            if not os.path.exists(default_compose):
-                src_file = os.path.join(os.path.dirname(__file__), 'services/resources/docker-compose.yml')
-                shutil.copyfile(src=src_file, dst=default_compose)
-        self.init_compose_handler()
-        ColorPrint.print_info("Project init completed")
-
-    def get_catalog(self):
-        if self.catalog_handler is not None:
-            return self.catalog_handler.get()
-
-    def get_compose_file(self, silent=False):
-        catalog = self.get_catalog()
-        return self.project_utils.get_compose_file(project_element=catalog,
-                                                   ssh=self.get_node(catalog, ["ssh-key"]), silent=silent)
-
-    def get_project_repository(self):
-        catalog = self.get_catalog()
-        if catalog is None:
-            return self.project_utils.add_repository(target_dir=StateHolder.work_dir)
-        return self.project_utils.get_project_repository(project_element=catalog,
-                                                         ssh=self.get_node(catalog, ["ssh-key"]))
-
-    def get_repository_dir(self):
-        if StateHolder.config is None:
-            return os.getcwd()
-        return self.project_utils.get_target_dir(self.catalog_handler.get())
-
-    def add_cta(self):
-        res = ""
-        if self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
-            res = CTAUtils.CTA_STRINGS['have_all']
-        elif not ConfigHandler.exists() and \
-                self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']) \
-                and not self.one_of_local_files_exits(files=['pocok.yml', 'pocok.yaml']):
-            res = CTAUtils.CTA_STRINGS['have_file']
-        elif not ConfigHandler.exists() and not \
-                self.one_of_local_files_exits(files=['docker-compose.yml', 'docker-compose.yaml', '.poco', 'docker']):
-            res = CTAUtils.CTA_STRINGS['default']
-        elif ConfigHandler.exists():
-            res = CTAUtils.CTA_STRINGS['have_cat']
-        return res
-
-    @staticmethod
-    def one_of_local_files_exits(files):
-        actual_dir = os.getcwd()
-        ''' TODO handle extension'''
-        for file in files:
-            if os.path.exists(os.path.join(actual_dir, file)):
-                return True
-        return False
-
-    @staticmethod
-    def run_checkouts():
-        for checkout in StateHolder.compose_handler.get_checkouts():
-            if " " not in checkout:
-                ColorPrint.exit_after_print_messages(message="Wrong checkout command: " + checkout)
-            directory, repository = checkout.split(" ")
-            target_dir = os.path.join(StateHolder.compose_handler.get_working_directory(), directory)
-            if not StateHolder.offline:
-                GitRepository(target_dir=target_dir, url=repository, branch="master")
-            if not os.path.exists(target_dir):
-                ColorPrint.exit_after_print_messages("checkout directory is empty: " + str(directory))
-
-    def init_compose_handler(self):
-        StateHolder.compose_handler = ComposeHandler(compose_file=self.get_compose_file(),
-                                                     plan=StateHolder.args.get('<plan>'),
-                                                     repo_dir=self.get_repository_dir())
-
-    @staticmethod
-    def get_node(structure, paths, default=None):
-        if structure is None:
-            return None
-        node = paths[0]
-        paths = paths[1:]
-
-        while node in structure and len(paths) > 0:
-            structure = structure[node]
-            node = paths[0]
-            paths = paths[1:]
-
-        return structure[node] if node in structure else default
+    def check_base_class(self, cls):
+        for base_class in cls.__bases__:
+            if base_class == AbstractCommand:
+                sub_command = getattr(cls, 'sub_command')
+                if sub_command not in self.command_classes.keys():
+                    self.command_classes[sub_command] = list()
+                self.command_classes[sub_command].append(cls)
+                break
 
 
 def main():
     pocok = Pocok()
-    pocok.run()
+    #try:
+    pocok.start_flow()
+    #except Exception as ex:
+    #    ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
 
 if __name__ == '__main__':
     sys.exit(main())

@@ -12,7 +12,7 @@ class PocokProject:
           pocok project add [<target-dir>] [<catalog>]
           pocok project init [<project>]
           pocok project ls
-          pocok project remove <project>
+          pocok project (remove|rm) <project>
 
         """
 
@@ -34,9 +34,9 @@ class PocokProject:
         -h, --help
 
         Specific parameters:
-          <project>         Name of the project that will be added to the catalog
+          <project>         Name of the project or the actual directory if it is empty
 
-        Create pocok.yml and docker-compose.yml to a project if aren't exists.
+        Initialize pocok project, pocok.yml and docker-compose.yml will be created if they don't exist.
     """
 
     LS = """Usage:
@@ -48,7 +48,7 @@ class PocokProject:
     """
 
     REMOVE = """Usage:
-    pocok project remove <project>
+    pocok project (remove|rm) <project>
 
         -h, --help
 
@@ -82,7 +82,7 @@ class PocokProject:
                                        url=repo.remotes.origin.url, file=file, repo_name=repo_name)
             ColorPrint.print_info("Project added")
             return
-        elif StateHolder.has_args('remove'):
+        elif StateHolder.has_least_one_arg('remove', 'rm'):
             CatalogHandler.remove_from_list()
             ColorPrint.print_info("Project removed")
             return

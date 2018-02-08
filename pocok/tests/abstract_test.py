@@ -130,7 +130,7 @@ class AbstractTestSuite(unittest.TestCase):
 
     def run_pocok_command(self, *args):
         runnable = pocok.Pocok(home_dir=self.tmpdir, argv=list(args))
-        runnable.run()
+        runnable.start_flow()
 
     def init_empty_compose_file(self):
         compose_file = dict()

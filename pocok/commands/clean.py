@@ -1,15 +1,30 @@
-from .console_logger import ColorPrint
-from .environment_utils import EnvironmentUtils
 from subprocess import check_output, CalledProcessError
+from .abstract_command import AbstractCommand
+from ..services.console_logger import ColorPrint
+from ..services.environment_utils import EnvironmentUtils
 
 
-class CleanHandler:
+class Clean(AbstractCommand):
 
-    def clean(self):
+    command = "clean"
+    description = "Clean all container and image from local Docker repository."
+
+    def prepare_states(self):
+        """ Nothing need """
+        self.prepared_states = True
+
+    def resolve_dependencies(self):
+
+        """ Check Docker """
+        EnvironmentUtils.check_docker()
+        self.resolved_dependencies = True
+
+    def execute(self):
         self.check_container(status="created")
         self.check_container(status="exited")
         self.check_images()
         self.check_volumes()
+        self.executed = True
 
     def check_container(self, status):
         out = check_output(" ".join(["docker", "ps", "-qf", "status=" + str(status)]), shell=True)

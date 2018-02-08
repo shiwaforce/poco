@@ -24,7 +24,8 @@ class PocokDefault:
     List the available projects in repos.
 """
 
-    CLEAN = """Usage:
+    CLEAN = """
+Usage:
   pocok clean
 
     -h, --help
@@ -203,10 +204,5 @@ class PocokDefault:
 
     @staticmethod
     def handle():
-        if StateHolder.has_args('catalog'):
-            if StateHolder.default_catalog_repository is None:
-                ColorPrint.print_warning("You have not catalog yet.", lvl=-1)
-                ColorPrint.exit_after_print_messages(message=CTAUtils.CTA_STRINGS['default'], msg_type="info")
-            else:
-                CatalogHandler.print_ls()
-            return
+        pass
+

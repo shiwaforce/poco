@@ -34,7 +34,7 @@ class StateHolder:
 
     # Virtualization type
     container_mode = "Docker"
-    test_mode = False # Not running scrips and virtualization types
+    test_mode = False  # Not running scrips and virtualization types
 
     # Handlers
     config_handler = None

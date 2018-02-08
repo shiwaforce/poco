@@ -2,22 +2,59 @@ import os
 import yaml
 from .catalog_handler import CatalogHandler
 from .config_handler import ConfigHandler
+from .console_logger import ColorPrint
 from .file_utils import FileUtils
 from .state import StateHolder
 
 
-class StateUtils(object):
+class StateUtils:
 
     @staticmethod
-    def fill_pre_states():
-        StateHolder.catalog_config_file = os.path.join(StateHolder.home_dir, 'config')
-        StateHolder.global_config_file = os.path.join(StateHolder.home_dir, '.pocok')
+    def prepare(preparable=None):
+        if preparable is None or len(preparable) == 0:
+            ColorPrint.print_info(message="Empty prepare object", lvl=1)
+            return
+        for elem in preparable:
+            if elem is "config":
+                StateUtils.prepare_config()
+            elif elem in ["catalog_read", "catalog"]:
+                StateUtils.prepare_catalog(elem)
+            else:
+                ColorPrint.print_info(message="Unknown prepare command : " + str(elem))
+
+        if StateHolder.args.get("--offline"):
+            StateHolder.offline = StateHolder.args.get("--offline")
+
+        if StateHolder.args.get("--always-update"):
+            StateHolder.always_update = StateHolder.args.get("--always-update")
+
+    @staticmethod
+    def prepare_config():
+        if StateHolder.global_config_file is None:
+            StateHolder.global_config_file = os.path.join(StateHolder.home_dir, '.pocok')
+        StateUtils.prepare_config_handler()
+        StateHolder.config_handler.read_configs(StateHolder.global_config_file, True)
+
+    @staticmethod
+    def prepare_catalog(elem):
+        if StateHolder.catalog_config_file is None:
+            StateHolder.catalog_config_file = os.path.join(StateHolder.home_dir, 'config')
+        StateUtils.prepare_config_handler()
+        if os.path.exists(StateHolder.catalog_config_file):
+            StateHolder.config_handler.read_catalogs()
+            if elem is "catalog":
+                CatalogHandler.load()
+
+    @staticmethod
+    def prepare_config_handler():
+        if StateHolder.config_handler is None:
+            ConfigHandler()
+
+
+
 
     @staticmethod
     def fill_states():
-        config_handler = ConfigHandler()
-        config_handler.read_configs(StateHolder.global_config_file, True)
-
         if '<project/plan>' in StateHolder.args:
             StateUtils.calculate_name_and_work_dir()
         elif '<project>' in StateHolder.args:
@@ -25,16 +62,6 @@ class StateUtils(object):
             StateHolder.work_dir = StateHolder.base_work_dir
         else:
             StateHolder.work_dir = StateHolder.base_work_dir
-
-        """ Always parse catalog """
-        if ConfigHandler.exists():
-            config_handler.read_catalogs()
-
-        if StateHolder.args.get("--offline"):
-            StateHolder.offline = StateHolder.args.get("--offline")
-
-        if StateHolder.args.get("--always-update"):
-            StateHolder.always_update = StateHolder.args.get("--always-update")
 
         if StateHolder.config is not None:
             StateUtils.read_project_config_and_catalog()
@@ -50,7 +77,7 @@ class StateUtils(object):
             StateHolder.name = project_and_plan[0]
             StateHolder.plan = project_and_plan[1]
         else:  # if need some another checks
-            local_project_file = FileUtils.get_exists_file_full_name(os.getcwd(), 'pocok', ['yml', 'yaml'])
+            local_project_file = FileUtils.get_file_with_extension('pocok')
             if local_project_file is None:
                 StateHolder.name = arg
             else:
@@ -80,8 +107,9 @@ class StateUtils(object):
         CatalogHandler.load()
         if StateHolder.name is not None:
             catalog = CatalogHandler.get()
-            StateHolder.config_handler.read_configs(
-                os.path.join(StateHolder.work_dir, catalog.get('repository_dir', StateHolder.name), '.pocok'))
+            if catalog is not None:
+                StateHolder.config_handler.read_configs(
+                    os.path.join(StateHolder.work_dir, catalog.get('repository_dir', StateHolder.name), '.pocok'))
         else:
             """ Read local config """
             StateHolder.config_handler.read_configs(os.path.join(os.getcwd(), '.pocok'))

@@ -101,34 +101,31 @@ class FileUtils:
         return file_list
 
     @staticmethod
-    def get_exists_file_full_name(dir, base, extensions):
-        if not isinstance(extensions, list):
-            extensions = list(extensions)
-
-        for ext in extensions:
-            file = os.path.join(dir, base, '.', ext)
-            if os.path.exists(file):
-                return file
-
-    @staticmethod
     def get_parameter_or_directory_name(param):
         arg = StateHolder.args.get(param)
         return arg if arg is not None else FileUtils.get_directory_name()
 
+    @staticmethod
+    def get_file_with_extension(file, directory=None, extensions=None):
+        if extensions is None:
+            extensions = ['yml', 'yaml']
+        directory = os.getcwd() if directory is None else directory
+        file_lists = os.listdir(directory)
+        for ext in extensions:
+            if file + "." + ext in file_lists:
+                return file
+        return None
+
     # TODO remove later
     @staticmethod
     def get_backward_compatible_pocok_file(directory=None):
-        filenames = ["pocok.yaml", "pocok.yml"]
-        old_filenames = ["poco.yaml", "poco.yml"]
-        directory = os.getcwd() if directory is None else directory
-        file_lists = os.listdir(directory)
+        file = FileUtils.get_file_with_extension(file="pocok", directory=directory)
+        if file is not None:
+            return file
 
-        for file in filenames:
-            if file in file_lists:
-                return file
-        for file in old_filenames:
-            if file in file_lists:
-                ColorPrint.print_info("Your configuration file (" + directory + "/" +
-                                      file + ") is deprecated! Use 'pocok.yaml/yml' instead.")
-                return file
+        file = FileUtils.get_file_with_extension(file="poco", directory=directory)
+        if file is not None:
+            ColorPrint.print_info("Your configuration file (" + directory + "/" + file +
+                                  ") is deprecated! Use 'pocok.yaml/yml' instead.")
+            return file
         ColorPrint.exit_after_print_messages("Directory not contains Pocok file!")

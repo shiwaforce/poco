@@ -3,7 +3,7 @@ import os
 import yaml
 import pocok.pocok as pocok
 from .abstract_test import AbstractTestSuite
-from pocok.services.state import StateHolder
+from pocok.services.file_utils import FileUtils
 from pocok.services.cta_utils import CTAUtils
 
 
@@ -14,7 +14,8 @@ class ComposeTestSuite(AbstractTestSuite):
             with self.assertRaises(SystemExit) as context:
                 self.run_pocok_command()
             self.assertIsNotNone(context.exception)
-        self.assertEqual(out.getvalue().strip(), pocok.__doc__.strip())
+        self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
+        self.assertIn(pocok.END_STRING.strip(), out.getvalue().strip())
 
     def test_version(self):
         with self.captured_output() as (out, err):
@@ -68,24 +69,18 @@ class ComposeTestSuite(AbstractTestSuite):
 
     def test_config_without_config(self):
         with self.captured_output() as (out, err):
-            with self.assertRaises(SystemExit) as context:
-                self.run_pocok_command("repo")
-            self.assertIsNotNone(context.exception)
+            self.run_pocok_command("repo")
         self.assertIn("Actual config\n-------------\n", out.getvalue().strip())
 
     def test_config_without_config_another(self):
         with self.captured_output() as (out, err):
-            with self.assertRaises(SystemExit) as context:
-                self.run_pocok_command("repo", "ls")
-            self.assertIsNotNone(context.exception)
+            self.run_pocok_command("repo", "ls")
         self.assertIn("Actual config\n-------------\n", out.getvalue().strip())
 
     def test_config_with_config(self):
         self.init_with_remote_catalog()
         with self.captured_output() as (out, err):
-            with self.assertRaises(SystemExit) as context:
-                self.run_pocok_command("repo", "ls")
-            self.assertIsNotNone(context.exception)
+            self.run_pocok_command("repo", "ls")
         out_string = out.getvalue().strip()
         self.assertIn("Actual config\n-------------\n", out_string)
         self.assertIn("Mode: developer\nOffline: False\nAlways update: False", out_string)
@@ -99,9 +94,7 @@ class ComposeTestSuite(AbstractTestSuite):
         extra_config['mode'] = 'demo'
         self.init_with_remote_catalog(extra_config)
         with self.captured_output() as (out, err):
-            with self.assertRaises(SystemExit) as context:
-                self.run_pocok_command("repo", "ls")
-            self.assertIsNotNone(context.exception)
+            self.run_pocok_command("repo", "ls")
         out_string = out.getvalue().strip()
         self.assertIn("Actual config\n-------------\n", out_string)
         self.assertIn("Mode: demo\nOffline: False\nAlways update: True", out_string)
@@ -117,9 +110,7 @@ class ComposeTestSuite(AbstractTestSuite):
         os.mkdir(os.path.join(self.tmpdir,'catalogHome'))
         os.mkdir(os.path.join(self.tmpdir, 'catalogHome', 'default'))
         with self.captured_output() as (out, err):
-            with self.assertRaises(SystemExit) as context:
-                self.run_pocok_command("repo", "ls")
-            self.assertIsNotNone(context.exception)
+            self.run_pocok_command("repo", "ls")
         out_string = out.getvalue().strip()
         self.assertIn("Actual config\n-------------\n", out_string)
         self.assertIn("Mode: server\nOffline: True\nAlways update: False", out_string)
@@ -131,9 +122,7 @@ class ComposeTestSuite(AbstractTestSuite):
     def test_config_with_config_and_options(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
-            with self.assertRaises(SystemExit) as context:
-                self.run_pocok_command("--offline", "--always-update", "repo", "ls")
-            self.assertIsNotNone(context.exception)
+            self.run_pocok_command("--offline", "--always-update", "repo", "ls")
         out_string = out.getvalue().strip()
         self.assertIn("Actual config\n-------------\n", out_string)
         self.assertIn("Mode: developer\nOffline: True\nAlways update: True", out_string)
@@ -259,7 +248,7 @@ class ComposeTestSuite(AbstractTestSuite):
             self.run_pocok_command("repo", "push")
         self.assertEqual(0, len(err.getvalue().strip()))
         self.assertIn("Push completed", out.getvalue())
-
+"""
     def test_failed_add(self):
         self.init_with_local_catalog()
         test_dir = os.path.join(self.tmpdir, "test-directory")
@@ -330,6 +319,33 @@ class ComposeTestSuite(AbstractTestSuite):
         for key in AbstractTestSuite.STACK_LIST_SAMPLE.keys():
             self.assertTrue(key in out.getvalue().strip())
         self.assertNotIn("test-directory", out.getvalue())
+"""
+"""
+    #  TODO change after rename examples project
+    def test_init_with_and_without_project_without_catalog(self):
+        self.init_with_local_catalog()
+        test_dir = os.path.join(self.tmpdir, "test-directory")
+        os.makedirs(test_dir)
+        git.Repo.clone_from(url=AbstractTestSuite.STACK_LIST_SAMPLE['nginx']['git'], to_path=test_dir)
+        self.assertIsNone(FileUtils.get_file_with_extension('pocok', directory=test_dir))
+        self.assertIsNone(FileUtils.get_file_with_extension('docker-compose', directory=test_dir))
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("project", "init")
+        self.assertEqual(0, len(err.getvalue().strip()))
+        pocok_file = FileUtils.get_file_with_extension('pocok', directory=test_dir)
+        compose_file = FileUtils.get_file_with_extension('docker-compose', directory=test_dir)
+        self.assertIsNotNone(pocok_file)
+        self.assertIsNotNone(compose_file)
+        os.remove(pocok_file)
+        os.remove(compose_file)
+        self.assertIsNone(pocok_file)
+        self.assertIsNone(compose_file)
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("project", "init")
+        self.assertEqual(0, len(err.getvalue().strip()))
+        self.assertIsNotNone(FileUtils.get_file_with_extension('pocok', directory=test_dir))
+        self.assertIsNotNone(FileUtils.get_file_with_extension('docker-compose', directory=test_dir))
+"""
 
 """
     def test_plan_list(self):

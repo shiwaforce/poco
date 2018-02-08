@@ -106,7 +106,7 @@ class CatalogHandler:
         for catalog in StateHolder.catalogs:
             if StateHolder.name in StateHolder.catalogs[catalog]:
                 return StateHolder.catalogs[catalog].get(StateHolder.name)
-        ColorPrint.exit_after_print_messages(message="Project with name: %s not exist" % StateHolder.name)
+        return None
 
     @staticmethod
     def get_repository(key, repo):
