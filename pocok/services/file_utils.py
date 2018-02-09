@@ -37,21 +37,6 @@ class FileUtils:
         return os.path.relpath(path=target_path, start=os.path.commonprefix([target_path, base_path])) + "/"
 
     @staticmethod
-    def get_normalized_dir(target_dir):
-        if target_dir is not None:
-            if not os.path.exists(target_dir):
-                if os.path.exists(os.path.join(os.getcwd(), target_dir)):
-                    target_dir = os.path.join(os.getcwd(), target_dir)
-                else:
-                    ColorPrint.exit_after_print_messages(message="Directory not exists: " + target_dir)
-        else:
-            target_dir = os.getcwd()
-        if not os.path.isdir(target_dir):
-            ColorPrint.exit_after_print_messages(message=target_dir + " is not a directory")
-
-        return os.path.normpath(target_dir)
-
-    @staticmethod
     def get_git_repo(base_dir):
         if not os.path.isdir(base_dir):
             ColorPrint.exit_after_print_messages(message="Target directory is not a valid git repository: "
@@ -113,7 +98,7 @@ class FileUtils:
         file_lists = os.listdir(directory)
         for ext in extensions:
             if file + "." + ext in file_lists:
-                return file
+                return file + "." + ext
         return None
 
     # TODO remove later

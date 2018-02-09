@@ -248,7 +248,7 @@ class ComposeTestSuite(AbstractTestSuite):
             self.run_pocok_command("repo", "push")
         self.assertEqual(0, len(err.getvalue().strip()))
         self.assertIn("Push completed", out.getvalue())
-"""
+
     def test_failed_add(self):
         self.init_with_local_catalog()
         test_dir = os.path.join(self.tmpdir, "test-directory")
@@ -319,7 +319,7 @@ class ComposeTestSuite(AbstractTestSuite):
         for key in AbstractTestSuite.STACK_LIST_SAMPLE.keys():
             self.assertTrue(key in out.getvalue().strip())
         self.assertNotIn("test-directory", out.getvalue())
-"""
+
 """
     #  TODO change after rename examples project
     def test_init_with_and_without_project_without_catalog(self):
