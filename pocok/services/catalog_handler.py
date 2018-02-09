@@ -80,18 +80,6 @@ class CatalogHandler:
         CatalogHandler.write_catalog(catalog=catalog)
 
     @staticmethod
-    def remove_from_list():
-        """Remove project from catalog"""
-
-        for catalog in StateHolder.catalogs:
-            lst = StateHolder.catalogs[catalog]
-            if StateHolder.name in lst:
-                lst.pop(StateHolder.name)
-                CatalogHandler.write_catalog(catalog=catalog)
-                return
-        ColorPrint.exit_after_print_messages(message="Project not exists in catalog: " + StateHolder.name)
-
-    @staticmethod
     def get_catalog_repository(catalog=None):
         if catalog is None:
             return StateHolder.default_catalog_repository.repository
