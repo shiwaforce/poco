@@ -15,10 +15,9 @@ class RepoRemove(AbstractCommand):
     def prepare_states(self):
         StateHolder.name = StateHolder.args.get('<name>')
         StateUtils.prepare(["config", "catalog_read"])
-        self.prepared_states = True
 
     def resolve_dependencies(self):
-        self.resolved_dependencies = True
+        pass
 
     def execute(self):
         #if StateHolder.name in StateHolder.catalogs:
@@ -28,4 +27,3 @@ class RepoRemove(AbstractCommand):
             #    CommandHandler(project_utils=self.project_utils).run_script("remove_script")
         #    pass
         ConfigHandler.remove()
-        self.executed = True

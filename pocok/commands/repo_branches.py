@@ -14,12 +14,10 @@ class RepoBranches(AbstractCommand):
 
     def prepare_states(self):
         StateUtils.prepare(["config", "catalog"])
-        self.prepared_states = True
 
     def resolve_dependencies(self):
-        self.resolved_dependencies = True
+        pass
 
     def execute(self):
         repository = CatalogHandler.get_catalog_repository(StateHolder.args.get('<name>'))
         repository.print_branches()
-        self.executed = True

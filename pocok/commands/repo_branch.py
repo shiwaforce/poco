@@ -17,12 +17,10 @@ class RepoBranch(AbstractCommand):
 
     def prepare_states(self):
         StateUtils.prepare(["config", "catalog"])
-        self.prepared_states = True
 
     def resolve_dependencies(self):
-        self.resolved_dependencies = True
+        pass
 
     def execute(self):
         ConfigHandler.set_branch(StateHolder.args.get('<branch>'), StateHolder.args.get('<name>'))
         ColorPrint.print_info("Branch changed")
-        self.executed = True

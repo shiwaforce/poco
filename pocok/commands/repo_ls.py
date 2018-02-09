@@ -12,11 +12,9 @@ class RepoLs(AbstractCommand):
 
     def prepare_states(self):
         StateUtils.prepare(["config", "catalog"])
-        self.prepared_states = True
 
     def resolve_dependencies(self):
-        self.resolved_dependencies = True
+        pass
 
     def execute(self):
         ColorPrint.print_info(message=ConfigHandler.print_config())
-        self.executed = True

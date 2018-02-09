@@ -11,20 +11,18 @@ class Clean(AbstractCommand):
 
     def prepare_states(self):
         """ Nothing need """
-        self.prepared_states = True
+        pass
 
     def resolve_dependencies(self):
 
         """ Check Docker """
         EnvironmentUtils.check_docker()
-        self.resolved_dependencies = True
 
     def execute(self):
         self.check_container(status="created")
         self.check_container(status="exited")
         self.check_images()
         self.check_volumes()
-        self.executed = True
 
     def check_container(self, status):
         out = check_output(" ".join(["docker", "ps", "-qf", "status=" + str(status)]), shell=True)

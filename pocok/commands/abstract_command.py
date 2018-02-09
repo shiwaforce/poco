@@ -1,4 +1,5 @@
 import abc
+from enum import Enum
 from ..services.console_logger import ColorPrint
 
 
@@ -11,21 +12,26 @@ class AbstractCommand(object):
     description = None
 
     def __init__(self):
-        self.prepared_states = False
-        self.resolved_dependencies = False
-        self.executed = False
+        self.state = CommandState.INIT
 
     @abc.abstractmethod
     def prepare_states(self):
         ColorPrint.print_info("Abstract prepare states")
-        return
 
     @abc.abstractmethod
     def resolve_dependencies(self):
         ColorPrint.print_info("Abstract resolve dependencies")
-        return
 
     @abc.abstractmethod
     def execute(self):
         ColorPrint.print_info("Abstract execute")
-        return
+
+    def cleanup(self):
+        pass
+
+class CommandState(Enum):
+    INIT = 1
+    RESOLVE = 2
+    EXECUTE = 3
+    CLEANUP = 4
+    DESTROYED = 5

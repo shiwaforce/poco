@@ -9,6 +9,7 @@ from contextlib import contextmanager
 import pocok.pocok as pocok
 from ..services.file_utils import FileUtils
 from ..services.state import StateHolder
+from ..services.console_logger import ColorPrint
 try:
     from StringIO import StringIO
 except ImportError:
@@ -75,7 +76,10 @@ class AbstractTestSuite(unittest.TestCase):
 
     def tearDown(self):
         os.chdir(self.orig_dir)
-        shutil.rmtree(self.tmpdir, onerror=FileUtils.remove_readonly)
+        try:
+            shutil.rmtree(self.tmpdir, onerror=FileUtils.remove_readonly)
+        except Exception:
+            ColorPrint.print_warning("Failed to delete test directory: " + self.tmpdir)
 
     @staticmethod
     def clean_states():

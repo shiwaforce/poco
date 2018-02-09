@@ -21,7 +21,7 @@ import pkgutil
 import os
 import sys
 from docopt import docopt
-from .commands.abstract_command import AbstractCommand
+from .commands.abstract_command import AbstractCommand, CommandState
 from .services.cta_utils import CTAUtils
 from .services.environment_utils import EnvironmentUtils
 from .services.console_logger import ColorPrint
@@ -57,16 +57,19 @@ class Pocok(object):
 
         while counter < 10:  # for tests
             counter += 1
-            if not self.active_object.prepared_states:
-                self.active_object.prepare_states()
-                continue
-            if not self.active_object.resolved_dependencies:
-                self.active_object.resolve_dependencies()
-                continue
-            if not self.active_object.executed:
-                self.active_object.execute()
-                continue
-            break
+
+            cmd = self.active_object;
+
+            if cmd.state == CommandState.INIT:
+                cmd.state = self.next_state(cmd.prepare_states(), CommandState.RESOLVE)
+            elif cmd.state == CommandState.RESOLVE:
+                cmd.state = self.next_state(cmd.resolve_dependencies(), CommandState.EXECUTE)
+            elif cmd.state == CommandState.EXECUTE:
+                cmd.state = self.next_state(cmd.execute(), CommandState.CLEANUP)
+            elif cmd.state == CommandState.CLEANUP:
+                cmd.state = self.next_state(cmd.cleanup(), CommandState.DESTROYED)
+            elif cmd.state == CommandState.DESTROYED:
+                break;
 
         if not counter < 10:
             ColorPrint.exit_after_print_messages("Can't complete the command running. States: \n"
@@ -74,6 +77,11 @@ class Pocok(object):
                                                  "\tResolve dependencies: "
                                                  + str(self.active_object.resolved_dependencies) +
                                                  "\tExecuted: " + str(self.active_object.executed))
+
+    def next_state(self, desired_next, default_next):
+        if desired_next is None:
+            return default_next
+        return desired_next
 
     def check_command(self):
         argv = Pocok.handle_alternatives(self.argv)  # TODO move to new structure
