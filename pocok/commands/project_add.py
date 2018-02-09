@@ -27,7 +27,6 @@ class ProjectAdd(AbstractCommand):
     def prepare_states(self):
         StateUtils.prepare(["config", "catalog"])
         self.get_normalized_dir()
-        self.prepared_states = True
 
     def resolve_dependencies(self):
         if not os.path.exists(self.target_dir):
@@ -39,7 +38,6 @@ class ProjectAdd(AbstractCommand):
             self.repo_name = os.path.basename(repo_dir)
         file_name = FileUtils.get_backward_compatible_pocok_file(self.target_dir)
         self.file = file_name if directory is None else directory + file_name
-        self.resolved_dependencies = True
 
     def execute(self):
 
@@ -47,7 +45,6 @@ class ProjectAdd(AbstractCommand):
                                    catalog=StateHolder.args.get('<catalog>'),
                                    url=self.repo.remotes.origin.url, file=self.file, repo_name=self.repo_name)
         ColorPrint.print_info("Project added")
-        self.executed = True
 
     def get_normalized_dir(self):
         target_dir = StateHolder.args.get('<target-dir>')

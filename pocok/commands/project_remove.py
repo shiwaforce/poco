@@ -17,16 +17,13 @@ class ProjectRemove(AbstractCommand):
     def prepare_states(self):
         StateHolder.name = StateHolder.args.get('<name>')
         StateUtils.prepare(["config", "catalog"])
-        self.prepared_states = True
 
     def resolve_dependencies(self):
         self.remove(dry_run=True)
-        self.resolved_dependencies = True
 
     def execute(self):
         self.remove()
         ColorPrint.print_info("Project removed")
-        self.executed = True
 
     @staticmethod
     def remove(dry_run=False):
