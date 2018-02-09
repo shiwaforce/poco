@@ -13,6 +13,8 @@ class CatalogHandler:
 
     @staticmethod
     def load():
+        if StateHolder.config is None:
+            return
 
         StateHolder.catalog_repositories = dict()
         StateHolder.default_catalog_repository = None
@@ -87,14 +89,6 @@ class CatalogHandler:
             ColorPrint.exit_after_print_messages(message="Catalog not exists : " + str(catalog))
         else:
             return StateHolder.catalog_repositories[catalog].repository
-
-    @staticmethod
-    def get():
-        """Get project parameters form catalog, if it is exists"""
-        for catalog in StateHolder.catalogs:
-            if StateHolder.name in StateHolder.catalogs[catalog]:
-                return StateHolder.catalogs[catalog].get(StateHolder.name)
-        return None
 
     @staticmethod
     def get_repository(key, repo):

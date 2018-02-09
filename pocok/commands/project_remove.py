@@ -1,4 +1,3 @@
-import os
 from .abstract_command import AbstractCommand
 from ..services.console_logger import ColorPrint
 from ..services.catalog_handler import CatalogHandler

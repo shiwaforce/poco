@@ -4,6 +4,7 @@ from .catalog_handler import CatalogHandler
 from .config_handler import ConfigHandler
 from .console_logger import ColorPrint
 from .file_utils import FileUtils
+from .project_utils import ProjectUtils
 from .state import StateHolder
 
 
@@ -19,6 +20,8 @@ class StateUtils:
                 StateUtils.prepare_config()
             elif elem in ["catalog_read", "catalog"]:
                 StateUtils.prepare_catalog(elem)
+            elif elem is "project_repo":
+                StateUtils.prepare_project_repo()
             else:
                 ColorPrint.print_info(message="Unknown prepare command : " + str(elem))
 
@@ -46,9 +49,27 @@ class StateUtils:
                 CatalogHandler.load()
 
     @staticmethod
+    def prepare_project_repo():
+        """Get project parameters form catalog, if it is exists"""
+
+        if StateHolder.name is None:
+            return
+        for catalog in StateHolder.catalogs:
+            if StateHolder.name in StateHolder.catalogs[catalog]:
+                StateHolder.catalog_element = StateHolder.catalogs[catalog].get(StateHolder.name)
+
+        if StateHolder.catalog_element is None:
+            return
+        StateHolder.repository = ProjectUtils.get_project_repository(StateHolder.catalog_element, ssh=None)
+        # TODO handle ssh parameter
+
+    @staticmethod
     def prepare_config_handler():
         if StateHolder.config_handler is None:
             ConfigHandler()
+
+
+
 
 
 
@@ -57,11 +78,6 @@ class StateUtils:
     def fill_states():
         if '<project/plan>' in StateHolder.args:
             StateUtils.calculate_name_and_work_dir()
-        elif '<project>' in StateHolder.args:
-            StateHolder.name = FileUtils.get_parameter_or_directory_name('<project>')
-            StateHolder.work_dir = StateHolder.base_work_dir
-        else:
-            StateHolder.work_dir = StateHolder.base_work_dir
 
         if StateHolder.config is not None:
             StateUtils.read_project_config_and_catalog()

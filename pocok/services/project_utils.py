@@ -8,41 +8,41 @@ from .console_logger import *
 
 class ProjectUtils:
 
-    def __init__(self):
-        self.repositories = {}
-
-    def get_project_repository(self, project_element, ssh):
+    @staticmethod
+    def get_project_repository(project_element, ssh):
         """Get and store repository handler for named project"""
         if StateHolder.offline:
-            repo_handler = FileRepository(target_dir=self.get_target_dir(project_element=project_element))
+            repo_handler = FileRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element))
         elif 'git' in project_element:
             branch = project_element.get('branch', 'master')
-            repo_handler = GitRepository(target_dir=self.get_target_dir(project_element=project_element),
+            repo_handler = GitRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element),
                                          url=project_element.get('git'), branch=branch,
                                          git_ssh_identity_file=ssh)
         elif 'svn' in project_element:
-            repo_handler = SvnRepository(target_dir=self.get_target_dir(project_element=project_element),
+            repo_handler = SvnRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element),
                                          url=project_element.get('svn'))
         else:
-            repo_handler = FileRepository(target_dir=self.get_target_dir(project_element=project_element))
-        self.repositories[StateHolder.name] = repo_handler
+            repo_handler = FileRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element))
+        StateHolder.repositories[StateHolder.name] = repo_handler
         return repo_handler
 
-    def add_repository(self, target_dir):
+    @staticmethod
+    def add_repository(target_dir):
 
         repo_handler = FileRepository(target_dir=target_dir)
-        self.repositories[StateHolder.name] = repo_handler
+        StateHolder.repositories[StateHolder.name] = repo_handler
         return repo_handler
 
-    def get_compose_file(self, project_element, ssh, silent=False):
+    @staticmethod
+    def get_compose_file(project_element, ssh, silent=False):
         """Get compose file from project repository """
 
         if StateHolder.config is None:
-            repository = self.add_repository(target_dir=StateHolder.work_dir)
+            repository = ProjectUtils.add_repository(target_dir=StateHolder.work_dir)
             # TODO
             file = repository.get_file('pocok.yml')
         else:
-            repo_handler = self.get_project_repository(project_element=project_element, ssh=ssh)
+            repo_handler = ProjectUtils.get_project_repository(project_element=project_element, ssh=ssh)
             # TODO
             file = repo_handler.get_file(project_element.get('file', 'pocok.yml'))
         if not os.path.exists(file):
@@ -53,9 +53,10 @@ class ProjectUtils:
                 doc=Doc.POCOK_CATALOG)
         return file
 
-    def get_file(self, file):
+    @staticmethod
+    def get_file(file):
         """Get file from project repository"""
-        return self.repositories.get(StateHolder.name).get_file(file)
+        return StateHolder.repositories.get(StateHolder.name).get_file(file)
 
     @staticmethod
     def get_target_dir(project_element):

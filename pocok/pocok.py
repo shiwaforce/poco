@@ -26,7 +26,7 @@ from .services.cta_utils import CTAUtils
 from .services.environment_utils import EnvironmentUtils
 from .services.console_logger import ColorPrint
 from .services.state import StateHolder
-from .services.state_utils import StateUtils
+
 
 END_STRING = """See 'pocok help <command>' for more information on a specific command."""
 __version__ = '0.24.0'
@@ -92,9 +92,6 @@ class Pocok(object):
                                                          argv=[] + StateHolder.args['<args>']))
         ColorPrint.set_log_level(StateHolder.args)
         ColorPrint.print_info('arguments:\n' + str(StateHolder.args), 1)
-
-    def fill_states(self):
-        StateUtils.fill_states()
 
     def get_full_doc(self):
         doc = __doc__

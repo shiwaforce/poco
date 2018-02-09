@@ -180,22 +180,7 @@ class Pocok(object):
             return os.getcwd()
         return self.project_utils.get_target_dir(self.catalog_handler.get())
 
-    @staticmethod
-    def run_checkouts():
-        for checkout in StateHolder.compose_handler.get_checkouts():
-            if " " not in checkout:
-                ColorPrint.exit_after_print_messages(message="Wrong checkout command: " + checkout)
-            directory, repository = checkout.split(" ")
-            target_dir = os.path.join(StateHolder.compose_handler.get_working_directory(), directory)
-            if not StateHolder.offline:
-                GitRepository(target_dir=target_dir, url=repository, branch="master")
-            if not os.path.exists(target_dir):
-                ColorPrint.exit_after_print_messages("checkout directory is empty: " + str(directory))
 
-    def init_compose_handler(self):
-        StateHolder.compose_handler = ComposeHandler(compose_file=self.get_compose_file(),
-                                                     plan=StateHolder.args.get('<plan>'),
-                                                     repo_dir=self.get_repository_dir())
 
     @staticmethod
     def get_node(structure, paths, default=None):

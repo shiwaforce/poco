@@ -87,6 +87,7 @@ class AbstractTestSuite(unittest.TestCase):
         StateHolder.home_dir = None
         StateHolder.catalog_config_file = None
         StateHolder.global_config_file = None
+        StateHolder.repositories = dict()
         StateHolder.args = dict()
         StateHolder.base_work_dir = os.path.join(os.path.expanduser(path='~'), 'workspace')
         StateHolder.work_dir = None
@@ -99,6 +100,7 @@ class AbstractTestSuite(unittest.TestCase):
         StateHolder.always_update = True
         StateHolder.name = None
         StateHolder.plan = None
+        StateHolder.repository= None
         StateHolder.container_mode = "Docker"
         StateHolder.test_mode = False
         StateHolder.config_handler = None

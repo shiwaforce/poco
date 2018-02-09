@@ -14,18 +14,7 @@ class PocokProject:
           pocok project ls
           pocok project (remove|rm) <project>
 
-        """
-
-    INIT = """Usage:
-      pocok project init [<project>]
-
-        -h, --help
-
-        Specific parameters:
-          <project>         Name of the project or the actual directory if it is empty
-
-        Initialize pocok project, pocok.yml and docker-compose.yml will be created if they don't exist.
-    """
+"""
 
     LS = """Usage:
       pocok project ls
@@ -36,7 +25,6 @@ class PocokProject:
     """
 
     command_dict = {
-        'ls': LS,
-        'init': INIT
+        'ls': LS
     }
 

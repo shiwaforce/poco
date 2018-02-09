@@ -107,7 +107,7 @@ class ComposeTestSuite(AbstractTestSuite):
         extra_config = dict()
         extra_config['mode'] = 'server'
         self.init_with_remote_catalog(extra_config)
-        os.mkdir(os.path.join(self.tmpdir,'catalogHome'))
+        os.mkdir(os.path.join(self.tmpdir, 'catalogHome'))
         os.mkdir(os.path.join(self.tmpdir, 'catalogHome', 'default'))
         with self.captured_output() as (out, err):
             self.run_pocok_command("repo", "ls")
@@ -281,7 +281,7 @@ class ComposeTestSuite(AbstractTestSuite):
         os.rename(os.path.join(test_dir, 'nginx', 'poco-compose.yml'), os.path.join(test_dir, 'poco.yml'))
         with self.captured_output() as (out, err):
             self.run_pocok_command("project", "add", test_dir)
-        self.assertIn("Your configuration file ("+str(test_dir)+
+        self.assertIn("Your configuration file ("+str(test_dir) +
                       "/poco.yml) is deprecated! Use 'pocok.yaml/yml' instead.", out.getvalue().strip())
         with self.captured_output() as (out, err):
             self.run_pocok_command("catalog")
@@ -320,32 +320,15 @@ class ComposeTestSuite(AbstractTestSuite):
             self.assertTrue(key in out.getvalue().strip())
         self.assertNotIn("test-directory", out.getvalue())
 
-"""
-    #  TODO change after rename examples project
-    def test_init_with_and_without_project_without_catalog(self):
+    def test_init_without_catalog(self):
         self.init_with_local_catalog()
-        test_dir = os.path.join(self.tmpdir, "test-directory")
-        os.makedirs(test_dir)
-        git.Repo.clone_from(url=AbstractTestSuite.STACK_LIST_SAMPLE['nginx']['git'], to_path=test_dir)
-        self.assertIsNone(FileUtils.get_file_with_extension('pocok', directory=test_dir))
-        self.assertIsNone(FileUtils.get_file_with_extension('docker-compose', directory=test_dir))
+        self.assertIsNone(FileUtils.get_file_with_extension('pocok', directory=self.ws_dir))
+        self.assertIsNone(FileUtils.get_file_with_extension('docker-compose', directory=self.ws_dir))
         with self.captured_output() as (out, err):
             self.run_pocok_command("project", "init")
         self.assertEqual(0, len(err.getvalue().strip()))
-        pocok_file = FileUtils.get_file_with_extension('pocok', directory=test_dir)
-        compose_file = FileUtils.get_file_with_extension('docker-compose', directory=test_dir)
-        self.assertIsNotNone(pocok_file)
-        self.assertIsNotNone(compose_file)
-        os.remove(pocok_file)
-        os.remove(compose_file)
-        self.assertIsNone(pocok_file)
-        self.assertIsNone(compose_file)
-        with self.captured_output() as (out, err):
-            self.run_pocok_command("project", "init")
-        self.assertEqual(0, len(err.getvalue().strip()))
-        self.assertIsNotNone(FileUtils.get_file_with_extension('pocok', directory=test_dir))
-        self.assertIsNotNone(FileUtils.get_file_with_extension('docker-compose', directory=test_dir))
-"""
+        self.assertIsNotNone(FileUtils.get_file_with_extension('pocok', directory=self.ws_dir))
+        self.assertIsNotNone(FileUtils.get_file_with_extension('docker-compose', directory=self.ws_dir))
 
 """
     def test_plan_list(self):

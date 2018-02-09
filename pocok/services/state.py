@@ -7,6 +7,7 @@ class StateHolder:
     home_dir = None
     catalog_config_file = None
     global_config_file = None
+    repositories = dict()
 
     # input arguments
     args = dict()
@@ -31,6 +32,7 @@ class StateHolder:
     # Project properties
     name = None
     plan = None
+    repository = None
 
     # Virtualization type
     container_mode = "Docker"
@@ -44,7 +46,6 @@ class StateHolder:
     catalog_repositories = dict()
     default_catalog_repository = None
 
-    # Catalog
 
     @staticmethod
     def has_args(*args):

@@ -1,7 +1,9 @@
 from .abstract_command import AbstractCommand
 from ..services.config_handler import ConfigHandler
+from ..services.console_logger import ColorPrint
 from ..services.state import StateHolder
 from ..services.state_utils import StateUtils
+from ..services.yaml_handler import YamlHandler
 
 
 class RepoRemove(AbstractCommand):
@@ -26,4 +28,12 @@ class RepoRemove(AbstractCommand):
             #    self.init_compose_handler()
             #    CommandHandler(project_utils=self.project_utils).run_script("remove_script")
         #    pass
-        ConfigHandler.remove()
+        RepoRemove.remove()
+
+    @staticmethod
+    def remove():
+        catalog = StateHolder.args.get('<name>')
+        if catalog not in list(StateHolder.config.keys()):
+            ColorPrint.exit_after_print_messages(message="Catalog not exists with name: " + catalog)
+        del StateHolder.config[catalog]
+        YamlHandler.write(file=StateHolder.catalog_config_file, data=StateHolder.config)

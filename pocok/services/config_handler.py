@@ -101,14 +101,6 @@ class ConfigHandler(object):
                                                           file=conf.get('file', 'pocok-catalog.yml'))
 
     @staticmethod
-    def remove():
-        catalog = StateHolder.args.get('<name>')
-        if catalog not in list(StateHolder.config.keys()):
-            ColorPrint.exit_after_print_messages(message="Catalog not exists with name: " + catalog)
-        del StateHolder.config[catalog]
-        YamlHandler.write(file=StateHolder.catalog_config_file, data=StateHolder.config)
-
-    @staticmethod
     def add():
         catalog = StateHolder.args.get('<name>')
         modify = StateHolder.has_args('modify')

@@ -36,7 +36,7 @@ class ProjectAdd(AbstractCommand):
         if self.target_dir != repo_dir:
             directory = FileUtils.get_relative_path(base_path=repo_dir, target_path=self.target_dir)
             self.repo_name = os.path.basename(repo_dir)
-        file_name = FileUtils.get_backward_compatible_pocok_file(self.target_dir)
+        file_name = FileUtils.get_backward_compatible_pocok_file(self.target_dir, True)
         self.file = file_name if directory is None else directory + file_name
 
     def execute(self):
