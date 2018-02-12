@@ -1,5 +1,4 @@
 import abc
-from enum import Enum
 from ..services.console_logger import ColorPrint
 
 
@@ -29,7 +28,8 @@ class AbstractCommand(object):
     def cleanup(self):
         pass
 
-class CommandState(Enum):
+
+class CommandState:
     INIT = 1
     RESOLVE = 2
     EXECUTE = 3
