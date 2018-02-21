@@ -58,7 +58,7 @@ class Pocok(object):
         while counter < 10:  # for tests
             counter += 1
 
-            cmd = self.active_object;
+            cmd = self.active_object
 
             if cmd.state == CommandState.INIT:
                 cmd.state = self.next_state(cmd.prepare_states(), CommandState.RESOLVE)
@@ -102,8 +102,8 @@ class Pocok(object):
                 [Pocok.build_command(commands=commands, cls=cls) for cls in self.command_classes[None]]
                 continue
             sub = "  " + sub_cmd + " [<subcommand>]"
-            doc += sub + (42-len(sub)) * " " + "See 'pocok help " + sub_cmd + "' for more."
-        doc += "\n" + "".join(commands) + "\n" + END_STRING
+            doc += sub + (42-len(sub)) * " " + "See 'pocok help " + sub_cmd + "' for more.\n"
+        doc += "".join(commands) + "\n" + END_STRING
         return doc
 
     def command_interpreter(self, command, argv):
@@ -184,8 +184,8 @@ class Pocok(object):
 
     @staticmethod
     def handle_alternatives(args):
-        if 'project' in args and ('ls' in args or len(args) == 1):
-            return ['catalog']
+        #if 'project' in args and (('ls' in args and len(args) == 2) or len(args) == 1):
+        #    return ['catalog']
         return args
 
     def collect_commands(self):

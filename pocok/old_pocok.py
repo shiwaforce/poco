@@ -25,7 +25,6 @@ COMMANDS = """
    install                  Get projects from remote repository (if its not exists locally yet) and run install scripts.
    build                    Build containers depends defined project and plan.
    ps                       Print containers statuses which depends defined project and plan.
-   plan ls                  Print all available plan for the project.
    pull                     Pull all necessary image for project and plan.
    log, logs                Print containers logs which depends defined project and plan.
    branch                   Switch branch on defined project.
@@ -33,6 +32,7 @@ COMMANDS = """
    pack                     Pack the selected project's plan configuration with docker images to an archive.
    unpack                   Unpack archive, install images to local repository.
 """
+
 
 class Pocok(object):
     catalog_handler = None
