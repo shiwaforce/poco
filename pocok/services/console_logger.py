@@ -136,18 +136,19 @@ class ColorPrint:
 
     @staticmethod
     def print_warning(message, lvl=0):
-        if ColorPrint.log_lvl >= lvl:
-            print(Colors.WARNING + "\n" + message + "\n" + Colors.END)
+        ColorPrint.print_with_lvl(message=message, lvl=lvl, color=Colors.WARNING)
 
     @staticmethod
     def print_info(message, lvl=0):
-        if ColorPrint.log_lvl >= lvl:
-            print(Colors.OKBLUE + "\n" + message + "\n" + Colors.END)
+        ColorPrint.print_with_lvl(message=message, lvl=lvl, color=Colors.OKBLUE)
 
     @staticmethod
-    def print_with_lvl(message, lvl=0):
+    def print_with_lvl(message, lvl=0, color=None):
         if ColorPrint.log_lvl >= lvl:
-            print(message)
+            if color is not None:
+                print(color + "\n" + message + "\n" + Colors.END)
+            else:
+                print(message)
 
     @staticmethod
     def exit_after_print_messages(message, doc=None, msg_type="error"):

@@ -69,7 +69,7 @@ class Pocok(object):
             elif cmd.state == CommandState.CLEANUP:
                 cmd.state = self.next_state(cmd.cleanup(), CommandState.DESTROYED)
             elif cmd.state == CommandState.DESTROYED:
-                break;
+                break
 
         if not counter < 10:
             ColorPrint.exit_after_print_messages("Can't complete the command running. States: \n"
@@ -78,7 +78,8 @@ class Pocok(object):
                                                  + str(self.active_object.resolved_dependencies) +
                                                  "\tExecuted: " + str(self.active_object.executed))
 
-    def next_state(self, desired_next, default_next):
+    @staticmethod
+    def next_state(desired_next, default_next):
         if desired_next is None:
             return default_next
         return desired_next
@@ -212,9 +213,9 @@ class Pocok(object):
 
 def main():
     pocok = Pocok()
-    #try:
+    # try:
     pocok.start_flow()
-    #except Exception as ex:
+    # except Exception as ex:
     #    ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
 
 if __name__ == '__main__':

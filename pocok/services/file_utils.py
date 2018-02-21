@@ -67,8 +67,19 @@ class FileUtils:
 
     @staticmethod
     def get_filtered_sorted_alter_from_base_dir(base_dir, actual_dir, target_directories=list(), filter_ends=list()):
-        files_dict = dict()
         file_list = list()
+        files_dict = FileUtils.get_files_dict_from_directory(base_dir, actual_dir,
+                                                             target_directories=target_directories,
+                                                             filter_ends=filter_ends)
+        for key in files_dict.keys():
+            for work_dir in files_dict[key]:
+                file_list.append(FileUtils.get_compose_file_relative_path(
+                    repo_dir=base_dir, working_directory=work_dir, file_name=key))
+        return file_list
+
+    @staticmethod
+    def get_files_dict_from_directory(base_dir, actual_dir, target_directories, filter_ends):
+        files_dict = dict()
         for directory in target_directories:
             for root, sub_folders, files in os.walk(os.path.join(base_dir, FileUtils.get_file_path(
                     repo_dir=base_dir, working_directory=actual_dir, file_name=directory))):
@@ -78,12 +89,7 @@ class FileUtils:
                     if file not in files_dict.keys():
                         files_dict[file] = list()
                         files_dict[file].append(root)
-
-        for key in files_dict.keys():
-            for work_dir in files_dict[key]:
-                file_list.append(FileUtils.get_compose_file_relative_path(
-                    repo_dir=base_dir, working_directory=work_dir, file_name=key))
-        return file_list
+        return files_dict
 
     @staticmethod
     def get_parameter_or_directory_name(param):
