@@ -8,7 +8,7 @@ from ..services.project_utils import ProjectUtils
 from ..services.state import StateHolder
 
 
-class ProjectInit(AbstractCommand):
+class Init(AbstractCommand):
 
     command = "init"
     args = ["[<name>]"]
@@ -28,11 +28,11 @@ class ProjectInit(AbstractCommand):
             target_file = os.path.join(ProjectUtils.get_target_dir(StateHolder.catalog_element),
                                        StateHolder.catalog_element.get('file', 'pocok.yml'))
             if not os.path.exists(target_file):
-                ProjectInit.fix_file(target_file)
+                Init.fix_file(target_file)
         else:
             file = FileUtils.get_backward_compatible_pocok_file(directory=os.getcwd())
             if file is None:
-                ProjectInit.fix_file(os.path.join(os.getcwd(), 'pocok.yml'))
+                Init.fix_file(os.path.join(os.getcwd(), 'pocok.yml'))
         ColorPrint.print_info("Project init completed")
 
     @staticmethod

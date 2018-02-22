@@ -85,10 +85,9 @@ class Pocok(object):
         return desired_next
 
     def check_command(self):
-        argv = Pocok.handle_alternatives(self.argv)  # TODO move to new structure
-        if len(argv) == 0:
-            argv.append('-h')
-        StateHolder.args = docopt(self.get_full_doc(), version=__version__, options_first=True, argv=argv)
+        if len(self.argv) == 0:
+            self.argv.append('-h')
+        StateHolder.args = docopt(self.get_full_doc(), version=__version__, options_first=True, argv=self.argv)
         StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'],
                                                          argv=[] + StateHolder.args['<args>']))
         ColorPrint.set_log_level(StateHolder.args)
@@ -114,7 +113,7 @@ class Pocok(object):
             self.command_interpreter(argv[0], argv[1:])
         if command in self.command_classes.keys():
             if len(argv) == 0:
-                argv.append("ls")  # TODO move to alternative handling if need
+                argv.append("-h")
             args = self.get_args(command=command, classes=self.command_classes[command], argv=argv)
             if args is None:
                 docopt(self.build_sub_commands_help(command, classes=self.command_classes[command]),
@@ -132,7 +131,7 @@ class Pocok(object):
         description = getattr(cls, 'description')
 
         if command is None:
-            ColorPrint.print_info("Command class not contains command: " + cls, lvl=1)
+            ColorPrint.print_info("Command class not contains command: " + str(cls), lvl=1)
             return
         if isinstance(command, list):
             cmd = "(" + "|".join(command) + ")"
@@ -182,12 +181,6 @@ class Pocok(object):
         [Pocok.build_command(commands=commands, cls=cls) for cls in classes]
         return doc + "".join(commands)
 
-    @staticmethod
-    def handle_alternatives(args):
-        #if 'project' in args and (('ls' in args and len(args) == 2) or len(args) == 1):
-        #    return ['catalog']
-        return args
-
     def collect_commands(self):
         try:
             command_packages = importlib.import_module('pocok.commands', package='pocok')
@@ -202,14 +195,13 @@ class Pocok(object):
             ColorPrint.exit_after_print_messages("Commands import error: " + str(ex.args))
 
     def check_base_class(self, cls):
-        for base_class in cls.__bases__:
+        for base_class in inspect.getmro(cls)[1:]:
             if base_class == AbstractCommand:
                 sub_command = getattr(cls, 'sub_command')
                 if sub_command not in self.command_classes.keys():
                     self.command_classes[sub_command] = list()
                 self.command_classes[sub_command].append(cls)
                 break
-
 
 def main():
     pocok = Pocok()
