@@ -203,6 +203,7 @@ class Pocok(object):
                 self.command_classes[sub_command].append(cls)
                 break
 
+
 def main():
     pocok = Pocok()
     # try:

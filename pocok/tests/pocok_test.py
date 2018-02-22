@@ -60,6 +60,15 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertIn(pocok.__doc__.strip(), out.getvalue().strip())
         self.assertIn(CTAUtils.CTA_STRINGS['have_all'], out.getvalue())
 
+    def test_subcommand_help(self):
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("repo")
+            self.assertIsNotNone(context.exception)
+        output = out.getvalue().strip()
+        self.assertIn("Pocok repo commands\n", output)
+        self.assertIn("Usage:", output)
+
     def test_wrong_parameters(self):
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
@@ -68,11 +77,6 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertIn("is not a pocok command. See 'pocok help'.", out.getvalue().strip())
 
     def test_config_without_config(self):
-        with self.captured_output() as (out, err):
-            self.run_pocok_command("repo")
-        self.assertIn("Actual config\n-------------\n", out.getvalue().strip())
-
-    def test_config_without_config_another(self):
         with self.captured_output() as (out, err):
             self.run_pocok_command("repo", "ls")
         self.assertIn("Actual config\n-------------\n", out.getvalue().strip())
@@ -158,10 +162,6 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertEqual(0, len(err.getvalue()))
         catalog = out.getvalue().strip()
         self.assertIn("Available projects:", catalog)
-        with self.captured_output() as (out, err):
-            self.run_pocok_command("project")
-        self.assertEqual(0, len(err.getvalue()))
-        self.assertEqual(catalog, out.getvalue().strip())
         with self.captured_output() as (out, err):
             self.run_pocok_command("project", "ls")
         self.assertEqual(0, len(err.getvalue()))

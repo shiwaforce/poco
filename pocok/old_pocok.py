@@ -12,9 +12,6 @@ from .services.package_handler import PackageHandler
 
 
 COMMANDS = """
-   catalog                  List the available projects in repos.
-   repo [<subcommand>]      Repository commands, see 'pocok help repo' for more.
-   project [<subcommand>]   Project commands, see 'pocok help project' for more.
    up, start                Start project
    down, stop               Stop project
    restart                  Restart project
