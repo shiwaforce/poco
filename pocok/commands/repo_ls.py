@@ -11,7 +11,7 @@ class RepoLs(AbstractCommand):
     description = "List the configs of repos."
 
     def prepare_states(self):
-        StateUtils.prepare(["config", "catalog"])
+        StateUtils.prepare("catalog")
 
     def resolve_dependencies(self):
         pass

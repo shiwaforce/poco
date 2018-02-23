@@ -25,7 +25,7 @@ class ProjectAdd(AbstractCommand):
         self.file = None
 
     def prepare_states(self):
-        StateUtils.prepare(["config", "catalog"])
+        StateUtils.prepare("catalog")
         self.get_normalized_dir()
 
     def resolve_dependencies(self):

@@ -16,7 +16,7 @@ class RepoBranch(AbstractCommand):
     description = "Switch catalog branch if it is using GIT."
 
     def prepare_states(self):
-        StateUtils.prepare(["config", "catalog"])
+        StateUtils.prepare("catalog")
 
     def resolve_dependencies(self):
         pass

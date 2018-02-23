@@ -34,6 +34,8 @@ class StateHolder:
     plan = None
     repository = None
 
+    poco_file = None
+
     # Virtualization type
     container_mode = "Docker"
     test_mode = False  # Not running scrips and virtualization types
@@ -45,7 +47,6 @@ class StateHolder:
     # Catalog repositories
     catalog_repositories = dict()
     default_catalog_repository = None
-
 
     @staticmethod
     def has_args(*args):

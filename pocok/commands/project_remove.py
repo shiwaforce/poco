@@ -15,7 +15,7 @@ class ProjectRemove(AbstractCommand):
 
     def prepare_states(self):
         StateHolder.name = StateHolder.args.get('<name>')
-        StateUtils.prepare(["config", "catalog"])
+        StateUtils.prepare("catalog")
 
     def resolve_dependencies(self):
         self.remove(dry_run=True)

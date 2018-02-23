@@ -18,7 +18,7 @@ class Init(AbstractCommand):
     def prepare_states(self):
         StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')
         StateHolder.work_dir = StateHolder.base_work_dir
-        StateUtils.prepare(["config", "catalog", "project_repo"])
+        StateUtils.prepare("project_repo")
 
     def resolve_dependencies(self):
         pass

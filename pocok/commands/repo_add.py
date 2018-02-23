@@ -15,7 +15,7 @@ class RepoAdd(AbstractCommand):
     description = "Add new/Modify repository to the config."
 
     def prepare_states(self):
-        StateUtils.prepare(["config", "catalog"])
+        StateUtils.prepare("catalog")
 
     def resolve_dependencies(self):
         pass

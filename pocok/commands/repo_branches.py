@@ -13,7 +13,7 @@ class RepoBranches(AbstractCommand):
     description = "List all available branches of catalog's GIT repository."
 
     def prepare_states(self):
-        StateUtils.prepare(["config", "catalog"])
+        StateUtils.prepare("catalog")
 
     def resolve_dependencies(self):
         pass

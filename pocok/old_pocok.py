@@ -38,7 +38,6 @@ class Pocok(object):
 
     @staticmethod
     def run():
-        # try:
         ColorPrint.print_info(StateHolder.config_handler.print_config(), 1)
         if StateHolder.has_args('repo'):
             PocokRepo.handle()
@@ -46,8 +45,6 @@ class Pocok(object):
             PocokProject.handle()
         else:
             PocokDefault.handle()
-            # except Exception as ex:
-            #    ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
 
     def run_default(self):
         """Handling top level commands"""
@@ -176,8 +173,6 @@ class Pocok(object):
         if StateHolder.config is None:
             return os.getcwd()
         return self.project_utils.get_target_dir(self.catalog_handler.get())
-
-
 
     @staticmethod
     def get_node(structure, paths, default=None):

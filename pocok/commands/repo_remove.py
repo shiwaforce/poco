@@ -16,7 +16,7 @@ class RepoRemove(AbstractCommand):
 
     def prepare_states(self):
         StateHolder.name = StateHolder.args.get('<name>')
-        StateUtils.prepare(["config", "catalog_read"])
+        StateUtils.prepare("catalog_read")
 
     def resolve_dependencies(self):
         pass

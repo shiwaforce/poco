@@ -10,20 +10,21 @@ from .state import StateHolder
 
 class StateUtils:
 
+    PREPARE_STATES = ["config", "catalog_read", "catalog", "project_repo", "project_file"]
+
     @staticmethod
     def prepare(preparable=None):
-        if preparable is None or len(preparable) == 0:
-            ColorPrint.print_info(message="Empty prepare object", lvl=1)
+        if preparable not in StateUtils.PREPARE_STATES:
+            ColorPrint.print_info(message="Unknown prepare command : " + str(preparable), lvl=1)
             return
-        for elem in preparable:
-            if elem is "config":
-                StateUtils.prepare_config()
-            elif elem in ["catalog_read", "catalog"]:
-                StateUtils.prepare_catalog(elem)
-            elif elem is "project_repo":
-                StateUtils.prepare_project_repo()
-            else:
-                ColorPrint.print_info(message="Unknown prepare command : " + str(elem))
+
+        StateUtils.prepare_config()
+        if preparable is not "config":
+            StateUtils.prepare_catalog(preparable)
+        if preparable not in ["config", "catalog_read", "catalog"]:
+            StateUtils.prepare_project_repo()
+        if preparable not in ["config", "catalog_read", "catalog", "project_repo"]:
+            StateHolder.prepare_project_file()
 
         if StateHolder.args.get("--offline"):
             StateHolder.offline = StateHolder.args.get("--offline")
@@ -45,7 +46,7 @@ class StateUtils:
         StateUtils.prepare_config_handler()
         if os.path.exists(StateHolder.catalog_config_file):
             StateHolder.config_handler.read_catalogs()
-            if elem is "catalog":
+            if elem is not "catalog_read":
                 CatalogHandler.load()
 
     @staticmethod
@@ -64,23 +65,16 @@ class StateUtils:
         # TODO handle ssh parameter
 
     @staticmethod
+    def prepare_project_file():
+        if StateHolder.repository is None:
+            StateHolder.poco_file = FileUtils.get_backward_compatible_pocok_file(directory=os.getcwd())
+        else:
+            pass
+
+    @staticmethod
     def prepare_config_handler():
         if StateHolder.config_handler is None:
             ConfigHandler()
-
-
-
-
-
-
-
-    @staticmethod
-    def fill_states():
-        if '<project/plan>' in StateHolder.args:
-            StateUtils.calculate_name_and_work_dir()
-
-        if StateHolder.config is not None:
-            StateUtils.read_project_config_and_catalog()
 
     @staticmethod
     def calculate_name_and_work_dir():
@@ -118,8 +112,13 @@ class StateUtils:
             except yaml.YAMLError as exc:
                 return False
 
+
+
+
+
+
     @staticmethod
-    def read_project_config_and_catalog():
+    def read_project_config_and_catalog(): # TODO
         CatalogHandler.load()
         if StateHolder.name is not None:
             catalog = CatalogHandler.get()

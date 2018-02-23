@@ -14,7 +14,7 @@ class RepoPush(AbstractCommand):
     description = "Push changes into catalog's remote GIT repository."
 
     def prepare_states(self):
-        StateUtils.prepare(["config", "catalog"])
+        StateUtils.prepare("catalog")
 
     def resolve_dependencies(self):
         pass

@@ -12,7 +12,7 @@ class Catalog(AbstractCommand):
     description = "List the available projects in repos."
 
     def prepare_states(self):
-        StateUtils.prepare(["config", "catalog"])
+        StateUtils.prepare("catalog")
         StateHolder.work_dir = StateHolder.base_work_dir
 
     def resolve_dependencies(self):
