@@ -26,6 +26,7 @@ class StateHolder:
 
     # Mode and mode properties
     mode = None
+    mode_properties = ['offline', 'always_update']  # TODO maybe more dynamic
     offline = False
     always_update = True
 
@@ -61,3 +62,11 @@ class StateHolder:
             if StateHolder.args.get(arg):
                 return True
         return False
+
+    @staticmethod
+    def process_extra_args():
+        for prop in StateHolder.mode_properties:
+            param_name = "--" + prop.replace("_", "-")
+            val = StateHolder.args.get(param_name)
+            if val:
+                setattr(StateHolder, prop, val)

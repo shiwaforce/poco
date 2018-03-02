@@ -24,13 +24,8 @@ class StateUtils:
         if preparable not in ["config", "catalog_read", "catalog"]:
             StateUtils.prepare_project_repo()
         if preparable not in ["config", "catalog_read", "catalog", "project_repo"]:
-            StateHolder.prepare_project_file()
-
-        if StateHolder.args.get("--offline"):
-            StateHolder.offline = StateHolder.args.get("--offline")
-
-        if StateHolder.args.get("--always-update"):
-            StateHolder.always_update = StateHolder.args.get("--always-update")
+            StateUtils.prepare_project_file()
+        StateHolder.process_extra_args()
 
     @staticmethod
     def prepare_config():

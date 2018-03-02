@@ -22,7 +22,6 @@ class ConfigHandler(object):
             'offline': True,
             'always_update': False
         }
-
     }
 
     def __init__(self):
