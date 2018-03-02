@@ -53,7 +53,7 @@ class ConfigHandler(object):
             if workspace is not None:
                 StateHolder.base_work_dir = workspace
             if not (os.path.exists(path=StateHolder.base_work_dir)):
-                os.makedirs(StateHolder.work_dir)
+                os.makedirs(StateHolder.base_work_dir)
 
         ''' mode and specific parameters '''
         if 'mode' in config and str(config['mode']).lower() in ConfigHandler.MODES.keys():

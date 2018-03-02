@@ -13,17 +13,17 @@ class StateUtils:
     PREPARE_STATES = ["config", "catalog_read", "catalog", "project_repo", "project_file"]
 
     @staticmethod
-    def prepare(preparable=None):
-        if preparable not in StateUtils.PREPARE_STATES:
-            ColorPrint.print_info(message="Unknown prepare command : " + str(preparable), lvl=1)
+    def prepare(prepareable=None):
+        if prepareable not in StateUtils.PREPARE_STATES:
+            ColorPrint.print_info(message="Unknown prepare command : " + str(prepareable), lvl=1)
             return
 
         StateUtils.prepare_config()
-        if preparable is not "config":
-            StateUtils.prepare_catalog(preparable)
-        if preparable not in ["config", "catalog_read", "catalog"]:
+        if prepareable is not "config":
+            StateUtils.prepare_catalog(prepareable)
+        if prepareable not in ["config", "catalog_read", "catalog"]:
             StateUtils.prepare_project_repo()
-        if preparable not in ["config", "catalog_read", "catalog", "project_repo"]:
+        if prepareable not in ["config", "catalog_read", "catalog", "project_repo"]:
             StateUtils.prepare_project_file()
         StateHolder.process_extra_args()
 
@@ -64,7 +64,7 @@ class StateUtils:
         if StateHolder.repository is None:
             StateHolder.poco_file = FileUtils.get_backward_compatible_pocok_file(directory=os.getcwd())
         else:
-            pass
+            StateHolder.poco_file = ProjectUtils.get_compose_file(StateHolder.catalog_element, None, True)
 
     @staticmethod
     def prepare_config_handler():
@@ -81,9 +81,10 @@ class StateUtils:
             project_and_plan = arg.split("/", maxsplit=2)
             StateHolder.name = project_and_plan[0]
             StateHolder.plan = project_and_plan[1]
-        else:  # if need some another checks
-            local_project_file = FileUtils.get_file_with_extension('pocok')
+        else:  # need some another checks
+            local_project_file = FileUtils.get_backward_compatible_pocok_file()
             if local_project_file is None:
+                StateHolder.work_dir = StateHolder.base_work_dir  # check if not default
                 StateHolder.name = arg
             else:
                 if StateUtils.check_file(local_project_file, arg):
@@ -113,7 +114,7 @@ class StateUtils:
 
 
     @staticmethod
-    def read_project_config_and_catalog(): # TODO
+    def read_project_config_and_catalog():  # TODO
         CatalogHandler.load()
         if StateHolder.name is not None:
             catalog = CatalogHandler.get()

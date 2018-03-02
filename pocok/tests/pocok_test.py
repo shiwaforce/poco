@@ -330,6 +330,16 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertIsNotNone(FileUtils.get_file_with_extension('pocok', directory=self.ws_dir))
         self.assertIsNotNone(FileUtils.get_file_with_extension('docker-compose', directory=self.ws_dir))
 
+    def test_install(self):
+        self.init_with_remote_catalog()
+        dir = os.path.join(self.ws_dir, 'poco-example')  # TODO rename later
+        self.assertFalse(os.path.exists(os.path.join(dir)))
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("install", "nginx")
+        self.assertIn("Install completed to " + dir, out.getvalue().strip())
+        self.assertEqual(0, len(err.getvalue().strip()))
+        self.assertTrue(os.path.exists(os.path.join(dir)))
+
 """
     def test_plan_list(self):
         self.init_with_local_catalog()
