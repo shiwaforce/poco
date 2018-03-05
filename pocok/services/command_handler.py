@@ -12,21 +12,20 @@ from .state import StateHolder
 
 class CommandHandler(object):
 
-    def __init__(self, project_utils):
+    def __init__(self):
 
         with open(os.path.join(os.path.dirname(__file__), 'resources/command-hierarchy.yml')) as stream:
             try:
                 self.hierarchy = yaml.load(stream=stream)
             except yaml.YAMLError as exc:
                 ColorPrint.exit_after_print_messages(message="Error: Wrong YAML format:\n " + str(exc),
-                                                     doc=Doc.POCO)
+                                                     doc=Doc.POCOK)
 
         StateHolder.compose_handler.get_compose_project()
         self.project_compose = StateHolder.compose_handler.compose_project
         self.working_directory = StateHolder.compose_handler.get_working_directory()
         self.plan = StateHolder.compose_handler.plan
-        self.repo_dir = StateHolder.compose_handler.repo_dir
-        self.project_utils = project_utils
+        self.repo_dir = StateHolder.repository
 
         ''' Check mode '''
         plan = self.project_compose['plan'][self.plan]
@@ -37,7 +36,7 @@ class CommandHandler(object):
         self.script_runner = ScriptPlanRunner(project_compose=self.project_compose,
                                               working_directory=self.working_directory)
 
-        if not StateHolder.skip_docker and StateHolder.container_mode == "Docker":
+        if StateHolder.container_mode == "Docker":
             EnvironmentUtils.check_docker()
         if StateHolder.container_mode == "Kubernetes":
             EnvironmentUtils.check_kubernetes()
@@ -72,7 +71,6 @@ class CommandHandler(object):
                 self.script_runner.run(plan=plan, script_type='script')
         elif StateHolder.container_mode == 'Kubernetes':
             runner = KubernetesRunner(working_directory=self.working_directory,
-                                      project_utils=self.project_utils,
                                       repo_dir=self.repo_dir)
             if len(command_list['kubernetes']) == 0:
                 ColorPrint.exit_after_print_messages('Command: ' + cmd + ' not supported with Kubernetes')
@@ -81,7 +79,6 @@ class CommandHandler(object):
         else:
             runner = DockerPlanRunner(project_compose=self.project_compose,
                                       working_directory=self.working_directory,
-                                      project_utils=self.project_utils,
                                       repo_dir=self.repo_dir)
             for cmd in command_list['docker']:
                 runner.run(plan=plan, commands=cmd,
@@ -99,7 +96,7 @@ class CommandHandler(object):
         file_name = FileUtils.get_compose_file_relative_path(repo_dir=self.repo_dir,
                                                              working_directory=self.working_directory,
                                                              file_name=path)
-        env_file = self.project_utils.get_file(file=file_name)
+        env_file = ProjectUtils.get_file(file=file_name)
         if env_file is None:
             ColorPrint.exit_after_print_messages(
                 message="Environment file (" + str(file_name) + ") not exists in repository: "
@@ -149,9 +146,8 @@ class CommandHandler(object):
         envs = self.get_environment_variables(plan=plan)
         runner = DockerPlanRunner(project_compose=self.project_compose,
                                   working_directory=self.working_directory,
-                                  project_utils=self.project_utils,
                                   repo_dir=self.repo_dir)
-        PackageHandler().pack(files=runner.get_docker_files(plan=plan), project_utils=self.project_utils, envs=envs)
+        PackageHandler().pack(files=runner.get_docker_files(plan=plan), envs=envs)
 
 
 class AbstractPlanRunner(object):
@@ -210,9 +206,8 @@ class ScriptPlanRunner(AbstractPlanRunner):
 
 class KubernetesRunner(AbstractPlanRunner):
 
-    def __init__(self, working_directory, project_utils, repo_dir):
+    def __init__(self, working_directory, repo_dir):
         self.working_directory = working_directory
-        self.project_utils = project_utils
         self.repo_dir = repo_dir
 
     def run(self, plan, command, envs):
@@ -237,7 +232,7 @@ class KubernetesRunner(AbstractPlanRunner):
             self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=envs)
 
     def get_file(self, file):
-        return self.project_utils.get_file(file=FileUtils.get_compose_file_relative_path(
+        return ProjectUtils.get_file(file=FileUtils.get_compose_file_relative_path(
                                                        repo_dir=self.repo_dir, working_directory=self.working_directory,
                                                        file_name=file))
 
@@ -247,16 +242,15 @@ class KubernetesRunner(AbstractPlanRunner):
                                                                       actual_dir=self.working_directory,
                                                                       target_directories=dir_list,
                                                                       filter_ends=('.yml', '.yaml')):
-            kube_list.append(self.project_utils.get_file(file=file))
+            kube_list.append(ProjectUtils.get_file(file=file))
         return kube_list
 
 
 class DockerPlanRunner(AbstractPlanRunner):
 
-    def __init__(self, project_compose, working_directory, project_utils, repo_dir):
+    def __init__(self, project_compose, working_directory, repo_dir):
         self.working_directory = working_directory
         self.project_compose = project_compose
-        self.project_utils = project_utils
         self.repo_dir = repo_dir
 
     def run(self, plan, commands, envs):
@@ -298,7 +292,7 @@ class DockerPlanRunner(AbstractPlanRunner):
     def get_docker_compose(self, service):
         """Get back the docker compose file"""
         file_name = self.get_compose_file_name(service=service)
-        return self.project_utils.get_file(file=FileUtils.get_compose_file_relative_path(
+        return ProjectUtils.get_file(file=FileUtils.get_compose_file_relative_path(
                                                        repo_dir=self.repo_dir, working_directory=self.working_directory,
                                                        file_name=file_name))
 
@@ -308,7 +302,7 @@ class DockerPlanRunner(AbstractPlanRunner):
                                                                       actual_dir=self.working_directory,
                                                                       target_directories=dir_list,
                                                                       filter_ends=('.yml', '.yaml')):
-            compose_list.append(self.project_utils.get_file(file=file))
+            compose_list.append(ProjectUtils.get_file(file=file))
         return compose_list
 
     def get_compose_file_name(self, service):

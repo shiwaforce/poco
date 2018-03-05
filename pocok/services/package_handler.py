@@ -1,14 +1,11 @@
 import os
-import platform
 import shutil
 import tarfile
 from subprocess import check_output, check_call
 from .console_logger import ColorPrint
 from .environment_utils import EnvironmentUtils
-from .project_utils import ProjectUtils
-from .file_utils import FileUtils
 from .state import StateHolder
-from .yaml_handler import YamlHandler
+from .yaml_utils import YamlUtils
 
 
 class PackageHandler(object):
@@ -104,7 +101,7 @@ class PackageHandler(object):
 
     def get_image(self, docker_file):
         res = list()
-        compose_content = YamlHandler.read(docker_file)
+        compose_content = YamlUtils.read(docker_file)
         for serv in compose_content['services']:
             service = compose_content['services'][serv]
             if isinstance(service, dict) and 'image' in service:

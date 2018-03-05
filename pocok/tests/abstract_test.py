@@ -100,7 +100,7 @@ class AbstractTestSuite(unittest.TestCase):
         StateHolder.always_update = True
         StateHolder.name = None
         StateHolder.plan = None
-        StateHolder.repository= None
+        StateHolder.repository = None
         StateHolder.container_mode = "Docker"
         StateHolder.test_mode = False
         StateHolder.config_handler = None

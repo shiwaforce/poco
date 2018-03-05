@@ -8,11 +8,10 @@ from .state import StateHolder
 
 class ComposeHandler:
 
-    def __init__(self, compose_file, plan, repo_dir):
+    def __init__(self, compose_file):
         self.compose_file = compose_file
+        self.plan = StateHolder.plan
         self.compose_project = None
-        self.plan = plan
-        self.repo_dir = repo_dir
 
     def get_working_directory(self):
         """Get back the working directory if it is set or the project file directory"""
@@ -26,6 +25,8 @@ class ComposeHandler:
 
     def get_compose_project(self):
         """Load compose file from repository"""
+        if self.compose_project is not None:
+            return
         with open(self.compose_file) as stream:
             try:
                 self.compose_project = yaml.load(stream=stream)
@@ -36,10 +37,10 @@ class ComposeHandler:
                         doc=Doc.COMPOSE_DOC)
                 if not isinstance(self.compose_project['plan'], dict):
                     ColorPrint.exit_after_print_messages(
-                        message="'plan' section must be a list", doc=Doc.POCO)
+                        message="'plan' section must be a list", doc=Doc.POCOK)
                 if len(self.compose_project['plan'].keys()) < 1:
                     ColorPrint.exit_after_print_messages(
-                        message="'plan' section must be one child element", doc=Doc.POCO)
+                        message="'plan' section must be one child element", doc=Doc.POCOK)
                 if self.plan is None:
                     if "demo" in self.compose_project['plan']:
                         self.plan = "demo"
@@ -49,15 +50,15 @@ class ComposeHandler:
                         self.plan = list(self.compose_project['plan'].keys())[0]
                 if self.plan not in self.compose_project['plan']:
                     ColorPrint.exit_after_print_messages(
-                        message="stages section must contains the selected stage: " + str(self.plan), doc=Doc.POCO)
+                        message="stages section must contains the selected stage: " + str(self.plan), doc=Doc.POCOK)
 
                 actual_plan = self.compose_project['plan'].get(self.plan)
                 if actual_plan is None:
                     ColorPrint.exit_after_print_messages(
-                        message="selected plan %s is empty" % str(self.plan), msg_type="warn", doc=Doc.POCO)
+                        message="selected plan %s is empty" % str(self.plan), msg_type="warn", doc=Doc.POCOK)
             except yaml.YAMLError as exc:
                 ColorPrint.exit_after_print_messages(message="Error: Wrong YAML format:\n " + str(exc),
-                                                     doc=Doc.POCO)
+                                                     doc=Doc.POCOK)
 
     def get_checkouts(self):
         """Get checkouts list from compose file"""
@@ -68,6 +69,15 @@ class ComposeHandler:
         if 'checkout' in self.compose_project['plan'][self.plan]:
             checkouts.extend(ProjectUtils.get_list_value(self.compose_project['plan'][self.plan]['checkout']))
         return checkouts
+
+    def have_script(self, script):
+        """Get checkouts list from compose file"""
+        self.get_compose_project()
+        if script in self.compose_project:
+            return True
+        if 'checkout' in self.compose_project['plan'][self.plan]:
+            return True
+        return False
 
     def get_plan_list(self):
         """Print all available plan from project compose file"""

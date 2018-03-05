@@ -1,10 +1,9 @@
 import os
-import shutil
 import yaml
 from .console_logger import Doc, ColorPrint
 from .file_utils import FileUtils
 from .state import StateHolder
-from .yaml_handler import YamlHandler
+from .yaml_utils import YamlUtils
 
 
 class ConfigHandler(object):
@@ -32,7 +31,7 @@ class ConfigHandler(object):
     def read_catalogs():
         """Parse local configuration file"""
         if not StateHolder.config_parsed:
-            config = YamlHandler.read(file=StateHolder.catalog_config_file, doc=Doc.CATALOGS_CONFIG)
+            config = YamlUtils.read(file=StateHolder.catalog_config_file, doc=Doc.CATALOGS_CONFIG)
 
             if not type(config) is dict:
                 config['default'] = {}
@@ -46,7 +45,7 @@ class ConfigHandler(object):
         if not os.path.exists(config_file):
             ColorPrint.print_info("Config file not exists: " + config_file, 1)
             return
-        config = YamlHandler.read(file=config_file, doc=Doc.CONFIG)
+        config = YamlUtils.read(file=config_file, doc=Doc.CONFIG)
 
         if check_wd:
             workspace = config.get('workspace')
@@ -76,7 +75,7 @@ class ConfigHandler(object):
         if StateHolder.config[config]['repositoryType'] == 'file':
             ColorPrint.exit_after_print_messages(message="Branch is not supported in this repository.")
         StateHolder.config[config]['branch'] = branch
-        YamlHandler.write(file=StateHolder.catalog_config_file, data=StateHolder.config)
+        YamlUtils.write(file=StateHolder.catalog_config_file, data=StateHolder.config)
 
     @staticmethod
     def init():
@@ -122,7 +121,7 @@ class ConfigHandler(object):
             config['file'] = StateHolder.args.get('<file>')
 
         StateHolder.config[catalog] = config
-        YamlHandler.write(file=StateHolder.catalog_config_file, data=StateHolder.config)
+        YamlUtils.write(file=StateHolder.catalog_config_file, data=StateHolder.config)
         ColorPrint.print_info(ConfigHandler.print_config())
 
     @staticmethod

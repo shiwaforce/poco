@@ -1,16 +1,17 @@
 import os
-import yaml
 from .catalog_handler import CatalogHandler
 from .config_handler import ConfigHandler
 from .console_logger import ColorPrint
+from .compose_handler import ComposeHandler
 from .file_utils import FileUtils
 from .project_utils import ProjectUtils
 from .state import StateHolder
+from .yaml_utils import YamlUtils
 
 
 class StateUtils:
 
-    PREPARE_STATES = ["config", "catalog_read", "catalog", "project_repo", "project_file"]
+    PREPARE_STATES = ["config", "catalog_read", "catalog", "project_repo", "project_file", "compose_handler"]
 
     @staticmethod
     def prepare(prepareable=None):
@@ -25,6 +26,8 @@ class StateUtils:
             StateUtils.prepare_project_repo()
         if prepareable not in ["config", "catalog_read", "catalog", "project_repo"]:
             StateUtils.prepare_project_file()
+        if prepareable is "compose_handler":
+            StateHolder.compose_handler = ComposeHandler(StateHolder.poco_file)
         StateHolder.process_extra_args()
 
     @staticmethod
@@ -87,30 +90,12 @@ class StateUtils:
                 StateHolder.work_dir = StateHolder.base_work_dir  # check if not default
                 StateHolder.name = arg
             else:
-                if StateUtils.check_file(local_project_file, arg):
+                if YamlUtils.check_file(local_project_file, arg):
                     StateHolder.work_dir = os.getcwd()
                     StateHolder.name = FileUtils.get_directory_name()
                     StateHolder.plan = arg
                 else:
                     StateHolder.name = arg
-
-    @staticmethod
-    def check_file(file, plan):  # TODO move to another utils!
-        with open(file) as stream:
-            try:
-                project_config = yaml.load(stream=stream)
-
-                if 'plan' not in project_config:
-                    return False
-                if not isinstance(project_config['plan'], dict):
-                    return False
-                return plan in project_config['plan']
-            except yaml.YAMLError as exc:
-                return False
-
-
-
-
 
 
     @staticmethod

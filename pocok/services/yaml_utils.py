@@ -1,8 +1,9 @@
 from .console_logger import ColorPrint
+from .state import StateHolder
 import yaml
 
 
-class YamlHandler:
+class YamlUtils:
 
     @staticmethod
     def read(file, doc=None):
@@ -24,3 +25,22 @@ class YamlHandler:
     def dump(data):
         ColorPrint.print_info(message=yaml.dump(
             data=data, default_flow_style=False, default_style='', indent=4), lvl=-1)
+
+    @staticmethod
+    def check_file(file, plan):
+        project_config = YamlUtils.read_without_exception(file=file)
+        if project_config is None:
+            return False
+        if 'plan' not in project_config:
+            return False
+        if not isinstance(project_config['plan'], dict):
+            return False
+        return plan in project_config['plan']
+
+    @staticmethod
+    def read_without_exception(file):
+        with open(file) as stream:
+            try:
+                return yaml.load(stream=stream)
+            except yaml.YAMLError:
+                return None

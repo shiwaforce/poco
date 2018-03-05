@@ -3,7 +3,7 @@ from ..services.config_handler import ConfigHandler
 from ..services.console_logger import ColorPrint
 from ..services.state import StateHolder
 from ..services.state_utils import StateUtils
-from ..services.yaml_handler import YamlHandler
+from ..services.yaml_utils import YamlUtils
 
 
 class RepoRemove(AbstractCommand):
@@ -36,4 +36,4 @@ class RepoRemove(AbstractCommand):
         if catalog not in list(StateHolder.config.keys()):
             ColorPrint.exit_after_print_messages(message="Catalog not exists with name: " + catalog)
         del StateHolder.config[catalog]
-        YamlHandler.write(file=StateHolder.catalog_config_file, data=StateHolder.config)
+        YamlUtils.write(file=StateHolder.catalog_config_file, data=StateHolder.config)

@@ -2,6 +2,7 @@ import os
 from .file_repository import FileRepository
 from .git_repository import GitRepository
 from .svn_repository import SvnRepository
+from .file_utils import FileUtils
 from .state import StateHolder
 from .console_logger import *
 
@@ -38,13 +39,15 @@ class ProjectUtils:
         """Get compose file from project repository """
 
         if StateHolder.config is None:
-            repository = ProjectUtils.add_repository(target_dir=StateHolder.work_dir)
-            # TODO
-            file = repository.get_file('pocok.yml')
+            ProjectUtils.add_repository(target_dir=StateHolder.work_dir)
+            file = FileUtils.get_backward_compatible_pocok_file(directory=StateHolder.work_dir)
         else:
             repo_handler = ProjectUtils.get_project_repository(project_element=project_element, ssh=ssh)
-            # TODO
-            file = repo_handler.get_file(project_element.get('file', 'pocok.yml'))
+            file_element = project_element.get('file')
+            if file_element is not None:
+                file = repo_handler.get_file(file=file_element)
+            else: # TODO remove later
+                file = FileUtils.get_backward_compatible_pocok_file(directory=repo_handler.target_dir)
         if not os.path.exists(file):
             if silent:
                 return None

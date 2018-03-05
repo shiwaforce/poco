@@ -332,24 +332,48 @@ class ComposeTestSuite(AbstractTestSuite):
 
     def test_install(self):
         self.init_with_remote_catalog()
-        dir = os.path.join(self.ws_dir, 'poco-example')  # TODO rename later
+        base_dir = os.path.join(self.ws_dir, 'poco-example')  # TODO rename later
+        dir = os.path.join(base_dir, 'nginx')
         self.assertFalse(os.path.exists(os.path.join(dir)))
         with self.captured_output() as (out, err):
             self.run_pocok_command("install", "nginx")
-        self.assertIn("Install completed to " + dir, out.getvalue().strip())
+        self.assertIn("Install completed to " + base_dir, out.getvalue().strip())
         self.assertEqual(0, len(err.getvalue().strip()))
         self.assertTrue(os.path.exists(os.path.join(dir)))
 
-"""
-    def test_plan_list(self):
+    def test_install_with_before_script(self): # TODO
+        self.init_with_remote_catalog()
+        base_dir = os.path.join(self.ws_dir, 'poco-example')  # TODO rename later
+        dir = os.path.join(base_dir, 'nginx')
+        self.assertFalse(os.path.exists(dir))
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("install", "nginx")
+        self.assertIn("Install completed to " + base_dir, out.getvalue().strip())
+        self.assertEqual(0, len(err.getvalue().strip()))
+        self.assertTrue(os.path.exists(dir))
+
+    def test_plan_list_with_not_exists_project(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["plan", "ls", "mysql"])
-            pocok.run()
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("plan", "ls")
+            self.assertIsNotNone(context.exception)
+        self.assertIn("Project not exists", out.getvalue())
+
+    def test_plan_list(self):
+        self.init_with_remote_catalog()
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("plan", "ls", "nginx")
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn("default", out.getvalue())
-
+        self.assertIn("demo/hello", out.getvalue())
+"""
+    def test_clean(self):
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("clean")
+        self.assertEqual(0, len(err.getvalue().strip()))
+"""
+"""
     def test_branches(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
@@ -368,39 +392,5 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn("Branch changed", out.getvalue())
 
-    def test_init(self):
-        self.init_with_local_catalog()
-        test_dir = os.path.join(self.tmpdir, "test-directory")
-        os.makedirs(test_dir)
-        git.Repo.clone_from(url=AbstractTestSuite.STACK_LIST_SAMPLE['nginx']['git'], to_path=test_dir)
-        StateHolder.skip_docker = True
-        pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "add", test_dir])
-        with self.captured_output() as (out, err):
-            pocok.run()
-        self.assertIn("Project added", out.getvalue())
-        with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["catalog", "ls"])
-            pocok.run()
-            self.assertEqual(0, len(err.getvalue().strip()))
-        with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["init", "test-directory"])
-            pocok.run()
-        self.assertEqual(0, len(err.getvalue()))
-        self.assertIn("Project init completed", out.getvalue())
-        self.assertTrue(os.path.exists(self.ws_dir))
-        self.assertTrue(os.path.exists(os.path.join(self.ws_dir, "test-directory")))
-        self.assertTrue(os.path.exists(os.path.join(self.ws_dir, "test-directory/pocok.yml")))
-        self.assertTrue(os.path.exists(os.path.join(self.ws_dir, "test-directory/docker-compose.yml")))
 
-    def test_install(self):
-        self.init_with_local_catalog()
-        with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            pocok = Pocok(home_dir=self.tmpdir, argv=["install", "mysql"])
-            pocok.run()
-        self.assertEqual(0, len(err.getvalue()))
-        self.assertTrue(os.path.exists(self.ws_dir))
-        self.assertTrue(os.path.exists(os.path.join(self.ws_dir, "pocok-example")))
 """

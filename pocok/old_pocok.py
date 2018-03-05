@@ -11,40 +11,12 @@ from .services.project_utils import ProjectUtils
 from .services.package_handler import PackageHandler
 
 
-COMMANDS = """
-   up, start                Start project
-   down, stop               Stop project
-   restart                  Restart project
-   plan ls                  Print all plan belongs to project
-   config                   Print full Docker compose configuration for a project's plan.
-   clean                    Clean all container and image from local Docker repository.
-   init                     Create pocok.yml and docker-compose.yml in project if aren't exists.
-   install                  Get projects from remote repository (if its not exists locally yet) and run install scripts.
-   build                    Build containers depends defined project and plan.
-   ps                       Print containers statuses which depends defined project and plan.
-   pull                     Pull all necessary image for project and plan.
-   log, logs                Print containers logs which depends defined project and plan.
-   branch                   Switch branch on defined project.
-   branches                 List all available git branch for the project.
-   pack                     Pack the selected project's plan configuration with docker images to an archive.
-   unpack                   Unpack archive, install images to local repository.
-"""
-
 
 class Pocok(object):
     catalog_handler = None
     project_utils = None
     command_handler = None
 
-    @staticmethod
-    def run():
-        ColorPrint.print_info(StateHolder.config_handler.print_config(), 1)
-        if StateHolder.has_args('repo'):
-            PocokRepo.handle()
-        elif StateHolder.has_args('project'):
-            PocokProject.handle()
-        else:
-            PocokDefault.handle()
 
     def run_default(self):
         """Handling top level commands"""
@@ -55,11 +27,6 @@ class Pocok(object):
 
         """Init project utils"""
         self.project_utils = ProjectUtils()
-
-        if StateHolder.has_args('init'):
-            self.init()
-            CommandHandler(project_utils=self.project_utils).run_script("init_script")
-            return
 
         if StateHolder.has_args('branches'):
             self.get_project_repository().print_branches()
@@ -73,11 +40,6 @@ class Pocok(object):
             project_descriptor['branch'] = branch
             self.catalog_handler.set(modified=project_descriptor)
             ColorPrint.print_info(message="Branch changed")
-            return
-
-        if StateHolder.has_args('install'):
-            self.get_project_repository()
-            ColorPrint.print_info("Project installed")
             return
 
         if StateHolder.has_args('plan', 'ls'):

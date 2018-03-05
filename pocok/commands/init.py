@@ -13,7 +13,7 @@ class Init(AbstractCommand):
     command = "init"
     args = ["[<name>]"]
     args_descriptions = {"[<name>]": "Name of the project or the actual directory if it is empty"}
-    description = "Initialize pocok project, pocok.yml and docker-compose.yml will be created if they don't exist."
+    description = "Initialize pocok project, pocok.yml and docker-compose.yml will be created if they don't exist"
 
     def prepare_states(self):
         StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')
@@ -33,6 +33,7 @@ class Init(AbstractCommand):
             file = FileUtils.get_backward_compatible_pocok_file(directory=os.getcwd())
             if file is None:
                 Init.fix_file(os.path.join(os.getcwd(), 'pocok.yml'))
+
         ColorPrint.print_info("Project init completed")
 
     @staticmethod
