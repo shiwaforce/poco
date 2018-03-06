@@ -29,7 +29,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'pocok help <command>' for more information on a specific command."""
-__version__ = '0.24.0'
+__version__ = '0.90.0'
 
 
 class Pocok(object):
