@@ -16,6 +16,7 @@ if platform.system() == "Darwin" and sys.version_info[0] == 3:
     requires.append("certifi>=2017.4.17")
     requires.append("Scrapy >= 1.4.0")
 
+
 class PyTestCommand(TestCommand):
     """ Command to run unit py.test unit tests
     """
