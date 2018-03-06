@@ -11,6 +11,7 @@ Pocok
     :target: https://pypi.python.org/pypi/pocok
 
 .. image:: https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/test_coverage
+
    :target: https://codeclimate.com/github/shiwaforce/pocok/test_coverage
    :alt: Test Coverage
 

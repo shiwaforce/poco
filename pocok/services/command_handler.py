@@ -80,6 +80,8 @@ class CommandHandler(object):
             runner = DockerPlanRunner(project_compose=self.project_compose,
                                       working_directory=self.working_directory,
                                       repo_dir=self.repo_dir)
+            if StateHolder.always_update and cmd is 'start': # Pull before start in developer mode
+                runner.run(plan=plan, commands='pull', envs=self.get_environment_variables(plan=plan))
             for cmd in command_list['docker']:
                 runner.run(plan=plan, commands=cmd,
                            envs=self.get_environment_variables(plan=plan))
@@ -173,7 +175,7 @@ class ScriptPlanRunner(AbstractPlanRunner):
                 cmd.append("\"")
                 cmd.append(script)
                 cmd.append("\"")
-                self.run_script_with_check(cmd=cmd, working_directory=self.working_directory)
+                self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=os.environ.copy())
 
     def get_native_scripts(self, plan, script_type):
         """Get scripts """
@@ -193,7 +195,8 @@ class ScriptPlanRunner(AbstractPlanRunner):
         """Add host system to environment"""
         command_array.append("-e")
         command_array.append("HOST_SYSTEM="+platform.system())
-
+        command_array.append("-u")
+        command_array.append("1000")
         command_array.append("-v")
         command_array.append(str(self.working_directory) + ":/usr/local")
         command_array.append("-w")
