@@ -1,18 +1,18 @@
-# POCO
-[![Build Status](https://travis-ci.org/shiwaforce/poco.svg?branch=command-refactor)](https://travis-ci.org/shiwaforce/poco)
-[![pypi](https://img.shields.io/pypi/v/poco.svg)](https://pypi.python.org/pypi/poco)
-[![python](https://img.shields.io/pypi/pyversions/poco.svg)](https://pypi.python.org/pypi/poco)
+# POCOK
+[![Build Status](https://travis-ci.org/shiwaforce/pocok.svg?branch=command-refactor)](https://travis-ci.org/shiwaforce/pocok)
+[![pypi](https://img.shields.io/pypi/v/pocok.svg)](https://pypi.python.org/pypi/pocok)
+[![python](https://img.shields.io/pypi/pyversions/pocok.svg)](https://pypi.python.org/pypi/pocok)
 
 <p align="center">
-  <img width="200" height="200" title="Poco Logo" src="https://raw.githubusercontent.com/shiwaforce/poco/command-refactor/logo.jpg"/>
+  <img width="200" height="200" title="Pocok Logo" src="https://raw.githubusercontent.com/shiwaforce/pocok/logo.svg"/>
 </p>
 
-`poco` is a docker missing tool. With it's help you will be able to manage docker or kubernetes projects of any complexity with ease. 
+`pocok` is a docker missing tool. With it's help you will be able to manage docker or kubernetes projects of any complexity with ease.
 It is just indispensable tool for any kind of projects from small to large.
-You can use `poco` for development and for demo purposes as well.
+You can use `pocok` for development and for demo purposes as well.
 
 
-[Video](https://asciinema.org/a/137172)
+[Video](https://asciinema.org/a/137172) - old
 [Example](https://github.com/shiwaforce/poco-example)
 
 ## Requirements

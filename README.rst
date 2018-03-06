@@ -1,26 +1,26 @@
-Poco
-====
+Pocok
+=====
 
-.. image:: https://travis-ci.org/shiwaforce/poco.svg?branch=master
-    :target: https://travis-ci.org/shiwaforce/poco
+.. image:: https://travis-ci.org/shiwaforce/pocok.svg?branch=master
+    :target: https://travis-ci.org/shiwaforce/pocok
 
-.. image:: https://img.shields.io/pypi/v/poco.svg
-    :target: https://pypi.python.org/pypi/poco
+.. image:: https://img.shields.io/pypi/v/pocok.svg
+    :target: https://pypi.python.org/pypi/pocok
 
-.. image:: https://img.shields.io/pypi/pyversions/poco.svg
-    :target: https://pypi.python.org/pypi/poco
+.. image:: https://img.shields.io/pypi/pyversions/pocok.svg
+    :target: https://pypi.python.org/pypi/pocok
 
 .. image:: https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/test_coverage
-   :target: https://codeclimate.com/github/shiwaforce/poco/test_coverage
+   :target: https://codeclimate.com/github/shiwaforce/pocok/test_coverage
    :alt: Test Coverage
 
 .. image:: https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/maintainability
-   :target: https://codeclimate.com/github/shiwaforce/poco/maintainability
+   :target: https://codeclimate.com/github/shiwaforce/pocok/maintainability
    :alt: Maintainability
 
-.. image:: logo.jpg
-    :height: 200px
-    :width: 200px
+.. image:: logo.svg
+   :height: 200px
+   :width: 200px
 
 About
 -----
