@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import poco
+import pocok
 import sys
 import platform
 from setuptools import setup, find_packages
@@ -10,6 +10,7 @@ test_requires = ['pytest==3.1.2', 'pytest-cov==2.5.1']
 
 if sys.version_info[0] < 3:
     test_requires.append('SystemIO>=1.1')
+    test_requires.append('mock')
 
 if platform.system() == "Darwin" and sys.version_info[0] == 3:
     requires.append("certifi>=2017.4.17")
@@ -20,7 +21,7 @@ class PyTestCommand(TestCommand):
     """
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ['--verbose', '--cov', 'poco']
+        self.test_args = ['--verbose', '--cov', 'pocok']
         self.test_suite = True
 
     def run(self):
@@ -29,15 +30,15 @@ class PyTestCommand(TestCommand):
         sys.exit(rcode)
 
 setup_options = dict(
-    name='poco',
-    version=poco.__version__,
-    description='poco lets you catalogue and manage your Docker projects using simple YAML files to shorten the route '
+    name='pocok',
+    version=pocok.__version__,
+    description='pocok lets you catalogue and manage your Docker projects using simple YAML files to shorten the route '
                 'from finding your project to initialising it in your environment.',
     long_description=open('README.rst').read(),
     author='Shiwaforce.com',
     url='https://www.shiwaforce.com',
     packages=find_packages(exclude=['tests*']),
-    package_data={'': ['poco.yml',
+    package_data={'': ['pocok.yml',
                        'docker-compose.yml',
                        'command-hierarchy.yml',
                        'config']},
@@ -46,7 +47,7 @@ setup_options = dict(
     tests_require=test_requires,
     cmdclass={'test': PyTestCommand},
     entry_points={
-      'console_scripts': ['poco=poco.poco:main'],
+      'console_scripts': ['pocok=pocok.pocok:main'],
     },
     license="Apache License 2.0",
     classifiers=(

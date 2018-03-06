@@ -1,0 +1,53 @@
+{
+  config: {
+    before: true,
+    docker: ["config"],
+    kubernetes: ["describe"]
+  },
+  build: {
+    before: true,
+    docker: ["build"]
+  },
+  up: {
+    before: true,
+    docker: ["build", "pull", "config", ["up", "-d"], "ps"],
+    kubernetes: ["apply"],
+    after: true
+  },
+  start: {
+    before: true,
+    docker: ["build", "pull", "config", ["up", "-d"], "ps"],
+    kubernetes: ["apply"],
+    after: true
+  },
+  restart: {
+    before: true,
+    docker: ["stop", "ps", "build", "pull", "config", ["up", "-d"], "ps"],
+    kubernetes: ["apply"],
+    after: true
+  },
+  ps: {
+    before: true,
+    docker: ["ps"],
+    kubernetes: ["get"],
+    after: true
+  },
+  pull: {
+    before: true,
+    docker: ["pull"],
+    after: true
+  },
+  stop: {
+    docker: ["stop", "ps"],
+    kubernetes: ["delete"],
+    after: true
+  },
+  logs: {
+    docker: ["logs"],
+    kubernetes: ["get"]
+  },
+  pack: {
+    docker: ["pull"],
+    postmethods: ["pack"]
+  }
+}
