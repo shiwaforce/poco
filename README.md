@@ -4,7 +4,7 @@
 [![python](https://img.shields.io/pypi/pyversions/pocok.svg)](https://pypi.python.org/pypi/pocok)
 
 <p align="center">
-  <img width="200" height="200" title="Pocok Logo" src="https://raw.githubusercontent.com/shiwaforce/pocok/logo.svg"/>
+  <img width="200" height="200" title="Pocok Logo" src="https://raw.githubusercontent.com/shiwaforce/pocok/master/logo.svg?sanitize=true"/>
 </p>
 
 `pocok` is a docker missing tool. With it's help you will be able to manage docker or kubernetes projects of any complexity with ease.
