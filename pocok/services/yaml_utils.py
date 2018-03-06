@@ -44,3 +44,17 @@ class YamlUtils:
                 return yaml.load(stream=stream)
             except yaml.YAMLError:
                 return None
+
+    @staticmethod
+    def get_node(structure, paths, default=None):
+        if structure is None:
+            return None
+        node = paths[0]
+        paths = paths[1:]
+
+        while node in structure and len(paths) > 0:
+            structure = structure[node]
+            node = paths[0]
+            paths = paths[1:]
+
+        return structure[node] if node in structure else default

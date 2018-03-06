@@ -10,25 +10,20 @@
   },
   up: {
     before: true,
-    docker: ["build", "pull", "config", ["up", "-d"], "logs", "ps"],
+    docker: ["build", "pull", "config", ["up", "-d"], "ps"],
     kubernetes: ["apply"],
     after: true
   },
   start: {
     before: true,
-    docker: ["build", "pull", "config", ["up", "-d"], "logs", "ps"],
+    docker: ["build", "pull", "config", ["up", "-d"], "ps"],
     kubernetes: ["apply"],
     after: true
   },
   restart: {
     before: true,
-    docker: ["stop", "ps", "build", "pull", "config", ["up", "-d"], "logs", "ps"],
+    docker: ["stop", "ps", "build", "pull", "config", ["up", "-d"], "ps"],
     kubernetes: ["apply"],
-    after: true
-  },
-  down: {
-    docker: [["down", "--remove-orphans"]],
-    kubernetes: ["delete"],
     after: true
   },
   ps: {
@@ -48,7 +43,7 @@
     after: true
   },
   logs: {
-    docker: [["logs", "-f"]],
+    docker: ["logs"],
     kubernetes: ["get"]
   },
   pack: {

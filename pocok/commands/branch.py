@@ -7,21 +7,22 @@ from ..services.console_logger import ColorPrint
 class Branch(AbstractCommand):
 
     command = "branch"
-    args = ["<project>", "<branch>", "[-f]"]
-    args_descriptions = {"<project>": "Name of the project in the catalog.",
+    args = ["<name>", "<branch>", "[-f]"]
+    args_descriptions = {"<name>": "Name of the project in the catalog.",
                          "<branch>": "Name of the git branch",
                          "-f": "Git force parameter"}
     description = "Switch branch on a defined project."
 
     def prepare_states(self):
-        StateUtils.calculate_name_and_work_dir()
-        StateUtils.prepare("project_file")
+        StateUtils.name = StateHolder.args.get('<name>')
+        StateUtils.prepare("project_repo")
 
     def resolve_dependencies(self):
-        if StateHolder.poco_file is None:
+        if StateHolder.repository is None:
             ColorPrint.exit_after_print_messages(message="Project not exists " + str(StateHolder.name))
 
     def execute(self):
-        # TODO
-        pass
+        StateHolder.repository.set_branch(StateHolder.args.get('<branch>'), StateHolder.name,
+                                          StateHolder.args.get('-f'))
+        ColorPrint.print_info("Branch changed")
 

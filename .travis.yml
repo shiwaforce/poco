@@ -8,11 +8,7 @@ python:
 - '3.5'
 - '3.6'
 install:
-- "pip install pyaml==16.12.2"
-- "pip install gitpython==2.1.8"
-- "pip install svn==0.3.44"
-- "pip install docopt==0.6.2"
-- "pip install pytest-cov"
+- "pip install -r requirements.txt"
 before_script:
   - "curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter"
   - "chmod +x ./cc-test-reporter"

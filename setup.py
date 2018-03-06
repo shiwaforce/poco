@@ -10,6 +10,7 @@ test_requires = ['pytest==3.1.2', 'pytest-cov==2.5.1']
 
 if sys.version_info[0] < 3:
     test_requires.append('SystemIO>=1.1')
+    test_requires.append('mock')
 
 if platform.system() == "Darwin" and sys.version_info[0] == 3:
     requires.append("certifi>=2017.4.17")

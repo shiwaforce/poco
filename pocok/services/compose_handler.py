@@ -1,7 +1,7 @@
 import os
 import yaml
 from .console_logger import *
-from .file_utils import FileUtils
+from .git_repository import GitRepository
 from .project_utils import ProjectUtils
 from .state import StateHolder
 
@@ -59,6 +59,18 @@ class ComposeHandler:
             except yaml.YAMLError as exc:
                 ColorPrint.exit_after_print_messages(message="Error: Wrong YAML format:\n " + str(exc),
                                                      doc=Doc.POCOK)
+
+    @staticmethod
+    def run_checkouts():
+        for checkout in StateHolder.compose_handler.get_checkouts():
+            if " " not in checkout:
+                ColorPrint.exit_after_print_messages(message="Wrong checkout command: " + checkout)
+            directory, repository = checkout.split(" ")
+            target_dir = os.path.join(StateHolder.compose_handler.get_working_directory(), directory)
+            if not StateHolder.offline:
+                GitRepository(target_dir=target_dir, url=repository, branch="master")
+            if not os.path.exists(target_dir):
+                ColorPrint.exit_after_print_messages("checkout directory is empty: " + str(directory))
 
     def get_checkouts(self):
         """Get checkouts list from compose file"""

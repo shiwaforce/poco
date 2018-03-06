@@ -53,14 +53,15 @@ class StateUtils:
 
         if StateHolder.name is None:
             return
+        ssh = None
         for catalog in StateHolder.catalogs:
             if StateHolder.name in StateHolder.catalogs[catalog]:
                 StateHolder.catalog_element = StateHolder.catalogs[catalog].get(StateHolder.name)
+                ssh = YamlUtils.get_node(catalog, ["ssh-key"])
 
         if StateHolder.catalog_element is None:
             return
-        StateHolder.repository = ProjectUtils.get_project_repository(StateHolder.catalog_element, ssh=None)
-        # TODO handle ssh parameter
+        StateHolder.repository = ProjectUtils.get_project_repository(StateHolder.catalog_element, ssh=ssh)
 
     @staticmethod
     def prepare_project_file():
@@ -96,6 +97,7 @@ class StateUtils:
                     StateHolder.plan = arg
                 else:
                     StateHolder.name = arg
+
 
 
     @staticmethod

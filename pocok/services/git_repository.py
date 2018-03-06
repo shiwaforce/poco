@@ -9,7 +9,7 @@ from .file_utils import FileUtils
 
 class GitRepository(AbstractRepository):
 
-    def __init__(self, target_dir, url, branch, git_ssh_identity_file=None, force=False):
+    def __init__(self, target_dir, url, branch, git_ssh_identity_file=None, force=False, silent=False):
         super(GitRepository, self).__init__(target_dir)
         self.branch = branch
 
@@ -34,7 +34,8 @@ class GitRepository(AbstractRepository):
                             self.repo = git.Repo.clone_from(url=url, to_path=target_dir)
                 self.set_branch(branch=branch, force=force)
         except git.GitCommandError as exc:
-            ColorPrint.exit_after_print_messages(message=exc.stderr)
+            if not silent:
+                ColorPrint.exit_after_print_messages(message=exc.stderr)
 
     def get_branches(self):
         return self.repo.branches

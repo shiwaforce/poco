@@ -5,7 +5,6 @@ from .file_repository import FileRepository
 from .git_repository import GitRepository
 from .svn_repository import SvnRepository
 from .environment_utils import EnvironmentUtils
-from .file_utils import FileUtils
 from .state import StateHolder
 
 
@@ -23,7 +22,7 @@ class CatalogHandler:
             conf = StateHolder.config[key]
             repo = CatalogHandler.get_repository_type(conf)
 
-            repository = CatalogHandler.get_repository(key, repo)
+            repository = CatalogHandler.get_repository(key, repo, True)
 
             if StateHolder.default_catalog_repository is None or key == 'default':
                 StateHolder.default_catalog_repository = CatalogData(config=conf, repository=repository)
@@ -91,7 +90,7 @@ class CatalogHandler:
             return StateHolder.catalog_repositories[catalog].repository
 
     @staticmethod
-    def get_repository(key, repo):
+    def get_repository(key, repo, silent=False):
         conf = StateHolder.config[key]
         if StateHolder.offline and repo in ('git', 'svn'):
             repository = FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key))
@@ -99,7 +98,7 @@ class CatalogHandler:
             repository = GitRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
                                        url=CatalogHandler.get_url(conf),
                                        branch=CatalogHandler.get_branch(conf),
-                                       git_ssh_identity_file=conf.get("ssh-key"))
+                                       git_ssh_identity_file=conf.get("ssh-key"), silent=silent)
         elif 'svn' == repo:
             repository = SvnRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
                                        url=CatalogHandler.get_url(conf))

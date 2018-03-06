@@ -7,7 +7,7 @@ from pocok.services.file_utils import FileUtils
 from pocok.services.cta_utils import CTAUtils
 
 
-class ComposeTestSuite(AbstractTestSuite):
+class PocokTestSuite(AbstractTestSuite):
 
     def test_without_command(self):
         with self.captured_output() as (out, err):
@@ -368,11 +368,15 @@ class ComposeTestSuite(AbstractTestSuite):
         self.assertIn("default", out.getvalue())
         self.assertIn("demo/hello", out.getvalue())
 """
-    def test_clean(self):
+    def test_check_docker(self):
         with self.captured_output() as (out, err):
-            self.run_pocok_command("clean")
-        self.assertEqual(0, len(err.getvalue().strip()))
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("clean")
+            self.assertIsNotNone(context.exception)
+        self.assertEqual(0, len(err.getvalue()))
+        self.assertIn("Docker not running.", out.getvalue())
 """
+
 """
     def test_branches(self):
         self.init_with_local_catalog()

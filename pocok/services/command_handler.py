@@ -25,7 +25,7 @@ class CommandHandler(object):
         self.project_compose = StateHolder.compose_handler.compose_project
         self.working_directory = StateHolder.compose_handler.get_working_directory()
         self.plan = StateHolder.compose_handler.plan
-        self.repo_dir = StateHolder.repository
+        self.repo_dir = StateHolder.repository.target_dir
 
         ''' Check mode '''
         plan = self.project_compose['plan'][self.plan]

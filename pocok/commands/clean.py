@@ -14,7 +14,6 @@ class Clean(AbstractCommand):
         pass
 
     def resolve_dependencies(self):
-
         """ Check Docker """
         EnvironmentUtils.check_docker()
 
@@ -23,9 +22,11 @@ class Clean(AbstractCommand):
         self.check_container(status="exited")
         self.check_images()
         self.check_volumes()
+        ColorPrint.print_info(message="Clean complete")
 
     def check_container(self, status):
         out = check_output(" ".join(["docker", "ps", "-qf", "status=" + str(status)]), shell=True)
+
         if len(out) == 0:
             ColorPrint.print_warning('No "' + str(status) + '" containers to remove.')
         else:
