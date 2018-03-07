@@ -83,18 +83,17 @@ class CommandHandler(object):
     def pre_run(self, command_list, plan):
         if command_list.get('before', False):
             self.script_runner.run(plan=plan, script_type='before_script')
-
-        if 'premethods' in command_list and len(command_list['premethods']) > 0:
-            for method in command_list['premethods']:
-                getattr(self, method)()
+        self.run_method('premethods', command_list)
 
     def after_run(self, command_list, plan):
-        if 'postmethods' in command_list and len(command_list['postmethods']) > 0:
-            for method in command_list['postmethods']:
-                getattr(self, method)()
-
+        self.run_method('postmethods', command_list)
         if command_list.get('after', False):
             self.script_runner.run(plan=plan, script_type='after_script')
+
+    def run_method(self, type, command_list):
+        if type in command_list and len(command_list[type]) > 0:
+            for method in command_list[type]:
+                getattr(self, method)()
 
     def parse_environment_dict(self, path, env):
         """Compose dictionary from environment variables."""
@@ -161,6 +160,16 @@ class AbstractPlanRunner(object):
         if res > 0:
             ColorPrint.exit_after_print_messages(message=res)
 
+    @staticmethod
+    def get_file_list(base_dir, working_dir, dir_list):
+        file_list = list()
+        for file in FileUtils.get_filtered_sorted_alter_from_base_dir(base_dir=base_dir,
+                                                                      actual_dir=working_dir,
+                                                                      target_directories=dir_list,
+                                                                      filter_ends=('.yml', '.yaml')):
+            file_list.append(ProjectUtils.get_file(file=file))
+        return file_list
+
 
 class ScriptPlanRunner(AbstractPlanRunner):
 
@@ -222,7 +231,8 @@ class KubernetesRunner(AbstractPlanRunner):
             for file in ProjectUtils.get_list_value(plan['kubernetes-file']):
                 files.append(self.get_file(file=file))
         elif isinstance(plan, dict) and 'kubernetes-dir' in plan:
-            files.extend(self.get_list(ProjectUtils.get_list_value(plan['kubernetes-dir'])))
+            files.extend(self.get_file_list(self.repo_dir, self.working_directory,
+                                            ProjectUtils.get_list_value(plan['kubernetes-dir'])))
 
         """Kubernetes commands"""
         for kube_file in files:
@@ -239,15 +249,6 @@ class KubernetesRunner(AbstractPlanRunner):
         return ProjectUtils.get_file(file=FileUtils.get_compose_file_relative_path(
                                                        repo_dir=self.repo_dir, working_directory=self.working_directory,
                                                        file_name=file))
-
-    def get_list(self, dir_list):
-        kube_list = list()
-        for file in FileUtils.get_filtered_sorted_alter_from_base_dir(base_dir=self.repo_dir,
-                                                                      actual_dir=self.working_directory,
-                                                                      target_directories=dir_list,
-                                                                      filter_ends=('.yml', '.yaml')):
-            kube_list.append(ProjectUtils.get_file(file=file))
-        return kube_list
 
 
 class DockerPlanRunner(AbstractPlanRunner):
@@ -286,7 +287,8 @@ class DockerPlanRunner(AbstractPlanRunner):
             for service in ProjectUtils.get_list_value(plan['docker-compose-file']):
                 docker_files.append(self.get_docker_compose(service=service))
         elif isinstance(plan, dict) and 'docker-compose-dir' in plan:
-            docker_files.extend(self.get_docker_compose_list(ProjectUtils.get_list_value(plan['docker-compose-dir'])))
+            docker_files.extend(self.get_file_list(self.repo_dir, self.working_directory,
+                                                   ProjectUtils.get_list_value(plan['docker-compose-dir'])))
         else:
             for service in ProjectUtils.get_list_value(plan):
                 docker_files.append(self.get_docker_compose(service=service))
@@ -299,15 +301,6 @@ class DockerPlanRunner(AbstractPlanRunner):
         return ProjectUtils.get_file(file=FileUtils.get_compose_file_relative_path(
                                                        repo_dir=self.repo_dir, working_directory=self.working_directory,
                                                        file_name=file_name))
-
-    def get_docker_compose_list(self, dir_list):
-        compose_list = list()
-        for file in FileUtils.get_filtered_sorted_alter_from_base_dir(base_dir=self.repo_dir,
-                                                                      actual_dir=self.working_directory,
-                                                                      target_directories=dir_list,
-                                                                      filter_ends=('.yml', '.yaml')):
-            compose_list.append(ProjectUtils.get_file(file=file))
-        return compose_list
 
     def get_compose_file_name(self, service):
         """Get back docker compose file name"""
