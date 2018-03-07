@@ -12,6 +12,9 @@ class Start(AbstractCommand):
     args_descriptions = {"[<project/plan>]": "Name of the project in the catalog and/or name of the project's plan"}
     description = "Start pocok project with the default or defined plan."
 
+    run_command = "start"
+    need_checkout = True
+
     def prepare_states(self):
         StateUtils.calculate_name_and_work_dir()
         StateUtils.prepare("compose_handler")
@@ -21,5 +24,8 @@ class Start(AbstractCommand):
             ColorPrint.exit_after_print_messages(message="Project not exists " + str(StateHolder.name))
 
     def execute(self):
-        StateHolder.compose_handler.run_checkouts()
-        CommandHandler().run("start")
+        if self.need_checkout:
+            StateHolder.compose_handler.run_checkouts()
+        CommandHandler().run(self.run_command)
+        if hasattr(self, "end_message"):
+            ColorPrint.print_info(getattr(self, "end_message"))
