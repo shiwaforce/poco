@@ -22,4 +22,3 @@ class Catalog(AbstractCommand):
 
     def execute(self):
         CatalogHandler.print_ls()
-

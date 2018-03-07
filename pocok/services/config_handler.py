@@ -81,8 +81,7 @@ class ConfigHandler(object):
     def init():
         """Check home directory"""
         if not ConfigHandler.exists():
-            ColorPrint.print_info(message="Catalog configuration initialized: "
-                                          + str(StateHolder.catalog_config_file))
+            ColorPrint.print_info(message="Catalog configuration initialized: " + str(StateHolder.catalog_config_file))
             if not os.path.exists(StateHolder.home_dir):
                 os.mkdir(StateHolder.home_dir)
             if not os.path.exists(StateHolder.catalog_config_file):

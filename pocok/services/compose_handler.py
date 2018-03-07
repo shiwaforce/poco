@@ -100,4 +100,3 @@ class ComposeHandler:
 
         for key in self.compose_project['plan'].keys():
             ColorPrint.print_with_lvl(message=key, lvl=-1)
-

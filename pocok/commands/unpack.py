@@ -23,4 +23,3 @@ class Unpack(AbstractCommand):
 
     def execute(self):
         PackageHandler().unpack()
-

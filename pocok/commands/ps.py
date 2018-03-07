@@ -23,4 +23,3 @@ class Ps(AbstractCommand):
     def execute(self):
         StateHolder.compose_handler.run_checkouts()
         CommandHandler().run('ps')
-

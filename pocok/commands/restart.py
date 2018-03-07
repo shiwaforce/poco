@@ -23,4 +23,3 @@ class Restart(AbstractCommand):
     def execute(self):
         StateHolder.compose_handler.run_checkouts()
         CommandHandler().run('restart')
-

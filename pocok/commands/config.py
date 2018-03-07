@@ -22,4 +22,3 @@ class Config(AbstractCommand):
 
     def execute(self):
         CommandHandler().run("config")
-

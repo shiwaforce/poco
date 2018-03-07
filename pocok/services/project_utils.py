@@ -42,12 +42,9 @@ class ProjectUtils:
             ProjectUtils.add_repository(target_dir=StateHolder.work_dir)
             file = FileUtils.get_backward_compatible_pocok_file(directory=StateHolder.work_dir)
         else:
-            repo_handler = ProjectUtils.get_project_repository(project_element=project_element, ssh=ssh)
-            file_element = project_element.get('file')
-            if file_element is not None:
-                file = repo_handler.get_file(file=file_element)
-            else: # TODO remove later
-                file = FileUtils.get_backward_compatible_pocok_file(directory=repo_handler.target_dir)
+            file = ProjectUtils.get_file_from_project(file_element=project_element.get('file'),
+                                                      repo_handler=ProjectUtils.get_project_repository(
+                                                          project_element=project_element, ssh=ssh))
         if not os.path.exists(file):
             if silent:
                 return None
@@ -55,6 +52,13 @@ class ProjectUtils:
                 message="Compose file : %s not exists in project : %s " % (str(file), str(StateHolder.name)),
                 doc=Doc.POCOK_CATALOG)
         return file
+
+    @staticmethod
+    def get_file_from_project(file_element, repo_handler):
+        if file_element is not None:
+            return repo_handler.get_file(file=file_element)
+        else:  # TODO remove later
+            return FileUtils.get_backward_compatible_pocok_file(directory=repo_handler.target_dir)
 
     @staticmethod
     def get_file(file):
@@ -74,4 +78,3 @@ class ProjectUtils:
         else:
             lst.append(value)
         return lst
-

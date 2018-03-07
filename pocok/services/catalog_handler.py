@@ -149,7 +149,7 @@ class CatalogHandler:
     def get_catalog_file(config):
         """Get catalog file"""
         if config is not None:
-            #TODO
+            #  TODO backward compatibility
             return config.get('file', 'pocok-catalog.yml')
         return None
 

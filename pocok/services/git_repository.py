@@ -42,12 +42,7 @@ class GitRepository(AbstractRepository):
 
     def set_branch(self, branch, force=False):
         try:
-            if branch not in self.repo.branches and branch == 'master':
-                '''Make init commit'''
-                self.repo.index.add(["*"])
-                self.repo.index.commit("init")
-                remote = self.repo.create_remote('master', self.repo.remotes.origin.url)
-                remote.push(refspec='{}:{}'.format(self.repo.active_branch, 'master'))
+            self.fix_empty_repo(branch)
             if self.is_developer_mode():
                 return
             if str(self.repo.active_branch) != branch:
@@ -98,6 +93,14 @@ class GitRepository(AbstractRepository):
         ColorPrint.print_with_lvl(message="----------------------------------------------------------", lvl=-1)
         for key in self.get_branches():
             ColorPrint.print_with_lvl(message=str(key) + "(*)" if str(key) == actual_branch else key, lvl=-1)
+
+    def fix_empty_repo(self, branch):
+        if branch not in self.repo.branches and branch == 'master':
+            '''Make init commit'''
+            self.repo.index.add(["*"])
+            self.repo.index.commit("init")
+            remote = self.repo.create_remote('master', self.repo.remotes.origin.url)
+            remote.push(refspec='{}:{}'.format(self.repo.active_branch, 'master'))
 
     @staticmethod
     def is_same_host(old_url, url):

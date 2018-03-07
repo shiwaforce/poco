@@ -39,8 +39,7 @@ class FileUtils:
     @staticmethod
     def get_git_repo(base_dir):
         if not os.path.isdir(base_dir):
-            ColorPrint.exit_after_print_messages(message="Target directory is not a valid git repository: "
-                                                         + base_dir)
+            ColorPrint.exit_after_print_messages(message="Target directory is not a valid git repository: " + base_dir)
         try:
             repo = git.Repo(base_dir)
             return repo, base_dir

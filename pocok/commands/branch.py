@@ -25,4 +25,3 @@ class Branch(AbstractCommand):
         StateHolder.repository.set_branch(StateHolder.args.get('<branch>'), StateHolder.name,
                                           StateHolder.args.get('-f'))
         ColorPrint.print_info("Branch changed")
-

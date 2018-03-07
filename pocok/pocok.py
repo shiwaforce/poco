@@ -52,8 +52,8 @@ class Pocok(object):
 
         counter = 0
         if self.active_object is None:
-            ColorPrint.exit_after_print_messages("Something went wrong. Command class not found for command: "
-                                                 + sys.argv[1:])
+            ColorPrint.exit_after_print_messages("Something went wrong. Command class not found for command: " +
+                                                 sys.argv[1:])
 
         while counter < 10:  # for tests
             counter += 1
@@ -74,8 +74,8 @@ class Pocok(object):
         if not counter < 10:
             ColorPrint.exit_after_print_messages("Can't complete the command running. States: \n"
                                                  "\tPrepare states: " + str(self.active_object.prepared_states) +
-                                                 "\tResolve dependencies: "
-                                                 + str(self.active_object.resolved_dependencies) +
+                                                 "\tResolve dependencies: " +
+                                                 str(self.active_object.resolved_dependencies) +
                                                  "\tExecuted: " + str(self.active_object.executed))
 
     @staticmethod
@@ -188,8 +188,8 @@ class Pocok(object):
                 if not ispkg:
                     mod = importlib.import_module('pocok.commands.' + modname, 'pocok')
                     for name, cls in inspect.getmembers(mod,
-                                                        lambda member: inspect.isclass(member)
-                                                        and member.__module__ == mod.__name__):
+                                                        lambda member: inspect.isclass(member) and
+                                                        member.__module__ == mod.__name__):
                         self.check_base_class(cls)
         except ImportError as ex:
             ColorPrint.exit_after_print_messages("Commands import error: " + str(ex.args))

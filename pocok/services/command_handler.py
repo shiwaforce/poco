@@ -80,7 +80,7 @@ class CommandHandler(object):
             runner = DockerPlanRunner(project_compose=self.project_compose,
                                       working_directory=self.working_directory,
                                       repo_dir=self.repo_dir)
-            if StateHolder.always_update and cmd is 'start': # Pull before start in developer mode
+            if StateHolder.always_update and cmd is 'start':  # Pull before start in developer mode
                 runner.run(plan=plan, commands='pull', envs=self.get_environment_variables(plan=plan))
             for cmd in command_list['docker']:
                 runner.run(plan=plan, commands=cmd,
@@ -310,8 +310,10 @@ class DockerPlanRunner(AbstractPlanRunner):
 
     def get_compose_file_name(self, service):
         """Get back docker compose file name"""
-        if self.project_compose is not None:
-            if 'containers' in self.project_compose:
-                if service in self.project_compose['containers']:
-                    return self.project_compose['containers'].get(service)
+        if self.project_compose is None:
+            return service
+
+        if 'containers' in self.project_compose:
+            if service in self.project_compose['containers']:
+                return self.project_compose['containers'].get(service)
         return service

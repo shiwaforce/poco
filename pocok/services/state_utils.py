@@ -98,8 +98,6 @@ class StateUtils:
                 else:
                     StateHolder.name = arg
 
-
-
     @staticmethod
     def read_project_config_and_catalog():  # TODO
         CatalogHandler.load()
@@ -111,5 +109,3 @@ class StateUtils:
         else:
             """ Read local config """
             StateHolder.config_handler.read_configs(os.path.join(os.getcwd(), '.pocok'))
-
-
