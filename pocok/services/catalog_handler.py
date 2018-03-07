@@ -179,7 +179,7 @@ class CatalogHandler:
                 msg = key
                 if os.path.exists(os.path.join(
                     StateHolder.work_dir,
-                    lst[cat][msg]["repository_dir"] if "repository_dir" in lst[cat][msg] else msg)):
+                        lst[cat][msg]["repository_dir"] if "repository_dir" in lst[cat][msg] else msg)):
                     msg += " (*)"
                 ColorPrint.print_with_lvl(message=msg, lvl=-1)
 

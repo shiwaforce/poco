@@ -43,25 +43,12 @@ class CommandHandler(object):
         self.script_runner.run(plan=self.project_compose['plan'][self.plan], script_type=script)
 
     def run(self, cmd):
-
-        if self.hierarchy is None or not isinstance(self.hierarchy, dict):
-            ColorPrint.exit_after_print_messages("Command hierarchy config is missing")
-
-        if cmd not in self.hierarchy:
-            ColorPrint.exit_after_print_messages("Command not found in hierarchy: " + str(cmd))
-
+        self.check_command(cmd)
         plan = self.project_compose['plan'][self.plan]
         command_list = self.hierarchy[cmd]
 
         if not isinstance(command_list, dict):
             ColorPrint.print_info("Wrong command in hierarchy: " + str(command_list))
-
-        if command_list.get('before', False):
-            self.script_runner.run(plan=plan, script_type='before_script')
-
-        if 'premethods' in command_list and len(command_list['premethods']) > 0:
-            for method in command_list['premethods']:
-                getattr(self, method)()
 
         if isinstance(plan, dict) and 'script' in plan:
             # script running only if start or up command
@@ -84,6 +71,24 @@ class CommandHandler(object):
                 runner.run(plan=plan, commands=cmd,
                            envs=self.get_environment_variables(plan=plan))
 
+        self.after_run(command_list, plan)
+
+    def check_command(self, cmd):
+        if self.hierarchy is None or not isinstance(self.hierarchy, dict):
+            ColorPrint.exit_after_print_messages("Command hierarchy config is missing")
+
+        if cmd not in self.hierarchy:
+            ColorPrint.exit_after_print_messages("Command not found in hierarchy: " + str(cmd))
+
+    def pre_run(self, command_list, plan):
+        if command_list.get('before', False):
+            self.script_runner.run(plan=plan, script_type='before_script')
+
+        if 'premethods' in command_list and len(command_list['premethods']) > 0:
+            for method in command_list['premethods']:
+                getattr(self, method)()
+
+    def after_run(self, command_list, plan):
         if 'postmethods' in command_list and len(command_list['postmethods']) > 0:
             for method in command_list['postmethods']:
                 getattr(self, method)()
@@ -121,8 +126,7 @@ class CommandHandler(object):
         """Get all environment variables depends on selected plan"""
         envs = list()
         if isinstance(plan, dict):
-            if 'environment' in plan:
-                if 'include' in plan['environment']:
+            if 'environment' in plan and 'include' in plan['environment']:
                     envs.extend(ProjectUtils.get_list_value(plan['environment']['include']))
             if 'docker-compose-dir' in plan:
                 envs.extend(FileUtils.get_filtered_sorted_alter_from_base_dir(base_dir=self.repo_dir,

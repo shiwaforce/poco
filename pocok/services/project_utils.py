@@ -12,18 +12,15 @@ class ProjectUtils:
     @staticmethod
     def get_project_repository(project_element, ssh):
         """Get and store repository handler for named project"""
-        if StateHolder.offline:
-            repo_handler = FileRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element))
-        elif 'git' in project_element:
+        repo_handler = FileRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element))
+        if not StateHolder.offline and 'git' in project_element:
             branch = project_element.get('branch', 'master')
             repo_handler = GitRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element),
                                          url=project_element.get('git'), branch=branch,
                                          git_ssh_identity_file=ssh)
-        elif 'svn' in project_element:
+        elif not StateHolder.offline and 'svn' in project_element:
             repo_handler = SvnRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element),
                                          url=project_element.get('svn'))
-        else:
-            repo_handler = FileRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element))
         StateHolder.repositories[StateHolder.name] = repo_handler
         return repo_handler
 

@@ -9,4 +9,3 @@ class Pull(Start):
     run_command = "pull"
     need_checkout = True
     end_message = "Project pull complete"
-
