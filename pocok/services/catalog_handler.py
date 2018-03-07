@@ -166,19 +166,22 @@ class CatalogHandler:
             ColorPrint.print_with_lvl(message="-------------------", lvl=-1)
             ColorPrint.print_with_lvl(message="Available projects:", lvl=-1)
             ColorPrint.print_with_lvl(message="-------------------", lvl=-1)
-
-            for cat in lst.keys():
-                for key in lst[cat].keys():
-                    msg = key
-                    if os.path.exists(os.path.join(
-                            StateHolder.work_dir,
-                            lst[cat][key]["repository_dir"] if "repository_dir" in lst[cat][key] else key)):
-                        msg += " (*)"
-                    ColorPrint.print_with_lvl(message=msg, lvl=-1)
+            CatalogHandler.check_and_print_project(lst)
         else:
             ColorPrint.print_with_lvl(
                 message="Project catalog is empty. You can add projects with 'project-catalog add' command",
                 lvl=-1)
+
+    @staticmethod
+    def check_and_print_project(lst):
+        for cat in lst.keys():
+            for key in lst[cat].keys():
+                msg = key
+                if os.path.exists(os.path.join(
+                    StateHolder.work_dir,
+                    lst[cat][msg]["repository_dir"] if "repository_dir" in lst[cat][msg] else msg)):
+                    msg += " (*)"
+                ColorPrint.print_with_lvl(message=msg, lvl=-1)
 
 
 class CatalogData:

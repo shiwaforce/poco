@@ -73,8 +73,8 @@ class GitRepository(AbstractRepository):
             ColorPrint.print_with_lvl(message="Remote repository " + self.repo.remotes.origin.url +
                                               " not accessible. Maybe not up to date ")
             return str(self.repo.active_branch)
-        ColorPrint.print_with_lvl(message="Repository " + self.repo.remotes.origin.url + " with "
-                                          + str(self.repo.active_branch) + " branch pull response:", lvl=1)
+        ColorPrint.print_with_lvl(message="Repository " + self.repo.remotes.origin.url + " with " +
+                                          str(self.repo.active_branch) + " branch pull response:", lvl=1)
 
         ColorPrint.print_with_lvl(message=self.repo.git.pull(), lvl=1)
 

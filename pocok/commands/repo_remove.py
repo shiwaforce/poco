@@ -21,14 +21,12 @@ class RepoRemove(AbstractCommand):
         StateUtils.prepare("compose_handler")
 
     def resolve_dependencies(self):
-        if StateHolder.poco_file is not None:
-            if StateHolder.compose_handler.have_script("remove_script"):
-                EnvironmentUtils.check_docker()
+        if StateHolder.poco_file is not None and StateHolder.compose_handler.have_script("remove_script"):
+            EnvironmentUtils.check_docker()
 
     def execute(self):
-        if StateHolder.poco_file is not None:
-            if StateHolder.compose_handler.have_script("remove_script"):
-                CommandHandler().run_script("remove_script")
+        if StateHolder.poco_file is not None and StateHolder.compose_handler.have_script("remove_script"):
+            CommandHandler().run_script("remove_script")
         RepoRemove.remove()
 
     @staticmethod

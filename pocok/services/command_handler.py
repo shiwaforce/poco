@@ -29,10 +29,8 @@ class CommandHandler(object):
 
         ''' Check mode '''
         plan = self.project_compose['plan'][self.plan]
-        if isinstance(plan, dict):
-            if 'kubernetes-file' in plan or 'kubernetes-dir' in plan:
-                StateHolder.container_mode = "Kubernetes"
-
+        if isinstance(plan, dict) and ('kubernetes-file' in plan or 'kubernetes-dir' in plan):
+            StateHolder.container_mode = "Kubernetes"
         self.script_runner = ScriptPlanRunner(project_compose=self.project_compose,
                                               working_directory=self.working_directory)
 
@@ -101,8 +99,7 @@ class CommandHandler(object):
         env_file = ProjectUtils.get_file(file=file_name)
         if env_file is None:
             ColorPrint.exit_after_print_messages(
-                message="Environment file (" + str(file_name) + ") not exists in repository: "
-                        + StateHolder.name)
+                message="Environment file (" + str(file_name) + ") not exists in repository: " + StateHolder.name)
         with open(env_file) as stream:
             for line in stream.readlines():
                 if not line.startswith("#"):
@@ -313,7 +310,6 @@ class DockerPlanRunner(AbstractPlanRunner):
         if self.project_compose is None:
             return service
 
-        if 'containers' in self.project_compose:
-            if service in self.project_compose['containers']:
-                return self.project_compose['containers'].get(service)
+        if 'containers' in self.project_compose and service in self.project_compose['containers']:
+            return self.project_compose['containers'].get(service)
         return service
