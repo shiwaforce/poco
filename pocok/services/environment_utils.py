@@ -28,6 +28,14 @@ class EnvironmentUtils:
         ColorPrint.print_with_lvl(message="Kubernetes\n " + str(out).strip())
 
     @staticmethod
+    def check_helm():
+        p = Popen("helm version -s --short", stdout=PIPE, stderr=PIPE, shell=True)
+        out, err = p.communicate()
+        if not len(err) == 0 or len(out) == 0:
+            ColorPrint.exit_after_print_messages(message=str(err).strip())
+        ColorPrint.print_with_lvl(message="Helm\n " + str(out).strip(), lvl=1)
+
+    @staticmethod
     def check_version(version):
 
         newest_version = "0.0.0"

@@ -1,7 +1,7 @@
 import os
 import yaml
 import platform
-from subprocess import check_call
+from subprocess import check_call, CalledProcessError
 from .console_logger import ColorPrint, Doc
 from .file_utils import FileUtils
 from .project_utils import ProjectUtils
@@ -31,13 +31,17 @@ class CommandHandler(object):
         plan = self.project_compose['plan'][self.plan]
         if isinstance(plan, dict) and ('kubernetes-file' in plan or 'kubernetes-dir' in plan):
             StateHolder.container_mode = "Kubernetes"
+        elif isinstance(plan, dict) and ('helm-file' in plan or 'helm-dir' in plan):
+            StateHolder.container_mode = "Helm"
         self.script_runner = ScriptPlanRunner(project_compose=self.project_compose,
                                               working_directory=self.working_directory)
 
         if StateHolder.container_mode == "Docker":
             EnvironmentUtils.check_docker()
-        if StateHolder.container_mode == "Kubernetes":
+        elif StateHolder.container_mode == "Kubernetes":
             EnvironmentUtils.check_kubernetes()
+        elif StateHolder.container_mode == "Helm":
+            EnvironmentUtils.check_helm()
 
     def run_script(self, script):
         self.script_runner.run(plan=self.project_compose['plan'][self.plan], script_type=script)
@@ -61,6 +65,12 @@ class CommandHandler(object):
                 ColorPrint.exit_after_print_messages('Command: ' + cmd + ' not supported with Kubernetes')
             for cmd in command_list['kubernetes']:
                 runner.run(plan=plan, command=cmd, envs=self.get_environment_variables(plan=plan))
+        elif StateHolder.container_mode == 'Helm':
+            runner = HelmRunner(working_directory=self.working_directory, repo_dir=self.repo_dir)
+            if len(command_list['helm']) == 0:
+                ColorPrint.exit_after_print_messages('Command: ' + cmd + ' not supported with Helm')
+            for cmd in command_list['helm']:
+                runner.run(plan=plan, commands=cmd, envs=self.get_environment_variables(plan=plan))
         else:
             runner = DockerPlanRunner(project_compose=self.project_compose,
                                       working_directory=self.working_directory,
@@ -244,6 +254,56 @@ class KubernetesRunner(AbstractPlanRunner):
 
             ColorPrint.print_with_lvl(message="Kubernetes command: " + str(cmd), lvl=1)
             self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=envs)
+
+    def get_file(self, file):
+        return ProjectUtils.get_file(file=FileUtils.get_compose_file_relative_path(
+                                                       repo_dir=self.repo_dir, working_directory=self.working_directory,
+                                                       file_name=file))
+
+
+class HelmRunner(AbstractPlanRunner):
+
+    def __init__(self, working_directory, repo_dir):
+        self.working_directory = working_directory
+        self.repo_dir = repo_dir
+
+    def run(self, plan, commands, envs):
+        files = list()
+        dirs = list()
+        if isinstance(plan, dict) and 'helm-file' in plan:
+            for file in ProjectUtils.get_list_value(plan['helm-file']):
+                files.append(self.get_file(file=file))
+        elif isinstance(plan, dict) and 'helm-dir' in plan:
+            directories = ProjectUtils.get_list_value(plan['helm-dir'])
+            if len(directories) > 1:
+                print(directories)
+                ColorPrint.print_with_lvl(message="Helm plan use only the first directory from helm-dir")
+            dirs.append(os.path.join(FileUtils.get_relative_path(self.repo_dir, self.working_directory),
+                                     directories[0]))
+
+        """Helm command"""
+
+        cmd = list()
+        cmd.append("helm")
+        if type(commands) is list:
+            for command in commands:
+                cmd.append(command)
+        else:
+            cmd.append(commands)
+        cmd.append("pocok-" + StateHolder.name)
+
+        if "install" in cmd or "upgrade" in cmd:
+            if len(dirs) > 0:
+                cmd.append(str(dirs[0]))
+            for file in files:
+                cmd.append("-f")
+                cmd.append(str(file))
+
+        ColorPrint.print_with_lvl(message="Helm command: " + str(cmd), lvl=1)
+        try:
+            self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=envs)
+        except CalledProcessError:
+            pass
 
     def get_file(self, file):
         return ProjectUtils.get_file(file=FileUtils.get_compose_file_relative_path(

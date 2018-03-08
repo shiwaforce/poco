@@ -42,6 +42,7 @@ class ProjectUtils:
             file = ProjectUtils.get_file_from_project(file_element=project_element.get('file'),
                                                       repo_handler=ProjectUtils.get_project_repository(
                                                           project_element=project_element, ssh=ssh))
+
         if not os.path.exists(file):
             if silent:
                 return None

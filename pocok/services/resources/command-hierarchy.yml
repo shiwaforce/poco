@@ -2,34 +2,32 @@
   config: {
     before: true,
     docker: ["config"],
-    kubernetes: ["describe"]
+    kubernetes: ["describe"],
+    helm: [["install", "--debug", "--dry-run", "--name"]]
   },
   build: {
     before: true,
     docker: ["build"]
   },
-  up: {
-    before: true,
-    docker: ["build", "pull", "config", ["up", "-d"], "ps"],
-    kubernetes: ["apply"],
-    after: true
-  },
   start: {
     before: true,
     docker: ["build", "pull", "config", ["up", "-d"], "ps"],
-    kubernetes: ["apply"],
+    kubernetes: ["apply", ["get", "all", "--all-namespaces"]],
+    helm: [["install", "--name"]],
     after: true
   },
   restart: {
     before: true,
     docker: ["stop", "ps", "build", "pull", "config", ["up", "-d"], "ps"],
-    kubernetes: ["apply"],
+    kubernetes: ["apply", ["get", "all", "--all-namespaces"]],
+    helm: ["upgrade"],
     after: true
   },
   ps: {
     before: true,
     docker: ["ps"],
     kubernetes: ["get"],
+    helm: [["ls", "--all"], "status"],
     after: true
   },
   pull: {
@@ -40,11 +38,13 @@
   stop: {
     docker: ["stop", "ps"],
     kubernetes: ["delete"],
+    helm: [["del", "--purge"]],
     after: true
   },
   logs: {
     docker: ["logs"],
-    kubernetes: ["get"]
+    kubernetes: ["get"],
+    helm: ["history"]
   },
   pack: {
     docker: ["pull"],

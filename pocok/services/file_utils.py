@@ -103,7 +103,7 @@ class FileUtils:
         file_lists = os.listdir(directory)
         for ext in extensions:
             if file + "." + ext in file_lists:
-                return file + "." + ext
+                return os.path.join(directory, file + "." + ext)
         return None
 
     # TODO remove later
@@ -115,7 +115,7 @@ class FileUtils:
 
         file = FileUtils.get_file_with_extension(file="poco", directory=directory)
         if file is not None:
-            ColorPrint.print_info("Your configuration file (" + directory + "/" + file +
+            ColorPrint.print_info("Your configuration file (" + file +
                                   ") is deprecated! Use 'pocok.yaml/yml' instead.")
             return file
         if throw_exception:
