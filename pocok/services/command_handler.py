@@ -61,16 +61,19 @@ class CommandHandler(object):
         elif StateHolder.container_mode in ['Kubernetes', 'Helm']:
             self.run_kubernetes(cmd, command_list, plan)
         else:
-            runner = DockerPlanRunner(project_compose=self.project_compose,
-                                      working_directory=self.working_directory,
-                                      repo_dir=self.repo_dir)
-            if StateHolder.always_update and cmd is 'start':  # Pull before start in developer mode
-                runner.run(plan=plan, commands='pull', envs=self.get_environment_variables(plan=plan))
-            for cmd in command_list['docker']:
-                runner.run(plan=plan, commands=cmd,
-                           envs=self.get_environment_variables(plan=plan))
+            self.run_docker(cmd, command_list, plan)
 
         self.after_run(command_list, plan)
+
+    def run_docker(self, cmd, command_list, plan):
+        runner = DockerPlanRunner(project_compose=self.project_compose,
+                                  working_directory=self.working_directory,
+                                  repo_dir=self.repo_dir)
+        if StateHolder.always_update and cmd is 'start':  # Pull before start in developer mode
+            runner.run(plan=plan, commands='pull', envs=self.get_environment_variables(plan=plan))
+        for cmd in command_list['docker']:
+            runner.run(plan=plan, commands=cmd,
+                       envs=self.get_environment_variables(plan=plan))
 
     def run_kubernetes(self, cmd, command_list, plan):
         runner = KubernetesRunner(working_directory=self.working_directory, repo_dir=self.repo_dir) \

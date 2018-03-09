@@ -41,8 +41,7 @@ class ProjectAdd(AbstractCommand):
 
     def execute(self):
 
-        CatalogHandler.add_to_list(name=os.path.basename(self.target_dir), handler="git",
-                                   catalog=StateHolder.args.get('<catalog>'),
+        CatalogHandler.add_to_list(name=os.path.basename(self.target_dir),
                                    url=self.repo.remotes.origin.url, file=self.file, repo_name=self.repo_name)
         ColorPrint.print_info("Project added")
 

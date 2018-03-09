@@ -175,16 +175,17 @@ class DockerPlanRunner(AbstractPlanRunner):
     def get_docker_files(self, plan):
         docker_files = list()
         if isinstance(plan, dict) and 'docker-compose-file' in plan:
-            for service in ProjectUtils.get_list_value(plan['docker-compose-file']):
-                docker_files.append(self.get_docker_compose(service=service))
+            self.parse_file_list(ProjectUtils.get_list_value(plan['docker-compose-file']), docker_files)
         elif isinstance(plan, dict) and 'docker-compose-dir' in plan:
             docker_files.extend(self.get_file_list(self.repo_dir, self.working_directory,
                                                    ProjectUtils.get_list_value(plan['docker-compose-dir'])))
         else:
-            for service in ProjectUtils.get_list_value(plan):
-                docker_files.append(self.get_docker_compose(service=service))
-
+            self.parse_file_list(ProjectUtils.get_list_value(plan), docker_files)
         return docker_files
+
+    def parse_file_list(self, services, docker_files):
+        for service in services:
+            docker_files.append(self.get_docker_compose(service=service))
 
     def get_docker_compose(self, service):
         """Get back the docker compose file"""

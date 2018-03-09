@@ -82,13 +82,17 @@ class FileUtils:
         for directory in target_directories:
             for root, sub_folders, files in os.walk(os.path.join(base_dir, FileUtils.get_file_path(
                     repo_dir=base_dir, working_directory=actual_dir, file_name=directory))):
-                if len(filter_ends) > 0:
-                    files = [file for file in files if file.endswith(tuple(filter_ends))]
-                for file in files:
-                    if file not in files_dict.keys():
-                        files_dict[file] = list()
-                        files_dict[file].append(root)
+                FileUtils.filter_and_add_to_dict(files_dict, filter_ends, root, files)
         return files_dict
+
+    @staticmethod
+    def filter_and_add_to_dict(files_dict, filter_ends, root, files):
+        if len(filter_ends) > 0:
+            files = [file for file in files if file.endswith(tuple(filter_ends))]
+        for file in files:
+            if file not in files_dict.keys():
+                files_dict[file] = list()
+                files_dict[file].append(root)
 
     @staticmethod
     def get_parameter_or_directory_name(param):

@@ -65,15 +65,16 @@ class CatalogHandler:
             CatalogHandler.write_catalog(catalog)
 
     @staticmethod
-    def add_to_list(name, handler, url, catalog, file=None, repo_name=None):
+    def add_to_list(name, url, file=None, repo_name=None):
         """Add project to the catalog"""
+        catalog = StateHolder.args.get('<catalog>')
         if catalog is None:
             catalog = CatalogHandler.get_default_catalog()
         if catalog not in StateHolder.catalogs:
             ColorPrint.exit_after_print_messages(message="Catalog not exists : " + str(catalog))
         lst = StateHolder.catalogs[catalog]
         lst[name] = dict()
-        lst[name][handler] = str(url)
+        lst[name]['git'] = str(url)  # later support svn
         if file is not None:
             lst[name]['file'] = file
         if repo_name is not None:
