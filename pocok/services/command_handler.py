@@ -179,6 +179,12 @@ class AbstractPlanRunner(object):
             file_list.append(ProjectUtils.get_file(file=file))
         return file_list
 
+    @staticmethod
+    def get_file(repo_dir, working_directory, file):
+        return ProjectUtils.get_file(file=FileUtils.get_compose_file_relative_path(
+                                                       repo_dir=repo_dir, working_directory=working_directory,
+                                                       file_name=file))
+
 
 class ScriptPlanRunner(AbstractPlanRunner):
 
@@ -238,7 +244,7 @@ class KubernetesRunner(AbstractPlanRunner):
 
         if isinstance(plan, dict) and 'kubernetes-file' in plan:
             for file in ProjectUtils.get_list_value(plan['kubernetes-file']):
-                files.append(self.get_file(file=file))
+                files.append(self.get_file(repo_dir=self.repo_dir, working_directory=self.working_directory, file=file))
         elif isinstance(plan, dict) and 'kubernetes-dir' in plan:
             files.extend(self.get_file_list(self.repo_dir, self.working_directory,
                                             ProjectUtils.get_list_value(plan['kubernetes-dir'])))
@@ -254,11 +260,6 @@ class KubernetesRunner(AbstractPlanRunner):
             ColorPrint.print_with_lvl(message="Kubernetes command: " + str(cmd), lvl=1)
             self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=envs)
 
-    def get_file(self, file):
-        return ProjectUtils.get_file(file=FileUtils.get_compose_file_relative_path(
-                                                       repo_dir=self.repo_dir, working_directory=self.working_directory,
-                                                       file_name=file))
-
 
 class HelmRunner(AbstractPlanRunner):
 
@@ -271,7 +272,7 @@ class HelmRunner(AbstractPlanRunner):
         dirs = list()
         if isinstance(plan, dict) and 'helm-file' in plan:
             for file in ProjectUtils.get_list_value(plan['helm-file']):
-                files.append(self.get_file(file=file))
+                files.append(self.get_file(repo_dir=self.repo_dir, working_directory=self.working_directory, file=file))
         elif isinstance(plan, dict) and 'helm-dir' in plan:
             directories = ProjectUtils.get_list_value(plan['helm-dir'])
             if len(directories) > 1:
@@ -299,11 +300,6 @@ class HelmRunner(AbstractPlanRunner):
             self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=envs)
         except CalledProcessError:
             pass
-
-    def get_file(self, file):
-        return ProjectUtils.get_file(file=FileUtils.get_compose_file_relative_path(
-                                                       repo_dir=self.repo_dir, working_directory=self.working_directory,
-                                                       file_name=file))
 
 
 class DockerPlanRunner(AbstractPlanRunner):

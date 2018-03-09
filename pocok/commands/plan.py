@@ -8,13 +8,13 @@ from ..services.compose_handler import ComposeHandler
 class Plan(Start):
 
     command = "plan"
-    args = ["ls", "[<project>]"]
+    args = ["ls", "[<name>]"]
     args_descriptions = {"ls": "List all plan",
-                         "[<project>]": "Name of the project in the catalog."}
+                         "[<name>]": "Name of the project in the catalog."}
     description = "Print all available plans of the project."
 
     def prepare_states(self):
-        StateHolder.name = FileUtils.get_parameter_or_directory_name('<project>')
+        StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')
         StateHolder.work_dir = StateHolder.base_work_dir
         StateUtils.prepare("project_file")
 

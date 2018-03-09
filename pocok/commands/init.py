@@ -16,8 +16,8 @@ class Init(AbstractCommand):
     description = "Initialize pocok project, pocok.yml and docker-compose.yml will be created if they don't exist"
 
     def prepare_states(self):
-        StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')
         StateHolder.work_dir = StateHolder.base_work_dir
+        StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')
         StateUtils.prepare("project_repo")
 
     def resolve_dependencies(self):

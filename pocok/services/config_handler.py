@@ -70,12 +70,16 @@ class ConfigHandler(object):
             else:
                 config = StateHolder.config[list(StateHolder.config.keys())[0]]
 
-        if config not in list(StateHolder.config.keys()):
-            ColorPrint.exit_after_print_messages(message="Catalog not exists with name: " + config)
+        ConfigHandler.check_name(config)
         if StateHolder.config[config]['repositoryType'] == 'file':
             ColorPrint.exit_after_print_messages(message="Branch is not supported in this repository.")
         StateHolder.config[config]['branch'] = branch
         YamlUtils.write(file=StateHolder.catalog_config_file, data=StateHolder.config)
+
+    @staticmethod
+    def check_name(name):
+        if name not in list(StateHolder.config.keys()):
+            ColorPrint.exit_after_print_messages(message="Catalog not exists with name: " + name)
 
     @staticmethod
     def init():

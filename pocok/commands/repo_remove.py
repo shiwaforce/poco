@@ -1,7 +1,7 @@
 from .abstract_command import AbstractCommand
 from ..services.command_handler import CommandHandler
 from ..services.file_utils import FileUtils
-from ..services.console_logger import ColorPrint
+from ..services.config_handler import ConfigHandler
 from ..services.state import StateHolder
 from ..services.state_utils import StateUtils
 from ..services.yaml_utils import YamlUtils
@@ -21,6 +21,7 @@ class RepoRemove(AbstractCommand):
         StateUtils.prepare("compose_handler")
 
     def resolve_dependencies(self):
+        ConfigHandler.check_name(StateHolder.name)
         if StateHolder.poco_file is not None and StateHolder.compose_handler.have_script("remove_script"):
             EnvironmentUtils.check_docker()
 
@@ -31,8 +32,5 @@ class RepoRemove(AbstractCommand):
 
     @staticmethod
     def remove():
-        catalog = StateHolder.args.get('<name>')
-        if catalog not in list(StateHolder.config.keys()):
-            ColorPrint.exit_after_print_messages(message="Catalog not exists with name: " + catalog)
-        del StateHolder.config[catalog]
+        del StateHolder.config[StateHolder.name]
         YamlUtils.write(file=StateHolder.catalog_config_file, data=StateHolder.config)
