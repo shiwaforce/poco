@@ -17,11 +17,9 @@ class PocokDockerTestSuite(AbstractTestSuite):
         with self.captured_output() as (out, err):
             self.run_pocok_command("start", "nginx")
         self.assertEqual(0, len(err.getvalue()))
-        self.assertEqual(0, len(out.getvalue()))
         with self.captured_output() as (out, err):
             self.run_pocok_command("stop", "nginx")
         self.assertEqual(0, len(err.getvalue()))
-        self.assertEqual(0, len(out.getvalue()))
 
     @mock.patch('pocok.services.environment_utils.EnvironmentUtils.check_docker')
     @mock.patch('pocok.services.command_runners.AbstractPlanRunner.run_script_with_check')
