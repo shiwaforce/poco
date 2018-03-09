@@ -17,8 +17,7 @@ class Branches(AbstractCommand):
         StateUtils.prepare("project_repo")
 
     def resolve_dependencies(self):
-        if StateHolder.repository is None:
-            ColorPrint.exit_after_print_messages(message="Project not exists " + str(StateHolder.name))
+        StateUtils.check_variable('repository')
 
     def execute(self):
         StateHolder.repository.print_branches()

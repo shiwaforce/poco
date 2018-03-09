@@ -20,8 +20,7 @@ class Start(AbstractCommand):
         StateUtils.prepare("compose_handler")
 
     def resolve_dependencies(self):
-        if StateHolder.poco_file is None:
-            ColorPrint.exit_after_print_messages(message="Project not exists " + str(StateHolder.name))
+        StateUtils.check_variable('poco_file')
 
     def execute(self):
         if self.need_checkout:

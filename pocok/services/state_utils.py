@@ -99,6 +99,11 @@ class StateUtils:
                     StateHolder.name = arg
 
     @staticmethod
+    def check_variable(var):
+        if getattr(StateHolder, var) is None:
+            ColorPrint.exit_after_print_messages(message="Project not exists " + str(StateHolder.name))
+
+    @staticmethod
     def read_project_config_and_catalog():  # TODO
         CatalogHandler.load()
         if StateHolder.name is not None:

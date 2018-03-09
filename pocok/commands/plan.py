@@ -1,12 +1,11 @@
-from .abstract_command import AbstractCommand
+from .start import Start
 from ..services.state_utils import StateUtils
 from ..services.state import StateHolder
 from ..services.file_utils import FileUtils
-from ..services.console_logger import ColorPrint
 from ..services.compose_handler import ComposeHandler
 
 
-class Plan(AbstractCommand):
+class Plan(Start):
 
     command = "plan"
     args = ["ls", "[<project>]"]
@@ -18,10 +17,6 @@ class Plan(AbstractCommand):
         StateHolder.name = FileUtils.get_parameter_or_directory_name('<project>')
         StateHolder.work_dir = StateHolder.base_work_dir
         StateUtils.prepare("project_file")
-
-    def resolve_dependencies(self):
-        if StateHolder.poco_file is None:
-            ColorPrint.exit_after_print_messages(message="Project not exists " + str(StateHolder.name))
 
     def execute(self):
         compose_handler = ComposeHandler(StateHolder.poco_file)
