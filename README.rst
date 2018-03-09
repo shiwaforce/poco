@@ -25,7 +25,7 @@ Pocok
 About
 -----
 
-**poco** lets you catalogue and manage your projects using simple YAML files to shorten the route from finding your project to initialising it in your local environment.
+**pocok** lets you catalogue and manage your projects using simple YAML files to shorten the route from finding your project to initialising it in your local environment.
 
 This helps you set up your local development environment and to run demos.
 
@@ -36,6 +36,7 @@ Requirements
 
  - Docker, version > 17, if you want use Docker-compose files
  - kubectl, if you want use Kubernetes files
+ - helm, if you want use helm functionality
 
 Quick start
 ===========
@@ -43,23 +44,21 @@ Quick start
 .. image:: https://asciinema.org/a/137172.png
     :target: https://asciinema.org/a/137172
 
-Install the latest poco:
+Install the latest pocok:
 
-``$ pip install poco``
+``$ pip install pocok``
 
 It will be initialise the sample catalogue at first time
 
-``$ poco catalog init``
+``$ pocok repo add sample https://github.com/shiwaforce/poco-example``
 
 List all projects in the catalogue:
 
-``$ poco catalog ls``
-
-``example-voting-app``
+``$ pocok catalog``
 
 List all available plans of the example-voting-app:
 
-``$ poco plan ls example-voting-app``
+``$ pocok plan ls example-voting-app``
 
 ``default``
 
@@ -71,7 +70,7 @@ Make sure your local Docker engine is up and running.
 
 Start the Docker example voting app in javaworker plan:
 
-``$ poco start example-voting-app javaworker``
+``$ pocok start example-voting-app javaworker``
 
 This will download all the required Docker images and start them. The last step of the process will issue a "docker ps" command listing all the running containers.
 
@@ -81,13 +80,13 @@ The application was started in javaworker plan, so the examplevotingapp_worker c
 
 Stop the example voting app:
 
-``$ poco down example-voting-app javaworker``
+``$ pocok down example-voting-app javaworker``
 
 ``Project stopped``
 
 Start the Docker example voting app in default plan:
 
-``$ poco start example-voting-app default``
+``$ pocok start example-voting-app default``
 
 Visit http://localhost:5000 to see the application's main page.
 
@@ -95,7 +94,7 @@ The application was started in default plan, so the examplevotingapp_worker cont
 
 Stop the example voting app:
 
-``$ poco down example-voting-app default``
+``$ pocok down example-voting-app default``
 
 ``Project stopped``
 
@@ -109,7 +108,7 @@ Detailed installation steps
 
 Use pip:
 
-``$ pip install poco``
+``$ pip install pocok``
 
 or
 
@@ -118,7 +117,7 @@ or
 Without configuration and catalogue
 -----------------------------------
 
-If you haven't an own home directory but your actual directory contains an poco.yml, you can use the same commands.
+If you haven't an own home directory but your actual directory contains an pocok.yml, you can use the same commands.
 
 The "catalog" and "catalog config" commands will not works this way.
 
@@ -127,10 +126,10 @@ You can change docker container's names, if you use <project> parameter.
 Home directory
 --------------
 
-The home directory is in the user's local home directory with the name: .poco
+The home directory is in the user's local home directory with the name: .pocok
 
 For example (OSX):
-    /Users/john.doe/.poco
+    /Users/john.doe/.pocok
 
 Basic configuration file
 ------------------------
@@ -173,20 +172,20 @@ Example 2 (Git, multiple):
 Project catalog file
 --------------------
 
-It describes the lists of the projects and the location of the projects' poco files in YAML format.
+It describes the lists of the projects and the location of the projects' pocok files in YAML format.
 
 Configuration:
  - keys: The name of the projects
  - git (optional): must be a valid GIT url for the project
  - svn (optional): must be a valid SVN url for the project
  - branch (optional): branch name - default : master
- - file (optional): path to the poco file. - Default : poco.yml
+ - file (optional): path to the pocok file. - Default : pocok.yml
  - repository-dir (optional): the base directory name where the project will be checked out. - Default: name of the project
  - ssh-key (optional): ssh file location for the Git repository - default: ~/.ssh/id_rsa
 
 If you don't define the repository it will be relative to the config file's location
 
-If the path ends with a name of a directory it will be extended with the default filename : poco.yml
+If the path ends with a name of a directory it will be extended with the default filename : pocok.yml
 
 For example:
 ::
@@ -260,115 +259,123 @@ For example:
 Commands
 --------
 
-    **poco catalog add [<target-dir>] [<catalog>]**
+    **pocok project add [<target-dir>] [<catalog>]**
 
-adds the current directory (or target directory) to the poco-catalog - default or selected (if it is a Git repository)
+Add directory to catalog.
 
-    **poco catalog ls**
+    **pocok project init [<name>]**
 
-lists the available projects (from the poco-catalog file)
+Initialize pocok project, pocok.yml and docker-compose.yml will be created if they don't exist
 
-    **poco catalog config**
+    **pocok project ls**
 
-prints the local config
+List the available projects in repos.
 
-    **poco catalog branch <branch> [<catalog>] [-f]**
+    **pocok project (remove|rm) <name>**
 
-switches branch in the poco-catalog (default is the name with 'default' or the first) repository, use -f to force
+Remove project from the catalog.
 
-    **poco catalog branches [<catalog>]**
+    **pocok repo (add|modify) <name> <git-url> [<branch>] [<file>]**
 
-lists the available poco-catalog (default is the name with 'default' or the first) repository branches
+Add new/Modify repository to the config.
 
-    **poco catalog push [<catalog>]**
+    **pocok repo branch <branch> [<name>] [-f]**
 
-pushes poco-catalog (default is the name with 'default' or the first) changes to the repository (if it is not a local file)
+Switch catalog branch if it is using GIT.
 
-    **poco catalog remove <project>**
+    **pocok repo branches [<name>]**
 
-removes selected project form the poco-catalog
+List all available branches of catalog's GIT repository.
 
-    **poco config <project> [plan]**
+    **pocok repo ls**
 
-prints the full config for selected project with plan (docker-compose file with environment variables or kubernetes describe)
+List the configs of repos.
 
-    **poco clean**
+    **pocok repo push [<name>]**
 
-cleans up all docker images, volumes and pulled repositories and data
+Push changes into catalog's remote GIT repository.
 
-    **poco init <project>**
+    **pocok repo (remove|rm) [<name>]**
 
-initialises selected project with the following steps:
-creates the poco file if it does not exist
-creates the docker-compose sample file if it does not exist
+Remove repository from local config.
 
-    **poco install <project> [plan]**
+    **pocok branch <name> <branch> [-f]**
 
-installs selected project with selected plan
-gets project descriptors from repository
+Switch branch on a defined project.
 
-    **poco up <project> [plan]**
+    **pocok branches [<name>]**
 
-starts the project with selected plan (if exists)
-installs if it isn't installed yet
+List all available git branches of the project.
 
-    **poco down <project> [plan]**
+    **pocok build [<project/plan>]**
 
-stops docker or kubernetes containers belonging the given project with selected plan
+Build containers depends defined project and plan.
 
-    **poco build <project> [plan]**
+    **pocok catalog**
 
-builds docker images for the selected project with the specified plan (not works with Kubernetes)
+List the available projects in repos.
 
-    **poco ps <project> [plan]**
+    **pocok clean**
 
-lists the state of docker images or kubernetes in selected project
+Clean all container and image from local Docker repository.
 
-    **poco plan ls <project>**
+    **pocok config [<project/plan>]**
 
-lists available plans in selected projects
+Print full Docker compose configuration for a project's plan.
 
-    **poco pull <project> [plan]**
+    **pocok init [<name>]**
 
-pulls docker images for the specified project with the selected plan (not works with Kubernetes)
+Initialize pocok project, pocok.yml and docker-compose.yml will be created if they don't exist
 
-    **poco start <project> [plan]**
+    **pocok install [<project/plan>]**
 
-alternative for up
+Get projects from remote repository (if its not exists locally yet) and run install scripts.
 
-    **poco stop <project> [plan]**
+    **pocok (log|logs) [<project/plan>]**
 
-alternative for down
+Print docker containers logs of the current project with the default or defined plan.
 
-    **poco restart <project> [plan]**
+    **pocok pack [<project/plan>]**
 
-restarts docker or kubernetes containers which belong to the specified project with selected plan
+Pack the selected project's plan configuration with docker images into an archive.
 
-    **poco log <project> [plan]**
+    **pocok plan ls [<project>]**
 
-prints log from docker or kubernetes containers which belongs to the specified project with selected plan
+Print all available plans of the project.
 
-    **poco logs <project> [plan]**
+    **pocok ps [<project/plan>]**
 
-prints log from docker or kubernetes containers which belongs to the specified project with selected plan
+Print containers statuses which depends defined project and plan.
 
-    **poco branch <project> <branch>**
+     **pocok pull [<project/plan>]**
 
-switches branch in the specified project repository
+Pull all necessary images for the project with the defined or default plan.
 
-    **poco branches <project>**
+    **pocok restart [<project/plan>]**
 
-lists the available project repository branches
+Restart project with the default or defined plan.
+
+    **pocok (start|up) [<project/plan>]**
+
+Start pocok project with the default or defined plan.
+
+    **pocok (stop|down) [<project/plan>]**
+
+Stop project with the default or defined plan.
+
+    **pocok unpack [<name>]**
+
+Unpack archive, install images to local repository.
 
 
 Local uninstall
 ---------------
 
-Delete the egg file from the current Python site-packages (for example: poco-0.15-py2.7)
+Delete the egg file from the current Python site-packages (for example: pocok-0.90.0-py2.7)
 
 OSX
 """
-remove script from /usr/local/bin (poco)
+remove script from /usr/local/bin (pocok)
 
 License
 -------
