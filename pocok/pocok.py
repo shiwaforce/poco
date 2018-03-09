@@ -58,17 +58,7 @@ class Pocok(object):
         while counter < 10:  # for tests
             counter += 1
 
-            cmd = self.active_object
-
-            if cmd.state == CommandState.INIT:
-                cmd.state = self.next_state(cmd.prepare_states(), CommandState.RESOLVE)
-            elif cmd.state == CommandState.RESOLVE:
-                cmd.state = self.next_state(cmd.resolve_dependencies(), CommandState.EXECUTE)
-            elif cmd.state == CommandState.EXECUTE:
-                cmd.state = self.next_state(cmd.execute(), CommandState.CLEANUP)
-            elif cmd.state == CommandState.CLEANUP:
-                cmd.state = self.next_state(cmd.cleanup(), CommandState.DESTROYED)
-            elif cmd.state == CommandState.DESTROYED:
+            if self.inner_flow():
                 break
 
         if not counter < 10:
@@ -77,6 +67,19 @@ class Pocok(object):
                                                  "\tResolve dependencies: " +
                                                  str(self.active_object.resolved_dependencies) +
                                                  "\tExecuted: " + str(self.active_object.executed))
+
+    def inner_flow(self):
+        cmd = self.active_object
+        if cmd.state == CommandState.INIT:
+            cmd.state = self.next_state(cmd.prepare_states(), CommandState.RESOLVE)
+        elif cmd.state == CommandState.RESOLVE:
+            cmd.state = self.next_state(cmd.resolve_dependencies(), CommandState.EXECUTE)
+        elif cmd.state == CommandState.EXECUTE:
+            cmd.state = self.next_state(cmd.execute(), CommandState.CLEANUP)
+        elif cmd.state == CommandState.CLEANUP:
+            cmd.state = self.next_state(cmd.cleanup(), CommandState.DESTROYED)
+        elif cmd.state == CommandState.DESTROYED:
+            return True
 
     @staticmethod
     def next_state(desired_next, default_next):
