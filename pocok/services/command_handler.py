@@ -58,19 +58,8 @@ class CommandHandler(object):
             # script running only if start or up command
             if cmd == 'start' or cmd == 'up':
                 self.script_runner.run(plan=plan, script_type='script')
-        elif StateHolder.container_mode == 'Kubernetes':
-            runner = KubernetesRunner(working_directory=self.working_directory,
-                                      repo_dir=self.repo_dir)
-            if len(command_list['kubernetes']) == 0:
-                ColorPrint.exit_after_print_messages('Command: ' + cmd + ' not supported with Kubernetes')
-            for cmd in command_list['kubernetes']:
-                runner.run(plan=plan, command=cmd, envs=self.get_environment_variables(plan=plan))
-        elif StateHolder.container_mode == 'Helm':
-            runner = HelmRunner(working_directory=self.working_directory, repo_dir=self.repo_dir)
-            if len(command_list['helm']) == 0:
-                ColorPrint.exit_after_print_messages('Command: ' + cmd + ' not supported with Helm')
-            for cmd in command_list['helm']:
-                runner.run(plan=plan, commands=cmd, envs=self.get_environment_variables(plan=plan))
+        elif StateHolder.container_mode in ['Kubernetes', 'Helm']:
+            self.run_kubernetes(cmd, command_list, plan)
         else:
             runner = DockerPlanRunner(project_compose=self.project_compose,
                                       working_directory=self.working_directory,
@@ -82,6 +71,16 @@ class CommandHandler(object):
                            envs=self.get_environment_variables(plan=plan))
 
         self.after_run(command_list, plan)
+
+    def run_kubernetes(self, cmd, command_list, plan):
+        runner = KubernetesRunner(working_directory=self.working_directory, repo_dir=self.repo_dir) \
+            if StateHolder.container_mode == 'Kubernetes' \
+            else HelmRunner(working_directory=self.working_directory, repo_dir=self.repo_dir)
+
+        if len(command_list[StateHolder.container_mode.lower()]) == 0:
+            ColorPrint.exit_after_print_messages('Command: ' + cmd + ' not supported with' + StateHolder.container_mode)
+        for cmd in command_list[StateHolder.container_mode.lower()]:
+            runner.run(plan=plan, commands=cmd, envs=self.get_environment_variables(plan=plan))
 
     def check_command(self, cmd):
         if self.hierarchy is None or not isinstance(self.hierarchy, dict):
@@ -233,7 +232,7 @@ class KubernetesRunner(AbstractPlanRunner):
         self.working_directory = working_directory
         self.repo_dir = repo_dir
 
-    def run(self, plan, command, envs):
+    def run(self, plan, commands, envs):
 
         files = list()
 
@@ -248,7 +247,7 @@ class KubernetesRunner(AbstractPlanRunner):
         for kube_file in files:
             cmd = list()
             cmd.append("kubectl")
-            cmd.append(command)
+            cmd.extend(ProjectUtils.get_list_value(commands))
             cmd.append("-f")
             cmd.append(str(kube_file))
 
@@ -285,11 +284,7 @@ class HelmRunner(AbstractPlanRunner):
 
         cmd = list()
         cmd.append("helm")
-        if type(commands) is list:
-            for command in commands:
-                cmd.append(command)
-        else:
-            cmd.append(commands)
+        cmd.extend(ProjectUtils.get_list_value(commands))
         cmd.append("pocok-" + StateHolder.name)
 
         if "install" in cmd or "upgrade" in cmd:
@@ -331,13 +326,7 @@ class DockerPlanRunner(AbstractPlanRunner):
         for compose_file in docker_files:
             cmd.append("-f")
             cmd.append(str(compose_file))
-
-        if type(commands) is list:
-            for command in commands:
-                cmd.append(command)
-        else:
-            cmd.append(commands)
-
+        cmd.extend(ProjectUtils.get_list_value(commands))
         ColorPrint.print_with_lvl(message="Docker command: " + str(cmd), lvl=1)
         self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=envs)
 

@@ -2,6 +2,7 @@ from subprocess import check_output, CalledProcessError
 from .abstract_command import AbstractCommand
 from ..services.console_logger import ColorPrint
 from ..services.environment_utils import EnvironmentUtils
+from ..services.project_utils import ProjectUtils
 
 
 class Clean(AbstractCommand):
@@ -61,11 +62,7 @@ class Clean(AbstractCommand):
     def checkout(self, *args):
         command_array = list()
         for cnt, command in enumerate(args):
-            if type(command) is list:
-                for comm in command:
-                    command_array.append(comm)
-            else:
-                command_array.append(command)
+            command_array.extend(ProjectUtils.get_list_value(command))
         try:
             check_output(" ".join(command_array), shell=True)
         except CalledProcessError as grepexc:

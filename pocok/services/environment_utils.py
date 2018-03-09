@@ -21,19 +21,19 @@ class EnvironmentUtils:
 
     @staticmethod
     def check_kubernetes():
-        p = Popen("kubectl version --short", stdout=PIPE, stderr=PIPE, shell=True)
-        out, err = p.communicate()
-        if not len(err) == 0 or len(out) == 0:
-            ColorPrint.exit_after_print_messages(message=str(err).strip())
-        ColorPrint.print_with_lvl(message="Kubernetes\n " + str(out).strip())
+        EnvironmentUtils.check_base(command="kubectl version --short", message_head="Kubernetes")
 
     @staticmethod
     def check_helm():
-        p = Popen("helm version -s --short", stdout=PIPE, stderr=PIPE, shell=True)
+        EnvironmentUtils.check_base(command="helm version -s --short", message_head="Helm")
+
+    @staticmethod
+    def check_base(command, message_head):
+        p = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
         if not len(err) == 0 or len(out) == 0:
             ColorPrint.exit_after_print_messages(message=str(err).strip())
-        ColorPrint.print_with_lvl(message="Helm\n " + str(out).strip(), lvl=1)
+        ColorPrint.print_with_lvl(message=message_head + "\n " + str(out).strip(), lvl=1)
 
     @staticmethod
     def check_version(version):
