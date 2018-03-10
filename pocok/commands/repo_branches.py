@@ -10,7 +10,8 @@ class RepoBranches(AbstractCommand):
     command = "branches"
     args = ["[<name>]"]
     args_descriptions = {"[<name>]": "Name of the catalog."}
-    description = "List all available branches of catalog's GIT repository."
+    description = "Run: 'pocok repo branches default' to list all available branches of default catalog's " \
+                  "GIT repository."
 
     def prepare_states(self):
         StateUtils.prepare("catalog")

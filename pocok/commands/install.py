@@ -9,7 +9,8 @@ from ..services.command_handler import CommandHandler
 class Install(Start):
 
     command = "install"
-    description = "Get projects from remote repository (if its not exists locally yet) and run install scripts."
+    description = "Run: 'pocok install nginx/default' to get nginx project from remote repository (if its not exists " \
+                  "locally yet) and run install scripts."
 
     def resolve_dependencies(self):
         Start.resolve_dependencies(self)

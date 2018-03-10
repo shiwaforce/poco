@@ -11,7 +11,7 @@ class Plan(Start):
     args = ["ls", "[<name>]"]
     args_descriptions = {"ls": "List all plan",
                          "[<name>]": "Name of the project in the catalog."}
-    description = "Print all available plans of the project."
+    description = "Run: 'pocok plan ls nginx' to print all available plans of the nginx project."
 
     def prepare_states(self):
         StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')

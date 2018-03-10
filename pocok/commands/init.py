@@ -13,7 +13,8 @@ class Init(AbstractCommand):
     command = "init"
     args = ["[<name>]"]
     args_descriptions = {"[<name>]": "Name of the project or the actual directory if it is empty"}
-    description = "Initialize pocok project, pocok.yml and docker-compose.yml will be created if they don't exist"
+    description = "Run: 'pocok init nginx' or 'pocok project init nginx' to initialize pocok project, pocok.yml " \
+                  "and docker-compose.yml will be created if they don't exist in nginx project directory"
 
     def prepare_states(self):
         StateHolder.work_dir = StateHolder.base_work_dir

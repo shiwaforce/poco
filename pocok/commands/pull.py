@@ -4,7 +4,8 @@ from .start import Start
 class Pull(Start):
 
     command = "pull"
-    description = "Pull all necessary images for the project with the defined or default plan."
+    description = "Run: 'pocok pull nginx/default' to pull all necessary images for the project 'nginx' and plan " \
+                  "'default'. It is working only Docker."
 
     run_command = "pull"
     need_checkout = True

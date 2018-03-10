@@ -10,7 +10,7 @@ class Branches(AbstractCommand):
     command = "branches"
     args = ["[<name>]"]
     args_descriptions = {"[<name>]": "Name of the project in the catalog."}
-    description = "List all available git branches of the project."
+    description = "Run: 'pocok branches nginx' to list all available git branches of the 'nginx' project."
 
     def prepare_states(self):
         StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')

@@ -10,7 +10,8 @@ class Unpack(Start):
     command = "unpack"
     args = ["[<name>]"]
     args_descriptions = {"[<name>]": "Name of the project in the catalog."}
-    description = "Unpack archive, install images to local repository."
+    description = "Run: 'pocok unpack name' to unpack archive from .pocok file and install images to local repository " \
+                  "with name: 'name'."
 
     def prepare_states(self):
         StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')

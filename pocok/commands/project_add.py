@@ -15,7 +15,7 @@ class ProjectAdd(AbstractCommand):
     args_descriptions = {"[<target-dir>]": "Target directory that will be added to the catalog. "
                                            "(default: current directory)",
                          "[<catalog>]": "Name of the catalog. (default: name with default or first)"}
-    description = "Add directory to catalog."
+    description = "Run: 'pocok project add . default' to add actual directory to default catalog."
 
     def __init__(self):
         super(ProjectAdd, self).__init__()

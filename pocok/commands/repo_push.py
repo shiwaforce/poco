@@ -11,7 +11,7 @@ class RepoPush(AbstractCommand):
     command = "push"
     args = ["[<name>]"]
     args_descriptions = {"[<name>]": "Name of the catalog."}
-    description = "Push changes into catalog's remote GIT repository."
+    description = "Run: 'pocok repo push default' to push changes into default catalog's remote GIT repository."
 
     def prepare_states(self):
         StateUtils.prepare("catalog")

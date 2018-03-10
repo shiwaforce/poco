@@ -8,7 +8,7 @@ from ..services.project_utils import ProjectUtils
 class Clean(AbstractCommand):
 
     command = "clean"
-    description = "Clean all container and image from local Docker repository."
+    description = "Run: 'pocok clean' to clean all container and image from local Docker repository."
 
     def prepare_states(self):
         """ Nothing need """

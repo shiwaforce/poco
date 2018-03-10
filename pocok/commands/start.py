@@ -10,7 +10,8 @@ class Start(AbstractCommand):
     command = ["start", "up"]
     args = ["[<project/plan>]"]
     args_descriptions = {"[<project/plan>]": "Name of the project in the catalog and/or name of the project's plan"}
-    description = "Start pocok project with the default or defined plan."
+    description = "Run: 'pocok start nginx/default' or 'pocok up nginx/default' to start nginx project (docker, helm " \
+                  "or kubernetes) with the default plan."
 
     run_command = "start"
     need_checkout = True

@@ -13,7 +13,8 @@ class RepoBranch(AbstractCommand):
     args_descriptions = {"<branch>": "Name of the branch that should be checked out.",
                          "[<name>]": "Name of the catalog.",
                          "[-f]": "Force switch."}
-    description = "Switch catalog branch if it is using GIT."
+    description = "Run: 'pocok repo branch master default' to switch default catalog's branch to master if it " \
+                  "is using GIT."
 
     def prepare_states(self):
         StateUtils.prepare("catalog")

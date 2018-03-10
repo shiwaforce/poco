@@ -9,7 +9,7 @@ from ..services.catalog_handler import CatalogHandler
 class Catalog(AbstractCommand):
 
     command = "catalog"
-    description = "List the available projects in repos."
+    description = "Run: 'pocok project ls' or 'pocok catalog' to list the available projects in repos."
 
     def prepare_states(self):
         StateUtils.prepare("catalog")

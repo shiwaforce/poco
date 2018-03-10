@@ -8,7 +8,7 @@ class RepoLs(AbstractCommand):
 
     sub_command = "repo"
     command = "ls"
-    description = "List the configs of repos."
+    description = "Run: 'pocok repo ls' to list the configs of repos."
 
     def prepare_states(self):
         StateUtils.prepare("catalog")

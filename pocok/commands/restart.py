@@ -4,7 +4,8 @@ from .start import Start
 class Restart(Start):
 
     command = "restart"
-    description = "Restart project with the default or defined plan."
+    description = "Run: 'pocok restart nginx default' to restart nginx/project (docker, helm or kubernetes) " \
+                  "with the default plan."
 
     run_command = "restart"
 

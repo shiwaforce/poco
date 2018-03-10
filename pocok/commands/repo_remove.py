@@ -14,7 +14,7 @@ class RepoRemove(AbstractCommand):
     command = ["remove", "rm"]
     args = ["[<name>]"]
     args_descriptions = {"[<name>]": "Name of the repository."}
-    description = "Remove repository from local config."
+    description = "Run: 'pocok repo remove default' or 'pocok repo rm default' to remove 'default' catalog's config."
 
     def prepare_states(self):
         StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')

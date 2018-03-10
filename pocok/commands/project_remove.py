@@ -11,7 +11,8 @@ class ProjectRemove(AbstractCommand):
     command = ["remove", "rm"]
     args = ["<name>"]
     args_descriptions = {"<name>": "Name of the project that will be removed"}
-    description = "Remove project from the catalog."
+    description = "Run: 'pocok project remove nginx' or 'pocok project rm nginx' to remove 'nginx' " \
+                  "project from the catalog."
 
     def prepare_states(self):
         StateHolder.name = StateHolder.args.get('<name>')
