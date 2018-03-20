@@ -29,7 +29,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'pocok help <command>' for more information on a specific command."""
-__version__ = '0.90.0'
+__version__ = '0.90.1'
 
 
 class Pocok(object):
@@ -209,10 +209,10 @@ class Pocok(object):
 
 def main():
     pocok = Pocok()
-    # try:
-    pocok.start_flow()
-    # except Exception as ex:
-    #    ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
+    try:
+        pocok.start_flow()
+    except Exception as ex:
+        ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
 
 if __name__ == '__main__':
     sys.exit(main())
