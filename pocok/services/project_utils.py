@@ -61,7 +61,10 @@ class ProjectUtils:
     @staticmethod
     def get_file(file):
         """Get file from project repository"""
-        return StateHolder.repositories.get(StateHolder.name).get_file(file)
+        repo = StateHolder.repositories.get(StateHolder.name)
+        if repo is not None:
+            return repo.get_file(file)
+        return os.path.join(os.getcwd(), file)
 
     @staticmethod
     def get_target_dir(project_element):

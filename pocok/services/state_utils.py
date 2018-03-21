@@ -50,8 +50,7 @@ class StateUtils:
     @staticmethod
     def prepare_project_repo():
         """Get project parameters form catalog, if it is exists"""
-
-        if StateHolder.name is None:
+        if StateHolder.name is None or StateHolder.catalogs is None:
             return
         ssh = None
         for catalog in StateHolder.catalogs:
