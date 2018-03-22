@@ -57,8 +57,8 @@ class EnvironmentUtils:
         if "(from versions: " in pip_content:
             first_line = pip_content.strip().splitlines()[0]
             versions = first_line.split(",")
-            if not len(versions[-1]) == len(first_line):
-                return versions[-1].strip(') ')
+            if len(versions[-1]) > 0:
+                return versions[-1][0:versions[-1].find(')')].strip()
         return "0.0.0"
 
     @staticmethod
