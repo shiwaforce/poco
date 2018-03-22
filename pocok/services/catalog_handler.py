@@ -170,7 +170,7 @@ class CatalogHandler:
             CatalogHandler.check_and_print_project(lst)
         else:
             ColorPrint.print_with_lvl(
-                message="Project catalog is empty. You can add projects with 'project-catalog add' command",
+                message="Project catalog is empty. You can add projects with 'pocok repo add' command",
                 lvl=-1)
 
     @staticmethod

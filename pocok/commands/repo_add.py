@@ -11,7 +11,7 @@ class RepoAdd(AbstractCommand):
     args_descriptions = {"<name>": "Name of the repository.",
                          "<git-url>": "URL of catalog's GIT repository",
                          "[<branch>]": "Name of the branch that should be checked out.(default: master)",
-                         "[<file>]": "Name of the catalog file in the repository.(default: pocok-catalog.yml)"}
+                         "[<file>]": "Name of the catalog file in the repository (default: pocok-catalog.yml)."}
     description = "Run: 'pocok repo add default https://github.com/shiwaforce/poco-example master' to add new " \
                   "catalog to the config from github and use master branch. Modify command use same metholody."
 
