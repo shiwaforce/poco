@@ -13,7 +13,7 @@
 
 - **Simple**. Configure, run and switch between projects with a very simple command line interface.     
 - **Flexibility**. Scaling, maintaining projects of any complexity is easy as never before.
-- **Configure Once, Use Everywhere**. This is what makes Pocok so unique. It is enough just to configure project once so the rest of your team will feel the value of zero configuration. 
+- **Configure Once, Use Everywhere**. Configure project once so the rest of your team will feel the value of zero configuration. 
 
 ## Features
 - **Docker, Docker-Compose, Kubernetes, Helm** support out of the box.
