@@ -54,6 +54,7 @@ class CommandHandler(object):
         if not isinstance(command_list, dict):
             ColorPrint.print_info("Wrong command in hierarchy: " + str(command_list))
 
+        self.pre_run(command_list, plan)
         if isinstance(plan, dict) and 'script' in plan:
             # script running only if start or up command
             if cmd == 'start' or cmd == 'up':
