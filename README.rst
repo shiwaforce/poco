@@ -27,8 +27,7 @@ Kubernetes projects of any complexity using simple YAML config files to
 shorten the route from finding your project to initialising it in your
 local environment.
 
--  **Simple**. Run any Docker, Docker-Compose, Kubernetes project of any
-   complexity in any defined environment just in few command lines.
+-  **Simple**. Configure, run and switch between projects with a very simple command line interface.
 -  **Flexibility**. Scaling, maintaining projects of any complexity is
    easy as never before.
 -  **Configure Once, Use Everywhere**. This is what makes Pocok so
