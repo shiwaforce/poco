@@ -12,7 +12,7 @@
 **Pocok** helps to organise and manage Docker, Docker-Compose, Kubernetes projects of any complexity using simple YAML config files to shorten the route from finding your project to initialising it in your local environment. 
 
 - **Simple**. Configure, run and switch between projects with a very simple command line interface.     
-- **Flexibility**. Scaling, maintaining projects of any complexity is easy as never before.
+- **Flexibility**. Manage, scale, maintain projects of any complexity with ease.
 - **Configure Once, Use Everywhere**. Configure project once so the rest of your team will feel the value of zero configuration. 
 
 ## Features
