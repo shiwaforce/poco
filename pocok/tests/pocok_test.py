@@ -152,7 +152,7 @@ class PocokTestSuite(AbstractTestSuite):
         with self.captured_output() as (out, err):
             self.run_pocok_command("catalog")
         self.assertEqual(0, len(err.getvalue()))
-        self.assertIn("Project catalog is empty. You can add projects with 'project-catalog add' command",
+        self.assertIn("Project catalog is empty. You can add projects with 'pocok repo add' command",
                       out.getvalue().strip())
 
     def test_catalog(self):
