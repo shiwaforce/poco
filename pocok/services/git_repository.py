@@ -35,6 +35,7 @@ class GitRepository(AbstractRepository):
                 self.set_branch(branch=branch, force=force)
         except git.GitCommandError as exc:
             if not silent:
+                ColorPrint.print_error("Problem with repository: " + target_dir + " (" + url + ")")
                 ColorPrint.exit_after_print_messages(message=exc.stderr)
 
     def get_branches(self):
@@ -50,6 +51,8 @@ class GitRepository(AbstractRepository):
             else:
                 self.pull()
         except git.GitCommandError as exc:
+            ColorPrint.print_error("Problem with repository: " + self.target_dir +
+                                   " (" + self.repo.remotes.origin.url + ")")
             ColorPrint.exit_after_print_messages(message=exc.stderr)
 
     def push(self):

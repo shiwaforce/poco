@@ -161,7 +161,6 @@ class CatalogHandler:
         lst = StateHolder.catalogs
         empty = True
         for cat in lst.keys():
-            print(lst[cat])
             if len(lst[cat].keys()) > 0:
                 empty = False
                 break

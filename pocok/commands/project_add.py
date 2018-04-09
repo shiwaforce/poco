@@ -43,8 +43,7 @@ class ProjectAdd(AbstractCommand):
         self.file = file_name if directory is None else directory + file_name
 
     def execute(self):
-
-        CatalogHandler.add_to_list(name=os.path.basename(self.target_dir),
+        CatalogHandler.add_to_list(name=os.path.basename(os.path.abspath(self.target_dir)),
                                    url=self.repo.remotes.origin.url, file=self.file, repo_name=self.repo_name)
         ColorPrint.print_info("Project added")
 
