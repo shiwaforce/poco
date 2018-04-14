@@ -22,367 +22,100 @@ Pocok
    :height: 200px
    :width: 200px
 
-About
------
+**Pocok** helps to organise and manage Docker, Docker-Compose,
+Kubernetes projects of any complexity using simple YAML config files to
+shorten the route from finding your project to initialising it in your
+local environment.
 
-**pocok** lets you catalogue and manage your projects using simple YAML files to shorten the route from finding your project to initialising it in your local environment.
+-  **Simple**. Configure, run and switch between projects with a very simple command line interface.
+-  **Flexibility**. Manage, scale, maintain projects of any complexity with ease.
+-  **Configure Once, Use Everywhere**. Configure project once so the rest of your team will feel the value of zero configuration.
 
-This helps you set up your local development environment and to run demos.
+Features
+--------
 
-Working examples can be found here: https://github.com/shiwaforce/poco-example
+-  **Docker, Docker-Compose, Kubernetes, Helm** support out of the box.
+-  **Git, SVN** support out of the box.
+-  **Project Catalog, Multiple Catalogues**. Create your own project
+   catalog. Organise and your projects without additional tools.
+-  **Multiple Plans**. Create multiple plans for different environments
+   or even environments for demo purposes. Switch between plans
+   (environments) with ease.
+-  **Simple Config Files**. Pocok helps to split config files, so it is
+   easy to maintain and scale them any time.
+-  **Script Support (Hooks)**. Add additional scripts any time.
+
+Documentation
+-------------
+All documentation is available on `pocok.io`_ - `Documentation`_ -
+`Quick Start`_ - `Advanced Guides`_ - `Tutorial`_
+
+.. _pocok.io: https://pocok.io
+.. _Documentation: https://pocok.io/documentation
+.. _Quick Start: https://pocok.io/quick-start
+.. _Advanced Guides: https://pocok.io/advanced-guides
+.. _Tutorial: https://pocok.io/tutorial
 
 Requirements
 ------------
 
- - Docker, version > 17, if you want use Docker-compose files
- - kubectl, if you want use Kubernetes files
- - helm, if you want use helm functionality
+-  Git or SVN
+-  SSH
+-  Docker (17.0.0 or higher version is recommended)
+-  kubectl, for Kubernetes support
+-  helm, for helm functionality support
 
 Quick start
-===========
+-----------
 
-.. image:: https://asciinema.org/a/137172.png
-    :target: https://asciinema.org/a/137172
+Install ``pocok``:
 
-Install the latest pocok:
-
-``$ pip install pocok``
-
-It will be initialise the sample catalogue at first time
-
-``$ pocok repo add sample https://github.com/shiwaforce/poco-example``
-
-List all projects in the catalogue:
-
-``$ pocok catalog``
-
-List all available plans of the example-voting-app:
-
-``$ pocok plan ls example-voting-app``
-
-``default``
-
-``javaworker``
-
-``simple``
-
-Make sure your local Docker engine is up and running.
-
-Start the Docker example voting app in javaworker plan:
-
-``$ pocok start example-voting-app javaworker``
-
-This will download all the required Docker images and start them. The last step of the process will issue a "docker ps" command listing all the running containers.
-
-Visit http://localhost:5000 to see the application's main page.
-
-The application was started in javaworker plan, so the examplevotingapp_worker container contains OpenJDK 1.8 to run the worker node.
-
-Stop the example voting app:
-
-``$ pocok down example-voting-app javaworker``
-
-``Project stopped``
-
-Start the Docker example voting app in default plan:
-
-``$ pocok start example-voting-app default``
-
-Visit http://localhost:5000 to see the application's main page.
-
-The application was started in default plan, so the examplevotingapp_worker container runs .Net in the worker node.
-
-Stop the example voting app:
-
-``$ pocok down example-voting-app default``
-
-``Project stopped``
-
-Custom installation and configuration
-=====================================
-
-To be added later.
-
-Detailed installation steps
----------------------------
-
-Use pip:
-
-``$ pip install pocok``
-
-or
-
-``$ python setup.py install``
-
-Without configuration and catalogue
------------------------------------
-
-If you haven't an own home directory but your actual directory contains an pocok.yml, you can use the same commands.
-
-The "catalog" and "catalog config" commands will not works this way.
-
-You can change docker container's names, if you use <project> parameter.
-
-Home directory
---------------
-
-The home directory is in the user's local home directory with the name: .pocok
-
-For example (OSX):
-    /Users/john.doe/.pocok
-
-Basic configuration file
-------------------------
-
-Location: under the home directory with name: config
-The format of the file is YAML, including a default section.
-
-If the default section is empty the poco-catalog.yml file looking in the config directory
-
-Parameters:
- - repositoryType (optional):  git | svn | file
- - url (optional): must be a valid GIT or SVN url
- - file (optional): catalog file path in the repository or local filesystem - default : poco-catalog.yml
- - branch (optional): branch name - default : master
- - ssh-key (optional): ssh file location for git repository - default: ~/.ssh/id_rsa
- - workspace (optional): the base directory, where the project will be checked out - default : ~/workspace
- - developer-mode (optional): git commands not be used in workspace directory - not change branch and pull in projects
-
-Example 1 (empty):
 ::
 
-    default:
+    $:~ pip install pocok
 
-Example 2 (Git, multiple):
+Init project:
+
 ::
 
-    default:
-        repositoryType: git
-        url: https://github.com/shiwaforce/poco-example.git
-        file: poco-catalog.yml
-        branch: master
-    another:
-        repositoryType: git
-        url: https://github.com/shiwaforce/poco-example-another.git
-        file: poco-catalog.yml
-        branch: master
-    workspace: /Users/john.doe/workspace
-    developer-mode: true
+    $:~ mkdir my-project
+    $:~ cd my-project
+    $:~ pocok init
 
-Project catalog file
---------------------
+``pocok.yml`` and ``docker-compose.yml`` example files will be created.
 
-It describes the lists of the projects and the location of the projects' pocok files in YAML format.
+Start project:
 
-Configuration:
- - keys: The name of the projects
- - git (optional): must be a valid GIT url for the project
- - svn (optional): must be a valid SVN url for the project
- - branch (optional): branch name - default : master
- - file (optional): path to the pocok file. - Default : pocok.yml
- - repository-dir (optional): the base directory name where the project will be checked out. - Default: name of the project
- - ssh-key (optional): ssh file location for the Git repository - default: ~/.ssh/id_rsa
-
-If you don't define the repository it will be relative to the config file's location
-
-If the path ends with a name of a directory it will be extended with the default filename : pocok.yml
-
-For example:
 ::
 
-    test1:
-        git: https://github.com/shiwaforce/poco-example.git
-        branch: master
-    test2:
-        svn: http://svn.apache.org/repos/test2/trunk
-    test3:
-        file: test3
-    test4:
-        git: ssh://git@git.example.com/test4/test4.git
-        file: another/directory/anoter_compose.yml
+    $:~ pocok up
 
-Poco file
----------
+Before adding your project to Pocok Repo create new empty git
+repository, add repository to your local Pocok Repo config:
 
-It describes the project's hierarchy divided into several 'plans' in YAML format.
-
-If you don't declare a section under a plan it will take the compose-files into account.
-
-Steps defined in the before_scripts section will run before the compose command (build, config, up, start)
-
-In the working-directory section you can change the working directory (the default is the parent
-of the compose file)
-
-Each row in the checkout section will check out a Git repository to the target directory
-which is relative to the compose file or the working directory if it is set.
-
-For example:
 ::
 
-    version: '2.0'
-    maintainer: "operations@shiwaforce.com"
-    containers:
-        sample: dc-sample.yml
-        mysql: dc-mysql.yml
-    before_script:
-        - ls -l
-    after_script:
-        - ls -l
-    checkout: test ssh://git@git.shiwaforce.com:7999/test/test.git
-    working-directory: microservice-all-war
-    enviroment:
-        include: conf/default.env
-    plan:
-        demo:
-            enviroment:
-                include: conf/dev/dev.env
-                external: svn
-            docker-compose-file: sample
-        dev/sw: sample
-        dev/default:
-            - docker-compose.yml
-        dev/java: docker-compose.yml
-        dev/js:
-            enviroment:
-                include: conf/dev/dev.env
-            docker-compose-file:
-                 - docker-compose.yml
-                 - docker-compose.yml
-        dev/another:
-            docker-compose-dir:
-                - /docker-files
-        dev/kubernetes:
-            kubernetes-file:
-                - kubernetes-file1.yaml
-                - kubernetes-file2.yaml
+    $:~ pocok repo add <name> <git-url>
 
-Commands
---------
+Now you can add you project to repo:
 
-    **pocok project add [<target-dir>] [<catalog>]**
+::
 
-Add directory to catalog.
+    $:~ pocok project add [<target-dir>] [<catalog>]
 
-    **pocok project init [<name>]**
+Publish your changes:
 
-Initialize pocok project, pocok.yml and docker-compose.yml will be created if they don't exist
+::
 
-    **pocok project ls**
+    $:~ pocok repo push
 
-List the available projects in repos.
+Stop your project:
 
-    **pocok project (remove|rm) <name>**
+::
 
-Remove project from the catalog.
+    $:~ pocok stop
 
-    **pocok repo (add|modify) <name> <git-url> [<branch>] [<file>]**
-
-Add new/Modify repository to the config.
-
-    **pocok repo branch <branch> [<name>] [-f]**
-
-Switch catalog branch if it is using GIT.
-
-    **pocok repo branches [<name>]**
-
-List all available branches of catalog's GIT repository.
-
-    **pocok repo ls**
-
-List the configs of repos.
-
-    **pocok repo push [<name>]**
-
-Push changes into catalog's remote GIT repository.
-
-    **pocok repo (remove|rm) [<name>]**
-
-Remove repository from local config.
-
-    **pocok branch <name> <branch> [-f]**
-
-Switch branch on a defined project.
-
-    **pocok branches [<name>]**
-
-List all available git branches of the project.
-
-    **pocok build [<project/plan>]**
-
-Build containers depends defined project and plan.
-
-    **pocok catalog**
-
-List the available projects in repos.
-
-    **pocok clean**
-
-Clean all container and image from local Docker repository.
-
-    **pocok config [<project/plan>]**
-
-Print full Docker compose configuration for a project's plan.
-
-    **pocok init [<name>]**
-
-Initialize pocok project, pocok.yml and docker-compose.yml will be created if they don't exist
-
-    **pocok install [<project/plan>]**
-
-Get projects from remote repository (if its not exists locally yet) and run install scripts.
-
-    **pocok (log|logs) [<project/plan>]**
-
-Print docker containers logs of the current project with the default or defined plan.
-
-    **pocok pack [<project/plan>]**
-
-Pack the selected project's plan configuration with docker images into an archive.
-
-    **pocok plan ls [<project>]**
-
-Print all available plans of the project.
-
-    **pocok ps [<project/plan>]**
-
-Print containers statuses which depends defined project and plan.
-
-     **pocok pull [<project/plan>]**
-
-Pull all necessary images for the project with the defined or default plan.
-
-    **pocok restart [<project/plan>]**
-
-Restart project with the default or defined plan.
-
-    **pocok (start|up) [<project/plan>]**
-
-Start pocok project with the default or defined plan.
-
-    **pocok (stop|down) [<project/plan>]**
-
-Stop project with the default or defined plan.
-
-    **pocok unpack [<name>]**
-
-Unpack archive, install images to local repository.
-
-
-Local uninstall
----------------
-
-Delete the egg file from the current Python site-packages (for example: pocok-0.90.0-py2.7)
-
-OSX
-"""
-remove script from /usr/local/bin (pocok)
-
-License
+Licence
 -------
 
-MIT
-
-Contributors
-------------
-
-`ShiwaForce.com Inc.  <https://www.shiwaforce.com/en/>`_
+`MIT`_ Copyright (c) 2017-present, `Shiwaforce.com`_
