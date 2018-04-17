@@ -185,11 +185,12 @@ class PocokTestSuite(AbstractTestSuite):
         self.clean_states()
 
         with self.captured_output() as (out, err):
-            self.run_pocok_command("repo", "modify", "test", "https://test.test2/test", "test2", "test2.yml")
+            self.run_pocok_command("repo", "modify", "test", "https://github.com/shiwaforce/pocok.git",
+                                   "master", "test2.yml")
 
-        data["test"]["branch"] = "test2"
+        data["test"]["branch"] = "master"
         data["test"]["file"] = "test2.yml"
-        data["test"]["server"] = "https://test.test2/test"
+        data["test"]["server"] = "https://github.com/shiwaforce/pocok.git"
 
         self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
                       out.getvalue().strip())
