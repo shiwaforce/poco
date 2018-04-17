@@ -66,6 +66,9 @@ class StateUtils:
     def prepare_project_file():
         if StateHolder.repository is None:
             StateHolder.poco_file = FileUtils.get_backward_compatible_pocok_file(directory=os.getcwd())
+            if not StateHolder.name == FileUtils.get_directory_name():  # need check for valid plan handling
+                StateHolder.plan = StateHolder.name
+                StateHolder.name = FileUtils.get_directory_name()
         else:
             StateHolder.poco_file = ProjectUtils.get_compose_file(StateHolder.catalog_element, None, True)
 
@@ -86,7 +89,7 @@ class StateUtils:
             StateHolder.plan = project_and_plan[1]
             StateHolder.work_dir = StateHolder.base_work_dir  # check if not default
         else:  # need some another checks
-            local_project_file = FileUtils.get_backward_compatible_pocok_file()
+            local_project_file = FileUtils.get_backward_compatible_pocok_file(silent=True)
             if local_project_file is None:
                 StateHolder.work_dir = StateHolder.base_work_dir  # check if not default
                 StateHolder.name = arg
@@ -98,19 +101,9 @@ class StateUtils:
                 else:
                     StateHolder.name = arg
 
+
     @staticmethod
     def check_variable(var):
         if getattr(StateHolder, var) is None:
-            ColorPrint.exit_after_print_messages(message="Project not exists " + str(StateHolder.name))
+            ColorPrint.exit_after_print_messages(message="Project or/and plan not exists: " + str(StateHolder.name))
 
-    @staticmethod
-    def read_project_config_and_catalog():  # TODO
-        CatalogHandler.load()
-        if StateHolder.name is not None:
-            catalog = CatalogHandler.get()
-            if catalog is not None:
-                StateHolder.config_handler.read_configs(
-                    os.path.join(StateHolder.work_dir, catalog.get('repository_dir', StateHolder.name), '.pocok'))
-        else:
-            """ Read local config """
-            StateHolder.config_handler.read_configs(os.path.join(os.getcwd(), '.pocok'))

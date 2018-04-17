@@ -112,15 +112,16 @@ class FileUtils:
 
     # TODO remove later
     @staticmethod
-    def get_backward_compatible_pocok_file(directory=None, throw_exception=False):
+    def get_backward_compatible_pocok_file(directory=None, throw_exception=False, silent=False):
         file = FileUtils.get_file_with_extension(file="pocok", directory=directory)
         if file is not None:
             return file
 
         file = FileUtils.get_file_with_extension(file="poco", directory=directory)
         if file is not None:
-            ColorPrint.print_info("Your configuration file (" + file +
-                                  ") is deprecated! Use 'pocok.yaml/yml' instead.")
+            if not silent:
+                ColorPrint.print_info("Your configuration file (" + file +
+                                      ") is deprecated! Use 'pocok.yaml/yml' instead.")
             return file
         if throw_exception:
             ColorPrint.exit_after_print_messages("Directory not contains Pocok file!")

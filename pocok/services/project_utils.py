@@ -37,7 +37,7 @@ class ProjectUtils:
 
         if StateHolder.config is None:
             ProjectUtils.add_repository(target_dir=StateHolder.work_dir)
-            file = FileUtils.get_backward_compatible_pocok_file(directory=StateHolder.work_dir)
+            file = FileUtils.get_backward_compatible_pocok_file(directory=StateHolder.work_dir, silent=True)
         else:
             file = ProjectUtils.get_file_from_project(file_element=project_element.get('file'),
                                                       repo_handler=ProjectUtils.get_project_repository(
@@ -56,7 +56,7 @@ class ProjectUtils:
         if file_element is not None:
             return repo_handler.get_file(file=file_element)
         else:  # TODO remove later
-            return FileUtils.get_backward_compatible_pocok_file(directory=repo_handler.target_dir)
+            return FileUtils.get_backward_compatible_pocok_file(directory=repo_handler.target_dir, silent=True)
 
     @staticmethod
     def get_file(file):
