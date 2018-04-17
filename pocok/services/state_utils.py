@@ -35,7 +35,7 @@ class StateUtils:
         if StateHolder.global_config_file is None:
             StateHolder.global_config_file = os.path.join(StateHolder.home_dir, '.pocok')
         StateUtils.prepare_config_handler()
-        StateHolder.config_handler.read_configs(StateHolder.global_config_file, True)
+        ConfigHandler.read_configs(StateHolder.global_config_file, True)
 
     @staticmethod
     def prepare_catalog(elem):
@@ -43,7 +43,7 @@ class StateUtils:
             StateHolder.catalog_config_file = os.path.join(StateHolder.home_dir, 'config')
         StateUtils.prepare_config_handler()
         if os.path.exists(StateHolder.catalog_config_file):
-            StateHolder.config_handler.read_catalogs()
+            ConfigHandler.read_catalogs()
             if elem is not "catalog_read":
                 CatalogHandler.load()
 
@@ -74,8 +74,7 @@ class StateUtils:
 
     @staticmethod
     def prepare_config_handler():
-        if StateHolder.config_handler is None:
-            ConfigHandler()
+        StateHolder.config_parsed = False
 
     @staticmethod
     def calculate_name_and_work_dir():

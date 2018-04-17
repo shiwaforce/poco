@@ -23,10 +23,6 @@ class ConfigHandler(object):
         }
     }
 
-    def __init__(self):
-        StateHolder.config_parsed = False
-        StateHolder.config_handler = self
-
     @staticmethod
     def read_catalogs():
         """Parse local configuration file"""

@@ -42,7 +42,6 @@ class StateHolder:
     test_mode = False  # Not running scrips and virtualization types
 
     # Handlers
-    config_handler = None
     compose_handler = None
 
     # Catalog repositories
