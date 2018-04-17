@@ -35,13 +35,10 @@ class GitRepository(AbstractRepository):
                             self.repo = git.Repo.clone_from(url=url, to_path=target_dir)
                 self.set_branch(branch=branch, force=force)
         except git.GitCommandError as exc:
+            ColorPrint.print_error("Problem with repository: " + target_dir + " (" + url + ")")
             if silent:
                 ColorPrint.print_error(message=exc.stderr)
             else:
-
-            if not silent:
-                ColorPrint.print_error("Problem with repository: " + target_dir + " (" + url + ")")
-
                 ColorPrint.exit_after_print_messages(message=exc.stderr)
 
     def get_branches(self):
