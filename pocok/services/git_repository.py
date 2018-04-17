@@ -20,6 +20,7 @@ class GitRepository(AbstractRepository):
                 git_ssh_identity_file = os.path.expanduser("~/.ssh/id_rsa")
             with git.Git().custom_environment(GIT_SSH=git_ssh_identity_file):
                 if not os.path.exists(target_dir) or not os.listdir(target_dir):
+                    silent = False  # clone never can be silent
                     self.repo = git.Repo.clone_from(url=url, to_path=target_dir)
                 else:
                     self.repo = git.Repo(target_dir)
@@ -34,7 +35,9 @@ class GitRepository(AbstractRepository):
                             self.repo = git.Repo.clone_from(url=url, to_path=target_dir)
                 self.set_branch(branch=branch, force=force)
         except git.GitCommandError as exc:
-            if not silent:
+            if silent:
+                ColorPrint.print_error(message=exc.stderr)
+            else:
                 ColorPrint.exit_after_print_messages(message=exc.stderr)
 
     def get_branches(self):
