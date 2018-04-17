@@ -1,4 +1,5 @@
 from .abstract_command import AbstractCommand
+from ..services.command_handler import CommandHandler
 from ..services.console_logger import ColorPrint
 from ..services.catalog_handler import CatalogHandler
 from ..services.state_utils import StateUtils
@@ -16,7 +17,8 @@ class ProjectRemove(AbstractCommand):
 
     def prepare_states(self):
         StateHolder.name = StateHolder.args.get('<name>')
-        StateUtils.prepare("catalog")
+        StateHolder.work_dir = StateHolder.base_work_dir
+        StateUtils.prepare("compose_handler")
 
     def resolve_dependencies(self):
         self.remove(dry_run=True)
@@ -27,10 +29,13 @@ class ProjectRemove(AbstractCommand):
 
     @staticmethod
     def remove(dry_run=False):
+
         for catalog in StateHolder.catalogs:
             lst = StateHolder.catalogs[catalog]
             if StateHolder.name in lst:
                 if not dry_run:
+                    if StateHolder.poco_file is not None and StateHolder.compose_handler.have_script("remove_script"):
+                        CommandHandler().run_script("remove_script")
                     lst.pop(StateHolder.name)
                     CatalogHandler.write_catalog(catalog=catalog)
                 return

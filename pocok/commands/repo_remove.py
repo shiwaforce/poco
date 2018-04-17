@@ -1,5 +1,4 @@
 from .abstract_command import AbstractCommand
-from ..services.command_handler import CommandHandler
 from ..services.file_utils import FileUtils
 from ..services.config_handler import ConfigHandler
 from ..services.state import StateHolder
@@ -18,7 +17,7 @@ class RepoRemove(AbstractCommand):
 
     def prepare_states(self):
         StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')
-        StateUtils.prepare("compose_handler")
+        StateUtils.prepare("catalog")
 
     def resolve_dependencies(self):
         ConfigHandler.check_name(StateHolder.name)
@@ -26,8 +25,6 @@ class RepoRemove(AbstractCommand):
             EnvironmentUtils.check_docker()
 
     def execute(self):
-        if StateHolder.poco_file is not None and StateHolder.compose_handler.have_script("remove_script"):
-            CommandHandler().run_script("remove_script")
         RepoRemove.remove()
 
     @staticmethod
