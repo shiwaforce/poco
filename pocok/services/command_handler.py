@@ -25,7 +25,7 @@ class CommandHandler(object):
         self.project_compose = StateHolder.compose_handler.compose_project
         self.working_directory = StateHolder.compose_handler.get_working_directory()
         self.plan = StateHolder.compose_handler.plan
-        self.repo_dir = StateHolder.repository.target_dir
+        self.repo_dir = StateHolder.repository.target_dir if StateHolder.repository is not None else os.getcwd()
 
         ''' Check mode '''
         plan = self.project_compose['plan'][self.plan]
@@ -54,6 +54,7 @@ class CommandHandler(object):
         if not isinstance(command_list, dict):
             ColorPrint.print_info("Wrong command in hierarchy: " + str(command_list))
 
+        self.pre_run(command_list, plan)
         if isinstance(plan, dict) and 'script' in plan:
             # script running only if start or up command
             if cmd == 'start' or cmd == 'up':
@@ -62,7 +63,6 @@ class CommandHandler(object):
             self.run_kubernetes(cmd, command_list, plan)
         else:
             self.run_docker(cmd, command_list, plan)
-
         self.after_run(command_list, plan)
 
     def run_docker(self, cmd, command_list, plan):

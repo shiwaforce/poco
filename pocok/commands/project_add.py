@@ -29,19 +29,21 @@ class ProjectAdd(AbstractCommand):
         self.get_normalized_dir()
 
     def resolve_dependencies(self):
-        if not os.path.exists(self.target_dir):
+
+        if not os.path.exists(self.target_dir) or not os.path.isdir(self.target_dir):
             ColorPrint.exit_after_print_messages(message=self.target_dir + " is not a directory")
+
         self.repo, repo_dir = FileUtils.get_git_repo(self.target_dir)
         directory = None
         if self.target_dir != repo_dir:
             directory = FileUtils.get_relative_path(base_path=repo_dir, target_path=self.target_dir)
             self.repo_name = os.path.basename(repo_dir)
         file_name = FileUtils.get_backward_compatible_pocok_file(self.target_dir, True)
+        file_name = FileUtils.get_relative_path(base_path=self.target_dir, target_path=file_name).rstrip('/')
         self.file = file_name if directory is None else directory + file_name
 
     def execute(self):
-
-        CatalogHandler.add_to_list(name=os.path.basename(self.target_dir),
+        CatalogHandler.add_to_list(name=os.path.basename(os.path.abspath(self.target_dir)),
                                    url=self.repo.remotes.origin.url, file=self.file, repo_name=self.repo_name)
         ColorPrint.print_info("Project added")
 
@@ -50,11 +52,7 @@ class ProjectAdd(AbstractCommand):
         if target_dir is not None:
             if not os.path.exists(target_dir):
                 if os.path.exists(os.path.join(os.getcwd(), target_dir)):
-                    target_dir = os.path.normpath(os.path.join(os.getcwd(), target_dir))
-                else:
-                    target_dir = None
+                    target_dir = os.path.join(os.getcwd(), target_dir)
         else:
-            target_dir = os.path.normpath(os.getcwd())
-        if not os.path.isdir(target_dir):
-            target_dir = None
-        self.target_dir = None if target_dir is None else os.path.normpath(target_dir)
+            target_dir = os.getcwd()
+        self.target_dir = os.path.normpath(target_dir)

@@ -50,8 +50,7 @@ class StateUtils:
     @staticmethod
     def prepare_project_repo():
         """Get project parameters form catalog, if it is exists"""
-
-        if StateHolder.name is None:
+        if StateHolder.name is None or StateHolder.catalogs is None:
             return
         ssh = None
         for catalog in StateHolder.catalogs:
@@ -82,9 +81,10 @@ class StateUtils:
             StateHolder.work_dir = os.getcwd()
             StateHolder.name = FileUtils.get_directory_name()
         elif '/' in arg:  # if have '/'
-            project_and_plan = arg.split("/", maxsplit=2)
+            project_and_plan = arg.split("/", 2)
             StateHolder.name = project_and_plan[0]
             StateHolder.plan = project_and_plan[1]
+            StateHolder.work_dir = StateHolder.base_work_dir  # check if not default
         else:  # need some another checks
             local_project_file = FileUtils.get_backward_compatible_pocok_file()
             if local_project_file is None:

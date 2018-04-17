@@ -26,7 +26,8 @@ class CatalogHandler:
 
             if StateHolder.default_catalog_repository is None or key == 'default':
                 StateHolder.default_catalog_repository = CatalogData(config=conf, repository=repository)
-                StateHolder.catalog_repositories[key] = CatalogData(config=conf, repository=repository)
+
+            StateHolder.catalog_repositories[key] = CatalogData(config=conf, repository=repository)
         CatalogHandler.parse_catalog()
 
     @staticmethod
