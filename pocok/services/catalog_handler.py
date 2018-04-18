@@ -3,6 +3,8 @@ import yaml
 from .console_logger import *
 from .file_repository import FileRepository
 from .git_repository import GitRepository
+from .github_repository import GitHubRepository
+from .gitlab_repository import GitLabRepository
 from .svn_repository import SvnRepository
 from .environment_utils import EnvironmentUtils
 from .state import StateHolder
@@ -104,6 +106,14 @@ class CatalogHandler:
         elif 'svn' == repo:
             repository = SvnRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
                                        url=CatalogHandler.get_url(conf))
+        elif 'github' == repo:
+            repository = GitHubRepository(target_dir=os.path.join(StateHolder.home_dir, 'gitHub', key),
+                                          tokenOrUser=conf.get("token", conf.get("user")), passw=conf.get("pass"),
+                                          url=CatalogHandler.get_url(conf))
+        elif 'gitlab' == repo:
+            repository = GitLabRepository(target_dir=os.path.join(StateHolder.home_dir, 'gitLab', key),
+                                          token=conf.get("token"),
+                                          url=CatalogHandler.get_url(conf))
         else:
             repository = FileRepository(target_dir=StateHolder.home_dir)
         return repository
@@ -131,6 +141,10 @@ class CatalogHandler:
                 return 'git'
             elif 'svn' == config["repositoryType"]:
                 return 'svn'
+            elif 'github' == config["repositoryType"]:
+                return 'github'
+            elif 'gitlab' == config["repositoryType"]:
+                return 'gitlab'
         return 'file'
 
     @staticmethod

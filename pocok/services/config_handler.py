@@ -37,12 +37,11 @@ class ConfigHandler(object):
     @staticmethod
     def read_configs(config_file, check_wd=False):
         if os.path.isdir(config_file):
-            os.path.join(config_file, '.poco')
+            os.path.join(config_file, '.pocok')
         if not os.path.exists(config_file):
             ColorPrint.print_info("Config file not exists: " + config_file, 1)
             return
         config = YamlUtils.read(file=config_file, doc=Doc.CONFIG)
-
         if check_wd:
             workspace = config.get('workspace')
             if workspace is not None:
