@@ -359,7 +359,7 @@ class PocokTestSuite(AbstractTestSuite):
             with self.assertRaises(SystemExit) as context:
                 self.run_pocok_command("plan", "ls")
             self.assertIsNotNone(context.exception)
-        self.assertIn("Project or/and plan not exists", out.getvalue())
+        self.assertIn("Repository not found for:", out.getvalue())
 
     def test_plan_list(self):
         self.init_with_remote_catalog()
