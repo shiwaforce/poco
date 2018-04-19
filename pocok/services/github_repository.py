@@ -22,14 +22,7 @@ class GitHubRepository(AbstractRepository):
         else:
             self.github = Github(tokenOrUser, passw, base_url=url)
 
-        if self.github is None:
-            ColorPrint.exit_after_print_messages("Github configuration is empty!")
-        else:
-            self.github.get_user()
-
-        if url is None:
-            ColorPrint.exit_after_print_messages(message="GIT URL is empty")
-
+        self.github.get_user()
         lst = dict()
 
         for repo in self.github.get_user().get_repos():
@@ -38,7 +31,7 @@ class GitHubRepository(AbstractRepository):
             lst[name]['git'] = str(repo.clone_url)
 
         self.write_yaml_file(os.path.join(target_dir, 'pocok-catalog.yml'),
-                             yaml.dump(data=lst, default_flow_style=False))
+                             yaml.dump(data=lst, default_flow_style=False), overwrite=True)
 
     def push(self):
         print("TODO")

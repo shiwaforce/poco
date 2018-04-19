@@ -18,6 +18,7 @@ class GitRepository(AbstractRepository):
                 ColorPrint.exit_after_print_messages(message="GIT URL is empty")
             if git_ssh_identity_file is None:
                 git_ssh_identity_file = os.path.expanduser("~/.ssh/id_rsa")
+
             with git.Git().custom_environment(GIT_SSH=git_ssh_identity_file):
                 if not os.path.exists(target_dir) or not os.listdir(target_dir):
                     silent = False  # clone never can be silent

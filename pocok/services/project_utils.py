@@ -10,14 +10,14 @@ from .console_logger import *
 class ProjectUtils:
 
     @staticmethod
-    def get_project_repository(project_element, ssh):
+    def get_project_repository(project_element):
         """Get and store repository handler for named project"""
         repo_handler = FileRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element))
         if not StateHolder.offline and 'git' in project_element:
             branch = project_element.get('branch', 'master')
             repo_handler = GitRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element),
                                          url=project_element.get('git'), branch=branch,
-                                         git_ssh_identity_file=ssh)
+                                         git_ssh_identity_file=project_element.get('ssh'))
         elif not StateHolder.offline and 'svn' in project_element:
             repo_handler = SvnRepository(target_dir=ProjectUtils.get_target_dir(project_element=project_element),
                                          url=project_element.get('svn'))
@@ -32,7 +32,7 @@ class ProjectUtils:
         return repo_handler
 
     @staticmethod
-    def get_compose_file(project_element, ssh, silent=False):
+    def get_compose_file(project_element, silent=False):
         """Get compose file from project repository """
 
         if StateHolder.config is None:
@@ -40,8 +40,7 @@ class ProjectUtils:
             file = FileUtils.get_backward_compatible_pocok_file(directory=StateHolder.work_dir, silent=True)
         else:
             file = ProjectUtils.get_file_from_project(file_element=project_element.get('file'),
-                                                      repo_handler=ProjectUtils.get_project_repository(
-                                                          project_element=project_element, ssh=ssh))
+                                                      repo_handler=StateHolder.repository)
 
         if not os.path.exists(file):
             if silent:

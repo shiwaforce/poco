@@ -56,11 +56,10 @@ class StateUtils:
         for catalog in StateHolder.catalogs:
             if StateHolder.name in StateHolder.catalogs[catalog]:
                 StateHolder.catalog_element = StateHolder.catalogs[catalog].get(StateHolder.name)
-                ssh = YamlUtils.get_node(catalog, ["ssh-key"])
-
         if StateHolder.catalog_element is None:
             return
-        StateHolder.repository = ProjectUtils.get_project_repository(StateHolder.catalog_element, ssh=ssh)
+
+        StateHolder.repository = ProjectUtils.get_project_repository(StateHolder.catalog_element)
 
     @staticmethod
     def prepare_project_file():
@@ -70,7 +69,7 @@ class StateUtils:
                 StateHolder.plan = StateHolder.name
                 StateHolder.name = FileUtils.get_directory_name()
         else:
-            StateHolder.poco_file = ProjectUtils.get_compose_file(StateHolder.catalog_element, None, True)
+            StateHolder.poco_file = ProjectUtils.get_compose_file(StateHolder.catalog_element, True)
 
     @staticmethod
     def prepare_config_handler():

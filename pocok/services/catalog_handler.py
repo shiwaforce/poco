@@ -112,8 +112,8 @@ class CatalogHandler:
                                           url=CatalogHandler.get_url(conf))
         elif 'gitlab' == repo:
             repository = GitLabRepository(target_dir=os.path.join(StateHolder.home_dir, 'gitLab', key),
-                                          token=conf.get("token"),
-                                          url=CatalogHandler.get_url(conf))
+                                          token=conf.get("token"), url=CatalogHandler.get_url(conf),
+                                          ssh=conf.get("ssh"))
         else:
             repository = FileRepository(target_dir=StateHolder.home_dir)
         return repository
