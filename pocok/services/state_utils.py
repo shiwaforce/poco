@@ -104,5 +104,6 @@ class StateUtils:
     @staticmethod
     def check_variable(var):
         if getattr(StateHolder, var) is None:
-            ColorPrint.exit_after_print_messages(message="Project or/and plan not exists: " + str(StateHolder.name))
+            return False
+        return True
 

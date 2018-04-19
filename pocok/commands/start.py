@@ -21,7 +21,13 @@ class Start(AbstractCommand):
         StateUtils.prepare("compose_handler")
 
     def resolve_dependencies(self):
-        StateUtils.check_variable('poco_file')
+        if not StateUtils.check_variable('repository'):
+            ColorPrint.exit_after_print_messages(message="Repository not found for: " + str(StateHolder.name))
+        if not StateUtils.check_variable('poco_file'):
+            ColorPrint.print_error(message="Pocok file not found in directory: "
+                                                         + str(StateHolder.repository.target_dir))
+            ColorPrint.exit_after_print_messages(message="Use 'pocok init " + StateHolder.name +
+                                             "', that will be generate a default pocok file for you", msg_type="warn")
 
     def execute(self):
         if self.need_checkout:

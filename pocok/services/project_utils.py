@@ -56,7 +56,8 @@ class ProjectUtils:
         if file_element is not None:
             return repo_handler.get_file(file=file_element)
         else:  # TODO remove later
-            return FileUtils.get_backward_compatible_pocok_file(directory=repo_handler.target_dir, silent=True)
+            file = FileUtils.get_backward_compatible_pocok_file(directory=repo_handler.target_dir, silent=True)
+            return file if file is not None else os.path.join(repo_handler.target_dir, "pocok.yaml")
 
     @staticmethod
     def get_file(file):

@@ -18,7 +18,8 @@ class Branch(AbstractCommand):
         StateUtils.prepare("project_repo")
 
     def resolve_dependencies(self):
-        StateUtils.check_variable('repository')
+        if not StateUtils.check_variable('repository'):
+            ColorPrint.exit_after_print_messages(message="Repository not found for: " + str(StateHolder.name))
 
     def execute(self):
         StateHolder.repository.set_branch(StateHolder.args.get('<branch>'), StateHolder.name,
