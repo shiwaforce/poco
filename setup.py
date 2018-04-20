@@ -36,7 +36,8 @@ setup_options = dict(
     version=pocok.__version__,
     description='pocok lets you catalogue and manage your Docker projects using simple YAML files to shorten the route '
                 'from finding your project to initialising it in your environment.',
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
+    long_description_content_type="text/markdown",
     author='Shiwaforce.com',
     url='https://www.shiwaforce.com',
     packages=find_packages(exclude=['tests*']),
