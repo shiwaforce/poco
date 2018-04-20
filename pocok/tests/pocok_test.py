@@ -359,7 +359,7 @@ class PocokTestSuite(AbstractTestSuite):
             with self.assertRaises(SystemExit) as context:
                 self.run_pocok_command("plan", "ls")
             self.assertIsNotNone(context.exception)
-        self.assertIn("Repository not found for:", out.getvalue())
+        self.assertIn("Pocok file not found in directory:", out.getvalue())
 
     def test_plan_list(self):
         self.init_with_remote_catalog()

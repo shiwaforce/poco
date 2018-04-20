@@ -99,7 +99,6 @@ class StateUtils:
                 else:
                     StateHolder.name = arg
 
-
     @staticmethod
     def check_variable(var):
         if getattr(StateHolder, var) is None:
