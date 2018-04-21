@@ -7,7 +7,6 @@ from .console_logger import ColorPrint
 
 class GitLabRepository(AbstractRepository):
 
-    GITLAB_PREFIX = "gitlab-"
     gitlab = None
 
     def __init__(self, target_dir, token=None, url=None, ssh=None):
@@ -23,18 +22,17 @@ class GitLabRepository(AbstractRepository):
             lst = dict()
             projects = self.gitlab.projects.list(membership=True)
             for project in projects:
-                name = self.GITLAB_PREFIX + project.name
+                name = project.name
                 lst[name] = dict()
                 lst[name]['git'] = str(project.ssh_url_to_repo)
                 if ssh is not None:
                     lst[name]['ssh'] = ssh
 
             self.write_yaml_file(os.path.join(target_dir, 'pocok-catalog.yml'),
-                                 yaml.dump(data=lst, default_flow_style=False), overwrite=True)
+                                 yaml.dump(data=lst, default_flow_style=False), create=True)
 
     def push(self):
         print("TODO")
 
     def pull(self):
         print("TODO")
-

@@ -17,12 +17,10 @@ class RepoRemove(AbstractCommand):
 
     def prepare_states(self):
         StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')
-        StateUtils.prepare("catalog")
+        StateUtils.prepare("catalog_read")
 
     def resolve_dependencies(self):
         ConfigHandler.check_name(StateHolder.name)
-        if StateHolder.poco_file is not None and StateHolder.compose_handler.have_script("remove_script"):
-            EnvironmentUtils.check_docker()
 
     def execute(self):
         RepoRemove.remove()

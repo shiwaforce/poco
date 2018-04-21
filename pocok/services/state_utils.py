@@ -52,7 +52,6 @@ class StateUtils:
         """Get project parameters form catalog, if it is exists"""
         if StateHolder.name is None or StateHolder.catalogs is None:
             return
-        ssh = None
         for catalog in StateHolder.catalogs:
             if StateHolder.name in StateHolder.catalogs[catalog]:
                 StateHolder.catalog_element = StateHolder.catalogs[catalog].get(StateHolder.name)

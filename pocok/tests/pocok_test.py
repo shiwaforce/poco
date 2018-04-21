@@ -167,6 +167,34 @@ class PocokTestSuite(AbstractTestSuite):
         self.assertEqual(0, len(err.getvalue()))
         self.assertEqual(catalog, out.getvalue().strip())
 
+    def test_catalog_with_param_that_not_exists(self):
+        self.init_with_remote_catalog()
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("catalog", "asd")
+            self.assertIsNotNone(context.exception)
+        self.assertEqual(0, len(err.getvalue()))
+        catalog = out.getvalue().strip()
+        self.assertNotIn("Available projects:", catalog)
+        with self.captured_output() as (out, err):
+            with self.assertRaises(SystemExit) as context:
+                self.run_pocok_command("project", "ls", "asd")
+            self.assertIsNotNone(context.exception)
+        self.assertEqual(0, len(err.getvalue()))
+        self.assertEqual(catalog, out.getvalue().strip())
+
+    def test_catalog_with_param(self):
+        self.init_with_remote_catalog()
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("catalog", "default")
+        self.assertEqual(0, len(err.getvalue()))
+        catalog = out.getvalue().strip()
+        self.assertIn("Available projects:", catalog)
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("project", "ls")
+        self.assertEqual(0, len(err.getvalue()))
+        self.assertEqual(catalog, out.getvalue().strip())
+
     def test_add_modify_and_remove_config(self):
         self.init_with_remote_catalog()
         with self.captured_output() as (out, err):
@@ -191,6 +219,73 @@ class PocokTestSuite(AbstractTestSuite):
         data["test"]["branch"] = "master"
         data["test"]["file"] = "test2.yml"
         data["test"]["server"] = "https://github.com/shiwaforce/pocok.git"
+
+        self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
+                      out.getvalue().strip())
+        self.clean_states()
+
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("--offline", "repo", "remove", "test")
+        self.assertEqual(0, len(err.getvalue()))
+        self.assertNotIn("test", out.getvalue().strip())
+
+    def test_add_modify_and_remove_config_github(self):
+        self.init_with_remote_catalog()
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("github", "add", "test", "thisistoken", "http://test/test")
+        self.assertEqual(0, len(err.getvalue()))
+        data = dict()
+        data["test"] = dict()
+        data["test"]["token"] = "thisistoken"
+        data["test"]["repositoryType"] = "github"
+        data["test"]["server"] = "http://test/test"
+
+        self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
+                      out.getvalue().strip())
+        self.clean_states()
+
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("github", "modify", "test", "user/pass")
+
+        data = dict()
+        data["test"] = dict()
+        data["test"]["user"] = "user"
+        data["test"]["pass"] = "pass"
+        data["test"]["repositoryType"] = "github"
+
+        self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
+                      out.getvalue().strip())
+        self.clean_states()
+
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("--offline", "repo", "remove", "test")
+        self.assertEqual(0, len(err.getvalue()))
+        self.assertNotIn("test", out.getvalue().strip())
+
+    def test_add_modify_and_remove_config_gitlab(self):
+        self.init_with_remote_catalog()
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("gitlab", "add", "test", "xxxxxx",
+                                   "http://test/test", "/ssh/ssh2")
+        self.assertEqual(0, len(err.getvalue()))
+        data = dict()
+        data["test"] = dict()
+        data["test"]["token"] = "xxxxxx"
+        data["test"]["repositoryType"] = "gitlab"
+        data["test"]["server"] = "http://test/test"
+        data["test"]["ssh"] = "/ssh/ssh2"
+
+        self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
+                      out.getvalue().strip())
+        self.clean_states()
+
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("gitlab", "modify", "test", "anothertoken")
+
+        data = dict()
+        data["test"] = dict()
+        data["test"]["token"] = "anothertoken"
+        data["test"]["repositoryType"] = "gitlab"
 
         self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
                       out.getvalue().strip())
@@ -331,18 +426,29 @@ class PocokTestSuite(AbstractTestSuite):
         self.assertIsNotNone(FileUtils.get_file_with_extension('pocok', directory=self.ws_dir))
         self.assertIsNotNone(FileUtils.get_file_with_extension('docker-compose', directory=self.ws_dir))
 
+    def test_checkout(self):
+        self.init_with_remote_catalog()
+        base_dir = os.path.join(self.ws_dir, 'poco-example')  # TODO rename later
+        directory = os.path.join(base_dir, 'nginx')
+        self.assertFalse(os.path.exists(directory))
+        with self.captured_output() as (out, err):
+            self.run_pocok_command("checkout", "nginx")
+        self.assertIn("Project checkout complete " + base_dir, out.getvalue().strip())
+        self.assertEqual(0, len(err.getvalue().strip()))
+        self.assertTrue(os.path.exists(directory))
+
     def test_install(self):
         self.init_with_remote_catalog()
         base_dir = os.path.join(self.ws_dir, 'poco-example')  # TODO rename later
-        dir = os.path.join(base_dir, 'nginx')
-        self.assertFalse(os.path.exists(os.path.join(dir)))
+        directory = os.path.join(base_dir, 'nginx')
+        self.assertFalse(os.path.exists(directory))
         with self.captured_output() as (out, err):
             self.run_pocok_command("install", "nginx")
         self.assertIn("Install completed to " + base_dir, out.getvalue().strip())
         self.assertEqual(0, len(err.getvalue().strip()))
-        self.assertTrue(os.path.exists(os.path.join(dir)))
+        self.assertTrue(os.path.exists(directory))
 
-    def test_install_with_before_script(self): # TODO
+    def test_install_with_before_script(self):  # TODO
         self.init_with_remote_catalog()
         base_dir = os.path.join(self.ws_dir, 'poco-example')  # TODO rename later
         dir = os.path.join(base_dir, 'nginx')

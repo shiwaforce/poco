@@ -108,7 +108,7 @@ class CatalogHandler:
                                        url=CatalogHandler.get_url(conf))
         elif 'github' == repo:
             repository = GitHubRepository(target_dir=os.path.join(StateHolder.home_dir, 'gitHub', key),
-                                          tokenOrUser=conf.get("token", conf.get("user")), passw=conf.get("pass"),
+                                          token=conf.get("token"), user=conf.get("user"), passw=conf.get("pass"),
                                           url=CatalogHandler.get_url(conf))
         elif 'gitlab' == repo:
             repository = GitLabRepository(target_dir=os.path.join(StateHolder.home_dir, 'gitLab', key),
@@ -172,7 +172,11 @@ class CatalogHandler:
     @staticmethod
     def print_ls():
         """Get catalog list"""
-        lst = StateHolder.catalogs
+        if StateHolder.name is not None:
+            lst = dict()
+            lst[StateHolder.name] = StateHolder.catalogs[StateHolder.name]
+        else:
+            lst = StateHolder.catalogs
         empty = True
         for cat in lst.keys():
             if len(lst[cat].keys()) > 0:

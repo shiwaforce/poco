@@ -11,7 +11,7 @@ class RepoLs(AbstractCommand):
     description = "Run: 'pocok repo ls' to list the configs of repos."
 
     def prepare_states(self):
-        StateUtils.prepare("catalog")
+        StateUtils.prepare("catalog_read")
 
     def resolve_dependencies(self):
         pass

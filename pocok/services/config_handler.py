@@ -97,28 +97,18 @@ class ConfigHandler(object):
                                                           file=conf.get('file', 'pocok-catalog.yml'))
 
     @staticmethod
-    def add():
+    def add(new_config):
         catalog = StateHolder.args.get('<name>')
         modify = StateHolder.has_args('modify')
 
         if StateHolder.config is None:  # init if not exists
             ConfigHandler.init()
 
-        config = dict()
-        if catalog in list(StateHolder.config.keys()):
-            if modify:
-                config = StateHolder.config.get(catalog)
-            else:
-                ColorPrint.exit_after_print_messages('Catalog with name %s is exists', catalog)
-
-        config['repositoryType'] = 'git'
-        config['server'] = StateHolder.args.get('<git-url>')
-        if StateHolder.has_args('<branch>'):
-            config['branch'] = StateHolder.args.get('<branch>')
-        if StateHolder.has_args('<file>'):
-            config['file'] = StateHolder.args.get('<file>')
-
-        StateHolder.config[catalog] = config
+        if catalog not in list(StateHolder.config.keys()) and modify:
+            ColorPrint.exit_after_print_messages('Catalog with name %s not exists in config', catalog)
+        if catalog in list(StateHolder.config.keys()) and not modify:
+            ColorPrint.exit_after_print_messages('Catalog with name %s is exists', catalog)
+        StateHolder.config[catalog] = new_config
         YamlUtils.write(file=StateHolder.catalog_config_file, data=StateHolder.config)
         ColorPrint.print_info(ConfigHandler.print_config())
 

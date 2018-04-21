@@ -34,9 +34,12 @@ class AbstractRepository(object):
             ColorPrint.exit_after_print_messages(
                 message="Error: Wrong YAML format:\n " + str(exc), msg_type="warn")
 
-    def write_yaml_file(self, file, content, overwrite=True):
+    def write_yaml_file(self, file, content, overwrite=True, create=False):
         result = self.get_file(file)
-        if not os.path.exists(result):
+        if create:
+            if not os.path.exists(os.path.dirname(file)):
+                os.makedirs(os.path.dirname(file))
+        elif not os.path.exists(result):
             return
         if overwrite:
             with open(result, 'w') as stream:
