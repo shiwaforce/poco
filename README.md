@@ -26,10 +26,10 @@
 
 ## Documentation
 All documentation is available on [pocok.io](https://pocok.io)
-- [Documentation](https://pocok.io/documentation) 
-- [Quick Start](https://pocok.io/quick-start) 
-- [Advanced Guides](https://pocok.io/advanced-guides) 
-- [Tutorial](https://pocok.io/tutorial) 
+- [Documentation](http://pocok.io/documentation) 
+- [Overview](http://pocok.io/documentation/) 
+- [Tutorials](http://pocok.io/tutorials/) 
+- [Github, Gitlab Integration](http://pocok.io/documentation/third-party-integrations/) 
 
 
 ## Requirements
