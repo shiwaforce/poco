@@ -5,6 +5,7 @@ from .file_repository import FileRepository
 from .git_repository import GitRepository
 from .github_repository import GitHubRepository
 from .gitlab_repository import GitLabRepository
+from .bitbucket_repository import BitbucketRepository
 from .svn_repository import SvnRepository
 from .environment_utils import EnvironmentUtils
 from .state import StateHolder
@@ -107,13 +108,16 @@ class CatalogHandler:
             repository = SvnRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
                                        url=CatalogHandler.get_url(conf))
         elif 'github' == repo:
-            repository = GitHubRepository(target_dir=os.path.join(StateHolder.home_dir, 'gitHub', key),
+            repository = GitHubRepository(name=key,
                                           token=conf.get("token"), user=conf.get("user"), passw=conf.get("pass"),
                                           url=CatalogHandler.get_url(conf))
         elif 'gitlab' == repo:
-            repository = GitLabRepository(target_dir=os.path.join(StateHolder.home_dir, 'gitLab', key),
+            repository = GitLabRepository(name=key,
                                           token=conf.get("token"), url=CatalogHandler.get_url(conf),
                                           ssh=conf.get("ssh"))
+        elif 'bitbucket' == repo:
+            repository = BitbucketRepository(name=key, user=conf.get("user"), passw=conf.get("pass"),
+                                             url=CatalogHandler.get_url(conf), ssh=conf.get("ssh"))
         else:
             repository = FileRepository(target_dir=StateHolder.home_dir)
         return repository
@@ -145,6 +149,8 @@ class CatalogHandler:
                 return 'github'
             elif 'gitlab' == config["repositoryType"]:
                 return 'gitlab'
+            elif 'bitbucket' == config["repositoryType"]:
+                return 'bitbucket'
         return 'file'
 
     @staticmethod
