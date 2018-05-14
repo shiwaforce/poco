@@ -45,7 +45,7 @@ class BitbucketRepository(AbstractRepository):
             for elem in j['values']:
                 if not elem['scmId'] == 'git':
                     continue
-                repo_name = elem['name']
+                repo_name = str(elem['name'])
                 for cloneref in elem['links']['clone']:
                     if cloneref['name'] == 'ssh':
                         self.lst[repo_name] = dict()

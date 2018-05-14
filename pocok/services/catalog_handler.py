@@ -97,8 +97,15 @@ class CatalogHandler:
     @staticmethod
     def get_repository(key, repo, silent=False):
         conf = StateHolder.config[key]
-        if StateHolder.offline and repo in ('git', 'svn'):
-            repository = FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key))
+        if StateHolder.offline and not repo == 'file':
+            if 'github' == repo:
+                repository = FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'gitHub', key))
+            elif 'gitlab' == repo:
+                repository = FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'gitLab', key))
+            elif 'bitbucket' == repo:
+                repository = FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'bitbucket', key))
+            else:
+                repository = FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key))
         elif 'git' == repo:
             repository = GitRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
                                        url=CatalogHandler.get_url(conf),

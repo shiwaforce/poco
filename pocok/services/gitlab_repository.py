@@ -23,7 +23,7 @@ class GitLabRepository(AbstractRepository):
             lst = dict()
             projects = self.gitlab.projects.list(membership=True)
             for project in projects:
-                project_name = project.name
+                project_name = str(project.name)
                 lst[project_name] = dict()
                 lst[project_name]['git'] = str(project.ssh_url_to_repo)
                 if ssh is not None:

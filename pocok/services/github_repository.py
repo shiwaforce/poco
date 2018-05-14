@@ -30,7 +30,7 @@ class GitHubRepository(AbstractRepository):
         lst = dict()
 
         for repo in user.get_repos():
-            repo_name = repo.name
+            repo_name = str(repo.name)
             lst[repo_name] = dict()
             lst[repo_name]['git'] = str(repo.clone_url)
 
