@@ -45,6 +45,8 @@ class ConfigHandler(object):
         if check_wd:
             workspace = config.get('workspace')
             if workspace is not None:
+                if StateHolder.base_work_dir == StateHolder.work_dir:
+                    StateHolder.work_dir = workspace
                 StateHolder.base_work_dir = workspace
             if not (os.path.exists(path=StateHolder.base_work_dir)):
                 os.makedirs(StateHolder.base_work_dir)
