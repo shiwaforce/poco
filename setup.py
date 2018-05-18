@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import pocok
+import proco
 import sys
 import platform
 from setuptools import setup, find_packages
@@ -23,7 +23,7 @@ class PyTestCommand(TestCommand):
     """
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ['--verbose', '--cov', 'pocok']
+        self.test_args = ['--verbose', '--cov', 'proco']
         self.test_suite = True
 
     def run(self):
@@ -32,16 +32,16 @@ class PyTestCommand(TestCommand):
         sys.exit(rcode)
 
 setup_options = dict(
-    name='pocok',
-    version=pocok.__version__,
-    description='pocok lets you catalogue and manage your Docker projects using simple YAML files to shorten the route '
+    name='proco',
+    version=proco.__version__,
+    description='proco lets you catalogue and manage your Docker projects using simple YAML files to shorten the route '
                 'from finding your project to initialising it in your environment.',
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
     author='Shiwaforce.com',
     url='https://www.shiwaforce.com',
     packages=find_packages(exclude=['tests*']),
-    package_data={'': ['pocok.yml',
+    package_data={'': ['proco.yml',
                        'docker-compose.yml',
                        'command-hierarchy.yml',
                        'config']},
@@ -50,7 +50,7 @@ setup_options = dict(
     tests_require=test_requires,
     cmdclass={'test': PyTestCommand},
     entry_points={
-      'console_scripts': ['pocok=pocok.pocok:main'],
+      'console_scripts': ['proco=proco.proco:main'],
     },
     license="Apache License 2.0",
     classifiers=(

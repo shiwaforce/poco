@@ -1,6 +1,6 @@
 include README.rst
 include LICENCE
-recursive-include pocok config
-recursive-include pocok docker-compose.yml
-recursive-include pocok pocok.yml
-recursive-include pocok command-hierarchy.yml
+recursive-include proco config
+recursive-include proco docker-compose.yml
+recursive-include proco proco.yml
+recursive-include proco command-hierarchy.yml
