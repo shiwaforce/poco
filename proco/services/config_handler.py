@@ -93,7 +93,11 @@ class ConfigHandler(object):
                 FileUtils.make_empty_file_with_empty_dict(StateHolder.home_dir, 'config')
                 StateHolder.config_parsed = False
         ConfigHandler.read_catalogs()
-        '''Check file type catalog'''
+        ConfigHandler.check_catalogs()
+
+    @staticmethod
+    def check_catalogs():
+        """Check file type catalog"""
         for config in StateHolder.config:
             conf = StateHolder.config[config]
             if type(conf) is not dict:

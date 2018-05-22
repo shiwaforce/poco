@@ -20,17 +20,20 @@ class GitLabRepository(AbstractRepository):
         else:
             self.gitlab = Gitlab(target_url, private_token=token)
             self.gitlab.version()  # test connection
-            lst = dict()
-            projects = self.gitlab.projects.list(membership=True)
-            for project in projects:
-                project_name = str(project.name)
-                lst[project_name] = dict()
-                lst[project_name]['git'] = str(project.ssh_url_to_repo)
-                if ssh is not None:
-                    lst[project_name]['ssh'] = ssh
 
-            self.write_yaml_file(os.path.join(self.target_dir, 'proco-catalog.yml'),
-                                 yaml.dump(data=lst, default_flow_style=False), create=True)
+            self.process_projects(projects=self.gitlab.projects.list(membership=True), ssh=ssh)
+
+    def process_projects(self, projects, ssh):
+        lst = dict()
+        for project in projects:
+            project_name = str(project.name)
+            lst[project_name] = dict()
+            lst[project_name]['git'] = str(project.ssh_url_to_repo)
+            if ssh is not None:
+                lst[project_name]['ssh'] = ssh
+
+        self.write_yaml_file(os.path.join(self.target_dir, 'proco-catalog.yml'),
+                             yaml.dump(data=lst, default_flow_style=False), create=True)
 
     def push(self):
         print("TODO")

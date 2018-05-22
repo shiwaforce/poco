@@ -13,19 +13,17 @@ class Checkout(AbstractCommand):
     description = "Run: 'proco checkout nginx' to checkout 'nginx' project from the catalog."
 
     def prepare_states(self):
-        StateHolder.name = StateHolder.args.get('<name>')
-        StateHolder.work_dir = StateHolder.base_work_dir
-        StateUtils.prepare("catalog")
+        Checkout.prepare("catalog")
 
     def resolve_dependencies(self):
-        self.remove(dry_run=True)
+        self.checkout(dry_run=True)
 
     def execute(self):
-        self.remove()
+        self.checkout()
         ColorPrint.print_info("Project checkout complete " + StateHolder.repository.target_dir)
 
     @staticmethod
-    def remove(dry_run=False):
+    def checkout(dry_run=False):
 
         for catalog in StateHolder.catalogs:
             lst = StateHolder.catalogs[catalog]
@@ -36,3 +34,9 @@ class Checkout(AbstractCommand):
                 return
         if dry_run:
             ColorPrint.exit_after_print_messages(message="Project not exists in catalog: " + StateHolder.name)
+
+    @staticmethod
+    def prepare(state):
+        StateHolder.name = StateHolder.args.get('<name>')
+        StateHolder.work_dir = StateHolder.base_work_dir
+        StateUtils.prepare(state)

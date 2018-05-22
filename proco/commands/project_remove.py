@@ -1,12 +1,11 @@
-from .abstract_command import AbstractCommand
+from .checkout import Checkout
 from ..services.command_handler import CommandHandler
 from ..services.console_logger import ColorPrint
 from ..services.catalog_handler import CatalogHandler
-from ..services.state_utils import StateUtils
 from ..services.state import StateHolder
 
 
-class ProjectRemove(AbstractCommand):
+class ProjectRemove(Checkout):
 
     sub_command = "project"
     command = ["remove", "rm"]
@@ -16,9 +15,7 @@ class ProjectRemove(AbstractCommand):
                   "project from the catalog."
 
     def prepare_states(self):
-        StateHolder.name = StateHolder.args.get('<name>')
-        StateHolder.work_dir = StateHolder.base_work_dir
-        StateUtils.prepare("compose_handler")
+        ProjectRemove.prepare("compose_handler")
 
     def resolve_dependencies(self):
         self.remove(dry_run=True)
