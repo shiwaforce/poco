@@ -2,8 +2,8 @@
 [![Build Status](https://travis-ci.org/shiwaforce/proco.svg?branch=master)](https://travis-ci.org/shiwaforce/proco)
 [![pypi](https://img.shields.io/pypi/v/proco.svg)](https://pypi.python.org/pypi/proco)
 [![pypi](https://img.shields.io/pypi/pyversions/proco.svg)](https://pypi.python.org/pypi/proco)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/test_coverage)](https://codeclimate.com/github/shiwaforce/pocok/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/maintainability)](https://codeclimate.com/github/shiwaforce/pocok/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/test_coverage)](https://codeclimate.com/github/shiwaforce/proco/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/maintainability)](https://codeclimate.com/github/shiwaforce/proco/maintainability)
 
 <p align="center">
   <img width="200" height="200" title="Proco Logo" src="https://raw.githubusercontent.com/shiwaforce/pocok/master/logo.svg?sanitize=true"/>
