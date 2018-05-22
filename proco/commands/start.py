@@ -25,12 +25,7 @@ class Start(AbstractCommand):
 
         if StateHolder.catalog_element is not None and not StateUtils.check_variable('repository'):
             ColorPrint.exit_after_print_messages(message="Repository not found for: " + str(StateHolder.name))
-        if not StateUtils.check_variable('proco_file'):
-            ColorPrint.print_error(message="Proco file not found in directory: "
-                                                         + str(StateHolder.repository.target_dir if
-                                                               StateHolder.repository is not None else os.getcwd()))
-            ColorPrint.exit_after_print_messages(message="Use 'proco init " + StateHolder.name +
-                                             "', that will be generate a default proco file for you", msg_type="warn")
+        self.check_proco_file()
 
     def execute(self):
         if self.need_checkout:
@@ -38,3 +33,12 @@ class Start(AbstractCommand):
         CommandHandler().run(self.run_command)
         if hasattr(self, "end_message"):
             ColorPrint.print_info(getattr(self, "end_message"))
+
+    def check_proco_file(self):
+        if not StateUtils.check_variable('proco_file'):
+            ColorPrint.print_error(message="Proco file not found in directory: " +
+                                           str(StateHolder.repository.target_dir if StateHolder.repository is not None
+                                               else os.getcwd()))
+            ColorPrint.exit_after_print_messages(message="Use 'proco init " + StateHolder.name +
+                                                         "', that will be generate a default proco file for you",
+                                                 msg_type="warn")
