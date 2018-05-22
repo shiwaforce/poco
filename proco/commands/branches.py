@@ -1,11 +1,10 @@
-from .abstract_command import AbstractCommand
+from .branch import Branch
 from ..services.state_utils import StateUtils
 from ..services.state import StateHolder
-from ..services.console_logger import ColorPrint
 from ..services.file_utils import FileUtils
 
 
-class Branches(AbstractCommand):
+class Branches(Branch):
 
     command = "branches"
     args = ["[<name>]"]
@@ -15,10 +14,6 @@ class Branches(AbstractCommand):
     def prepare_states(self):
         StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')
         StateUtils.prepare("project_repo")
-
-    def resolve_dependencies(self):
-        if not StateUtils.check_variable('repository'):
-            ColorPrint.exit_after_print_messages(message="Repository not found for: " + str(StateHolder.name))
 
     def execute(self):
         StateHolder.repository.print_branches()

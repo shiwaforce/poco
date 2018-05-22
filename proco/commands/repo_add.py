@@ -23,19 +23,18 @@ class RepoAdd(AbstractCommand):
         pass
 
     def execute(self):
-        config = self.get_config_with_type('git')
-        config['server'] = StateHolder.args.get('<git-url>')
-        if StateHolder.has_args('<branch>'):
-            config['branch'] = StateHolder.args.get('<branch>')
-        if StateHolder.has_args('<file>'):
-            config['file'] = StateHolder.args.get('<file>')
+        config = self.get_config_with_type('git', [('server', '<git-url>'), ('branch', '<branch>'), ('file', '<file>')])
         ConfigHandler.add(new_config=config)
 
     @staticmethod
-    def get_config_with_type(repo_type):
+    def get_config_with_type(repo_type, add_param):
         config = dict()
         config['repositoryType'] = repo_type
+        for param in add_param:
+            if StateHolder.has_args(param[1]):
+                config[param[0]] = StateHolder.args.get(param[1])
         return config
+
 
 class GitHubAdd(RepoAdd):
 
@@ -48,7 +47,7 @@ class GitHubAdd(RepoAdd):
                   "your GitHub projects in catalog. Modify command use same metholody."
 
     def execute(self):
-        config = self.get_config_with_type('github')
+        config = self.get_config_with_type('github', [('server', '<url>')])
         login = StateHolder.args.get('<login>')
         if "/" in login:
             args = login.split("/")
@@ -56,8 +55,6 @@ class GitHubAdd(RepoAdd):
             config['pass'] = args[1]
         else:
             config['token'] = login
-        if StateHolder.has_args('<url>'):
-            config['server'] = StateHolder.args.get('<url>')
         ConfigHandler.add(new_config=config)
 
 
@@ -73,12 +70,8 @@ class GitLabAdd(RepoAdd):
                   "your GitLab projects in catalog. Modify command use same metholody."
 
     def execute(self):
-        config = self.get_config_with_type('gitlab')
-        config['token'] = StateHolder.args.get('<login>')
-        if StateHolder.has_args('<url>'):
-            config['server'] = StateHolder.args.get('<url>')
-        if StateHolder.has_args('<ssh>'):
-            config['ssh'] = StateHolder.args.get('<ssh>')
+        params = [('token', '<login>'), ('server', '<url>'), ('ssh', '<ssh>')]
+        config = self.get_config_with_type('gitlab', params)
         ConfigHandler.add(new_config=config)
 
 
@@ -94,12 +87,9 @@ class BitbucketAdd(RepoAdd):
                   "your Bitbucket projects in catalog. Modify command use same metholody."
 
     def execute(self):
-        config = self.get_config_with_type('bitbucket')
+        params = [('server', '<url>'), ('ssh', '<ssh>')]
+        config = self.get_config_with_type('bitbucket', params)
         args = StateHolder.args.get('<login>').split("/")
         config['user'] = args[0]
         config['pass'] = args[1]
-        if StateHolder.has_args('<url>'):
-            config['server'] = StateHolder.args.get('<url>')
-        if StateHolder.has_args('<ssh>'):
-            config['ssh'] = StateHolder.args.get('<ssh>')
         ConfigHandler.add(new_config=config)

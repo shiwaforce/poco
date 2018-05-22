@@ -296,6 +296,42 @@ class ProcoTestSuite(AbstractTestSuite):
         self.assertEqual(0, len(err.getvalue()))
         self.assertNotIn("test", out.getvalue().strip())
 
+    def test_add_modify_and_remove_config_bitbucket(self):
+        self.init_with_remote_catalog()
+        with self.captured_output() as (out, err):
+            self.run_proco_command("bitbucket", "add", "test", "user/pass",
+                                   "http://test/test", "/ssh/ssh2")
+        self.assertEqual(0, len(err.getvalue()))
+        data = dict()
+        data["test"] = dict()
+        data["test"]["user"] = "user"
+        data["test"]["pass"] = "pass"
+        data["test"]["repositoryType"] = "bitbucket"
+        data["test"]["server"] = "http://test/test"
+        data["test"]["ssh"] = "/ssh/ssh2"
+
+        self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
+                      out.getvalue().strip())
+        self.clean_states()
+
+        with self.captured_output() as (out, err):
+            self.run_proco_command("bitbucket", "modify", "test", "user2/pass2")
+
+        data = dict()
+        data["test"] = dict()
+        data["test"]["user"] = "user2"
+        data["test"]["pass"] = "pass2"
+        data["test"]["repositoryType"] = "bitbucket"
+
+        self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
+                      out.getvalue().strip())
+        self.clean_states()
+
+        with self.captured_output() as (out, err):
+            self.run_proco_command("--offline", "repo", "remove", "test")
+        self.assertEqual(0, len(err.getvalue()))
+        self.assertNotIn("test", out.getvalue().strip())
+
     def test_add_if_catalog_not_exists(self):
         with self.captured_output() as (out, err):
             self.run_proco_command("repo", "add", "test", "https://github.com/shiwaforce/proco-example",

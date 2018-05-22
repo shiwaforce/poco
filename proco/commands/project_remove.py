@@ -33,11 +33,15 @@ class ProjectRemove(AbstractCommand):
         for catalog in StateHolder.catalogs:
             lst = StateHolder.catalogs[catalog]
             if StateHolder.name in lst:
-                if not dry_run:
-                    if StateHolder.proco_file is not None and StateHolder.compose_handler.have_script("remove_script"):
-                        CommandHandler().run_script("remove_script")
-                    lst.pop(StateHolder.name)
-                    CatalogHandler.write_catalog(catalog=catalog)
+                ProjectRemove.run(catalog=catalog, lst=lst, dry_run=dry_run)
                 return
         if dry_run:
             ColorPrint.exit_after_print_messages(message="Project not exists in catalog: " + StateHolder.name)
+
+    @staticmethod
+    def run(catalog, lst, dry_run):
+        if not dry_run:
+            if StateHolder.proco_file is not None and StateHolder.compose_handler.have_script("remove_script"):
+                CommandHandler().run_script("remove_script")
+            lst.pop(StateHolder.name)
+            CatalogHandler.write_catalog(catalog=catalog)

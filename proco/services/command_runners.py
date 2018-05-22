@@ -31,6 +31,15 @@ class AbstractPlanRunner(object):
                                                        repo_dir=repo_dir, working_directory=working_directory,
                                                        file_name=file))
 
+    @staticmethod
+    def get_files_list(plan, repo_dir, working_directory):
+        files = list()
+        if isinstance(plan, dict) and 'kubernetes-file' in plan:
+            for file in ProjectUtils.get_list_value(plan['kubernetes-file']):
+                files.append(AbstractPlanRunner.get_file(repo_dir=repo_dir, working_directory=working_directory,
+                                                         file=file))
+        return files
+
 
 class ScriptPlanRunner(AbstractPlanRunner):
 
@@ -85,13 +94,9 @@ class KubernetesRunner(AbstractPlanRunner):
         self.repo_dir = repo_dir
 
     def run(self, plan, commands, envs):
-
-        files = list()
-
-        if isinstance(plan, dict) and 'kubernetes-file' in plan:
-            for file in ProjectUtils.get_list_value(plan['kubernetes-file']):
-                files.append(self.get_file(repo_dir=self.repo_dir, working_directory=self.working_directory, file=file))
-        elif isinstance(plan, dict) and 'kubernetes-dir' in plan:
+        files = AbstractPlanRunner.get_files_list(plan=plan, repo_dir=self.repo_dir,
+                                                  working_directory=self.working_directory)
+        if isinstance(plan, dict) and len(files) == 0 and 'kubernetes-dir' in plan:
             files.extend(self.get_file_list(self.repo_dir, self.working_directory,
                                             ProjectUtils.get_list_value(plan['kubernetes-dir'])))
 
@@ -114,15 +119,12 @@ class HelmRunner(AbstractPlanRunner):
         self.repo_dir = repo_dir
 
     def run(self, plan, commands, envs):
-        files = list()
+        files = AbstractPlanRunner.get_files_list(plan=plan, repo_dir=self.repo_dir,
+                                                  working_directory=self.working_directory)
         dirs = list()
-        if isinstance(plan, dict) and 'helm-file' in plan:
-            for file in ProjectUtils.get_list_value(plan['helm-file']):
-                files.append(self.get_file(repo_dir=self.repo_dir, working_directory=self.working_directory, file=file))
-        elif isinstance(plan, dict) and 'helm-dir' in plan:
+        if isinstance(plan, dict) and 'helm-dir' in plan:
             directories = ProjectUtils.get_list_value(plan['helm-dir'])
             if len(directories) > 1:
-                print(directories)
                 ColorPrint.print_with_lvl(message="Helm plan use only the first directory from helm-dir")
             dirs.append(os.path.join(FileUtils.get_relative_path(self.repo_dir, self.working_directory),
                                      directories[0]))
@@ -134,18 +136,21 @@ class HelmRunner(AbstractPlanRunner):
         cmd.extend(ProjectUtils.get_list_value(commands))
         cmd.append("proco-" + StateHolder.name)
 
+        HelmRunner.build_command(cmd=cmd, dirs=dirs, files=files)
+        ColorPrint.print_with_lvl(message="Helm command: " + str(cmd), lvl=1)
+        try:
+            self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=envs)
+        except CalledProcessError:
+            pass
+
+    @staticmethod
+    def build_command(cmd, dirs, files):
         if "install" in cmd or "upgrade" in cmd:
             if len(dirs) > 0:
                 cmd.append(str(dirs[0]))
             for file in files:
                 cmd.append("-f")
                 cmd.append(str(file))
-
-        ColorPrint.print_with_lvl(message="Helm command: " + str(cmd), lvl=1)
-        try:
-            self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=envs)
-        except CalledProcessError:
-            pass
 
 
 class DockerPlanRunner(AbstractPlanRunner):
