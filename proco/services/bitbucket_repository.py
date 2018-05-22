@@ -43,18 +43,24 @@ class BitbucketRepository(AbstractRepository):
         if r.status_code == 200:
             j = json.loads(r.text)
             for elem in j['values']:
-                if not elem['scmId'] == 'git':
-                    continue
-                repo_name = str(elem['name'])
-                for cloneref in elem['links']['clone']:
-                    if cloneref['name'] == 'ssh':
-                        self.lst[repo_name] = dict()
-                        self.lst[repo_name]['git'] = str(cloneref['href'])
-                        if self.ssh is not None:
-                            self.lst[repo_name]['ssh'] = self.ssh
+                self.process_elem(elem=elem)
 
         if not j['isLastPage']:
             self.prepare_dict_bitbucket_own(j['nextPageStart'])
+
+    def process_elem(self, elem):
+        if not elem['scmId'] == 'git':
+            return
+        repo_name = str(elem['name'])
+        for cloneref in elem['links']['clone']:
+            self.add_elem(cloneref=cloneref, repo_name=repo_name)
+
+    def add_elem(self, cloneref, repo_name):
+        if cloneref['name'] == 'ssh':
+            self.lst[repo_name] = dict()
+            self.lst[repo_name]['git'] = str(cloneref['href'])
+            if self.ssh is not None:
+                self.lst[repo_name]['ssh'] = self.ssh
 
     def push(self):
         print("TODO")

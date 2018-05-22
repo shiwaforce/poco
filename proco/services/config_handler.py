@@ -43,19 +43,23 @@ class ConfigHandler(object):
             return
         config = YamlUtils.read(file=config_file, doc=Doc.CONFIG)
         if check_wd:
-            workspace = config.get('workspace')
-            if workspace is not None:
-                if StateHolder.base_work_dir == StateHolder.work_dir:
-                    StateHolder.work_dir = workspace
-                StateHolder.base_work_dir = workspace
-            if not (os.path.exists(path=StateHolder.base_work_dir)):
-                os.makedirs(StateHolder.base_work_dir)
+            ConfigHandler.check_wd(config=config)
 
         ''' mode and specific parameters '''
         if 'mode' in config and str(config['mode']).lower() in ConfigHandler.MODES.keys():
             StateHolder.mode = str(config['mode']).lower()
             for key, value in ConfigHandler.MODES[StateHolder.mode].items():
                 setattr(StateHolder, key, value)
+
+    @staticmethod
+    def check_wd(config):
+        workspace = config.get('workspace')
+        if workspace is not None:
+            if StateHolder.base_work_dir == StateHolder.work_dir:
+                StateHolder.work_dir = workspace
+            StateHolder.base_work_dir = workspace
+        if not (os.path.exists(path=StateHolder.base_work_dir)):
+            os.makedirs(StateHolder.base_work_dir)
 
     @staticmethod
     def set_branch(branch, config=None):

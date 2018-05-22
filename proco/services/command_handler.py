@@ -14,13 +14,7 @@ class CommandHandler(object):
 
     def __init__(self):
 
-        with open(os.path.join(os.path.dirname(__file__), 'resources/command-hierarchy.yml')) as stream:
-            try:
-                self.hierarchy = yaml.load(stream=stream)
-            except yaml.YAMLError as exc:
-                ColorPrint.exit_after_print_messages(message="Error: Wrong YAML format:\n " + str(exc),
-                                                     doc=Doc.PROCO)
-
+        self.hierarchy=self.load_hierarchy()
         StateHolder.compose_handler.get_compose_project()
         self.project_compose = StateHolder.compose_handler.compose_project
         self.working_directory = StateHolder.compose_handler.get_working_directory()
@@ -42,6 +36,15 @@ class CommandHandler(object):
             EnvironmentUtils.check_kubernetes()
         elif StateHolder.container_mode == "Helm":
             EnvironmentUtils.check_helm()
+
+    @staticmethod
+    def load_hierarchy():
+        with open(os.path.join(os.path.dirname(__file__), 'resources/command-hierarchy.yml')) as stream:
+            try:
+                return yaml.load(stream=stream)
+            except yaml.YAMLError as exc:
+                ColorPrint.exit_after_print_messages(message="Error: Wrong YAML format:\n " + str(exc),
+                                                     doc=Doc.PROCO)
 
     def run_script(self, script):
         self.script_runner.run(plan=self.project_compose['plan'][self.plan], script_type=script)

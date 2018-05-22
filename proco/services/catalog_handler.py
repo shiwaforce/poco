@@ -23,9 +23,7 @@ class CatalogHandler:
 
         for key in StateHolder.config.keys():
             conf = StateHolder.config[key]
-            repo = CatalogHandler.get_repository_type(conf)
-
-            repository = CatalogHandler.get_repository(key, repo, True)
+            repository = CatalogHandler.get_repository(key, CatalogHandler.get_repository_type(conf), True)
 
             if StateHolder.default_catalog_repository is None or key == 'default':
                 StateHolder.default_catalog_repository = CatalogData(config=conf, repository=repository)
@@ -105,12 +103,8 @@ class CatalogHandler:
 
     @staticmethod
     def get_offline_repo(key, repo):
-        if 'github' == repo:
-            return FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'gitHub', key))
-        elif 'gitlab' == repo:
-            return FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'gitLab', key))
-        elif 'bitbucket' == repo:
-            return FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'bitbucket', key))
+        if repo in ('gitHub', 'gitLab', 'bitbucket'):
+            return FileRepository(target_dir=os.path.join(StateHolder.home_dir, repo, key))
         else:
             return FileRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key))
 
@@ -125,11 +119,11 @@ class CatalogHandler:
         elif 'svn' == repo:
             repository = SvnRepository(target_dir=os.path.join(StateHolder.home_dir, 'catalogHome', key),
                                        url=CatalogHandler.get_url(conf))
-        elif 'github' == repo:
+        elif 'gitHub' == repo:
             repository = GitHubRepository(name=key,
                                           token=conf.get("token"), user=conf.get("user"), passw=conf.get("pass"),
                                           url=CatalogHandler.get_url(conf))
-        elif 'gitlab' == repo:
+        elif 'gitLab' == repo:
             repository = GitLabRepository(name=key,
                                           token=conf.get("token"), url=CatalogHandler.get_url(conf),
                                           ssh=conf.get("ssh"))
@@ -159,16 +153,12 @@ class CatalogHandler:
     def get_repository_type(config):
         """Get catalog repository type (or file)"""
         if config is not None and "repositoryType" in config:
-            if 'git' == config["repositoryType"]:
-                return 'git'
-            elif 'svn' == config["repositoryType"]:
-                return 'svn'
+            if config["repositoryType"] in ('git', 'svn', 'bitbucket'):
+                return config["repositoryType"]
             elif 'github' == config["repositoryType"]:
-                return 'github'
+                return 'gitHub'
             elif 'gitlab' == config["repositoryType"]:
-                return 'gitlab'
-            elif 'bitbucket' == config["repositoryType"]:
-                return 'bitbucket'
+                return 'gitLab'
         return 'file'
 
     @staticmethod

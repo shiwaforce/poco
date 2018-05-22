@@ -171,13 +171,17 @@ class Proco(object):
             doc += " " + " ".join(args)
         doc += "\n\n  -h, --help"
         if args is not None:
-            descriptions = getattr(cls, 'args_descriptions')
-            doc += "\n\n  Specific parameters:\n"
-            for arg in args:
-                des = descriptions[arg] if arg in descriptions else " "
-                doc += "    " + arg + (40 - len(arg)) * " " + des + "\n"
+            Proco.build_command_help_from_args(cls=cls, doc=doc, args=args)
         doc += "\n  " + desc
         return doc
+
+    @staticmethod
+    def build_command_help_from_args(cls, doc, args):
+        descriptions = getattr(cls, 'args_descriptions')
+        doc += "\n\n  Specific parameters:\n"
+        for arg in args:
+            des = descriptions[arg] if arg in descriptions else " "
+            doc += "    " + arg + (40 - len(arg)) * " " + des + "\n"
 
     @staticmethod
     def build_sub_commands_help(sub_command, classes):
@@ -211,10 +215,10 @@ class Proco(object):
 
 def main():
     proco = Proco()
-    #try:
-    proco.start_flow()
-    #except Exception as ex:
-    #    ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
+    try:
+        proco.start_flow()
+    except Exception as ex:
+        ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
 
 if __name__ == '__main__':
     sys.exit(main())

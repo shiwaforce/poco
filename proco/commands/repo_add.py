@@ -23,8 +23,7 @@ class RepoAdd(AbstractCommand):
         pass
 
     def execute(self):
-        config = dict()
-        config['repositoryType'] = 'git'
+        config = self.get_config_with_type('git')
         config['server'] = StateHolder.args.get('<git-url>')
         if StateHolder.has_args('<branch>'):
             config['branch'] = StateHolder.args.get('<branch>')
@@ -32,6 +31,11 @@ class RepoAdd(AbstractCommand):
             config['file'] = StateHolder.args.get('<file>')
         ConfigHandler.add(new_config=config)
 
+    @staticmethod
+    def get_config_with_type(repo_type):
+        config = dict()
+        config['repositoryType'] = repo_type
+        return config
 
 class GitHubAdd(RepoAdd):
 
@@ -44,8 +48,7 @@ class GitHubAdd(RepoAdd):
                   "your GitHub projects in catalog. Modify command use same metholody."
 
     def execute(self):
-        config = dict()
-        config['repositoryType'] = 'github'
+        config = self.get_config_with_type('github')
         login = StateHolder.args.get('<login>')
         if "/" in login:
             args = login.split("/")
@@ -70,8 +73,7 @@ class GitLabAdd(RepoAdd):
                   "your GitLab projects in catalog. Modify command use same metholody."
 
     def execute(self):
-        config = dict()
-        config['repositoryType'] = 'gitlab'
+        config = self.get_config_with_type('gitlab')
         config['token'] = StateHolder.args.get('<login>')
         if StateHolder.has_args('<url>'):
             config['server'] = StateHolder.args.get('<url>')
@@ -92,8 +94,7 @@ class BitbucketAdd(RepoAdd):
                   "your Bitbucket projects in catalog. Modify command use same metholody."
 
     def execute(self):
-        config = dict()
-        config['repositoryType'] = 'bitbucket'
+        config = self.get_config_with_type('bitbucket')
         args = StateHolder.args.get('<login>').split("/")
         config['user'] = args[0]
         config['pass'] = args[1]
