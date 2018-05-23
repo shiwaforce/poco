@@ -14,7 +14,7 @@ class CommandHandler(object):
 
     def __init__(self):
 
-        self.hierarchy=self.load_hierarchy()
+        self.hierarchy = self.load_hierarchy()
         StateHolder.compose_handler.get_compose_project()
         self.project_compose = StateHolder.compose_handler.compose_project
         self.working_directory = StateHolder.compose_handler.get_working_directory()

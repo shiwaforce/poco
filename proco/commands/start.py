@@ -34,7 +34,8 @@ class Start(AbstractCommand):
         if hasattr(self, "end_message"):
             ColorPrint.print_info(getattr(self, "end_message"))
 
-    def check_proco_file(self):
+    @staticmethod
+    def check_proco_file():
         if not StateUtils.check_variable('proco_file'):
             ColorPrint.print_error(message="Proco file not found in directory: " +
                                            str(StateHolder.repository.target_dir if StateHolder.repository is not None

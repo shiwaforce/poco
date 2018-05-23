@@ -10,26 +10,19 @@ from .yaml_utils import YamlUtils
 
 class PackageHandler(object):
 
-    repo_dir = None
     working_directory = None
-    project_utils = None
 
-    def pack(self, files, project_utils, envs):
+    def pack(self, files, envs):
         EnvironmentUtils.check_docker()
         compose_handler = StateHolder.compose_handler
-        self.repo_dir = compose_handler.repo_dir
         self.working_directory = compose_handler.get_working_directory()
-
-        self.project_utils = project_utils
 
         if not os.path.exists(os.path.join(self.working_directory, "tmp_archive")):
             os.mkdir(os.path.join(self.working_directory, "tmp_archive"))
 
-        target_file = os.path.join(self.working_directory, StateHolder.name + ".proco")
-        images_file = os.path.join(self.working_directory, "tmp_archive", StateHolder.name + ".tar")
         compose_file = os.path.join(self.working_directory, "tmp_archive", "docker-compose.yml")
         proco_file = os.path.join(self.working_directory, "tmp_archive", "proco.yml")
-        images = self.get_images(files)
+        images = PackageHandler.get_images(files)
 
         cmd = self.get_compose_base_cmd(docker_files=files)
         cmd.append("config")
@@ -41,6 +34,11 @@ class PackageHandler(object):
 
         src_file = os.path.join(os.path.dirname(__file__), 'resources/proco.yml')
         shutil.copyfile(src=src_file, dst=proco_file)
+        self.run_save_cmd(images=images)
+
+    def run_save_cmd(self, images):
+        target_file = os.path.join(self.working_directory, StateHolder.name + ".proco")
+        images_file = os.path.join(self.working_directory, "tmp_archive", StateHolder.name + ".tar")
 
         cmd = list()
         cmd.append("docker")
@@ -93,13 +91,15 @@ class PackageHandler(object):
         if res > 0:
             ColorPrint.exit_after_print_messages(message=res)
 
-    def get_images(self, docker_files):
+    @staticmethod
+    def get_images(docker_files):
         res = list()
         for docker_file in docker_files:
-            res.extend(self.get_image(docker_file))
+            res.extend(PackageHandler.get_image(docker_file))
         return set(res)
 
-    def get_image(self, docker_file):
+    @staticmethod
+    def get_image(docker_file):
         res = list()
         compose_content = YamlUtils.read(docker_file)
         for serv in compose_content['services']:
