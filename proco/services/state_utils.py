@@ -57,7 +57,6 @@ class StateUtils:
                 StateHolder.catalog_element = StateHolder.catalogs[catalog].get(StateHolder.name)
         if StateHolder.catalog_element is None:
             return
-
         StateHolder.repository = ProjectUtils.get_project_repository(StateHolder.catalog_element)
 
     @staticmethod
@@ -68,7 +67,7 @@ class StateUtils:
                 StateHolder.plan = StateHolder.name
                 StateHolder.name = FileUtils.get_directory_name()
         else:
-            StateHolder.proco_file = ProjectUtils.get_compose_file(StateHolder.catalog_element, True)
+            StateHolder.proco_file = ProjectUtils.get_compose_file(True)
 
     @staticmethod
     def prepare_config_handler():

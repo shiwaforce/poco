@@ -15,6 +15,7 @@ class Branch(AbstractCommand):
 
     def prepare_states(self):
         StateUtils.name = StateHolder.args.get('<name>')
+        StateHolder.work_dir = StateHolder.base_work_dir
         StateUtils.prepare("project_repo")
 
     def resolve_dependencies(self):
@@ -22,6 +23,5 @@ class Branch(AbstractCommand):
             ColorPrint.exit_after_print_messages(message="Repository not found for: " + str(StateHolder.name))
 
     def execute(self):
-        StateHolder.repository.set_branch(StateHolder.args.get('<branch>'), StateHolder.name,
-                                          StateHolder.args.get('-f'))
+        StateHolder.repository.set_branch(StateHolder.args.get('<branch>'), StateHolder.args.get('-f'))
         ColorPrint.print_info("Branch changed")

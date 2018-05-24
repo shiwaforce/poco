@@ -13,6 +13,7 @@ class Branches(Branch):
 
     def prepare_states(self):
         StateHolder.name = FileUtils.get_parameter_or_directory_name('<name>')
+        StateHolder.work_dir = StateHolder.base_work_dir
         StateUtils.prepare("project_repo")
 
     def execute(self):

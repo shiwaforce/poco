@@ -40,12 +40,12 @@ class AbstractTestSuite(unittest.TestCase):
 
     STACK_LIST_SAMPLE = {
         'nginx': {
-            'file': 'nginx/proco-compose.yml',
+            'file': 'nginx/proco.yml',
             'git': 'https://github.com/shiwaforce/proco-example.git',
             'repository_dir': 'proco-example'
         },
         'mysql': {
-            'file': 'mysql/proco-compose.yml',
+            'file': 'mysql/proco.yml',
             'git': 'https://github.com/shiwaforce/proco-example.git',
             'repository_dir': 'proco-example'
         }

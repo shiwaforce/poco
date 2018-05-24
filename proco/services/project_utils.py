@@ -32,14 +32,14 @@ class ProjectUtils:
         return repo_handler
 
     @staticmethod
-    def get_compose_file(project_element, silent=False):
+    def get_compose_file(silent=False):
         """Get compose file from project repository """
 
         if StateHolder.config is None:
             ProjectUtils.add_repository(target_dir=StateHolder.work_dir)
             file = FileUtils.get_backward_compatible_proco_file(directory=StateHolder.work_dir, silent=True)
         else:
-            file = ProjectUtils.get_file_from_project(file_element=project_element.get('file'),
+            file = ProjectUtils.get_file_from_project(file_element=StateHolder.catalog_element.get('file'),
                                                       repo_handler=StateHolder.repository)
 
         if not os.path.exists(file):

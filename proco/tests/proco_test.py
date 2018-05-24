@@ -491,34 +491,21 @@ class ProcoTestSuite(AbstractTestSuite):
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn("default", out.getvalue())
         self.assertIn("demo/hello", out.getvalue())
-"""
-    def test_check_docker(self):
-        with self.captured_output() as (out, err):
-            with self.assertRaises(SystemExit) as context:
-                self.run_proco_command("clean")
-            self.assertIsNotNone(context.exception)
-        self.assertEqual(0, len(err.getvalue()))
-        self.assertIn("Docker not running.", out.getvalue())
-"""
 
-"""
     def test_branches(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            proco = Proco(home_dir=self.tmpdir, argv=["branches", "mysql"])
-            proco.run()
+            self.run_proco_command("branches", "nginx")
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn("master", out.getvalue())
 
     def test_branch_without_change_branch(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
-            StateHolder.skip_docker = True
-            proco = Proco(home_dir=self.tmpdir, argv=["branch", "mysql", "master"])
-            proco.run()
+            self.run_proco_command("install", "nginx")
+        self.assertIn("Install completed to ", out.getvalue().strip())
+        self.assertEqual(0, len(err.getvalue().strip()))
+        with self.captured_output() as (out, err):
+            self.run_proco_command("branch", "mysql", "master")
         self.assertEqual(0, len(err.getvalue()))
         self.assertIn("Branch changed", out.getvalue())
-
-
-"""
