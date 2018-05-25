@@ -75,8 +75,9 @@ class ScriptPlanRunner(AbstractPlanRunner):
         """Add host system to environment"""
         command_array.append("-e")
         command_array.append("HOST_SYSTEM="+platform.system())
-        command_array.append("-u")
-        command_array.append("1000")
+        if not platform.system() == 'Windows':
+            command_array.append("-u")
+            command_array.append("1000")
         command_array.append("-v")
         command_array.append(str(self.working_directory) + ":/usr/local")
         command_array.append("-w")
