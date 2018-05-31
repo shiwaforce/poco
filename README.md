@@ -25,11 +25,11 @@
 
 
 ## Documentation
-All documentation is available on [pocok.io](https://pocok.io)
-- [Documentation](http://pocok.io/documentation) 
-- [Overview](http://pocok.io/documentation/) 
-- [Tutorials](http://pocok.io/tutorials/) 
-- [Github, Gitlab Integration](http://pocok.io/documentation/third-party-integrations/) 
+All documentation is available on [proco.app](https://proco.app)
+- [Documentation](http://proco.app/documentation) 
+- [Overview](http://proco.app/documentation/) 
+- [Tutorials](http://proco.app/tutorials/) 
+- [Github, Gitlab Integration](http://proco.app/documentation/third-party-integrations/) 
 
 
 ## Requirements
@@ -81,4 +81,4 @@ $:~ proco stop
 
 ## Licence
 [MIT](http://opensource.org/licenses/MIT)
-Copyright (c) 2017-present, [Shiwaforce.com](https://www.shiwaforce.com)
+Copyright (c) 2017-present, [Shiwaforce.com](https://www.shiwaforce.com/en)
