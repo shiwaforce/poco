@@ -29,7 +29,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'proco help <command>' for more information on a specific command."""
-__version__ = '0.95.1'
+__version__ = '0.95.2'
 
 
 class Proco(object):
@@ -218,7 +218,11 @@ def main():
     try:
         proco.start_flow()
     except Exception as ex:
-        ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args))
+        if ColorPrint.log_lvl > 0:
+            ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex))
+        else:
+            ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args)
+                                                         + "\nRun with '-v' for more information.")
 
 if __name__ == '__main__':
     sys.exit(main())
