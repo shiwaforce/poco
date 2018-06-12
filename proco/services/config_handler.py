@@ -115,9 +115,9 @@ class ConfigHandler(object):
             ConfigHandler.init()
 
         if catalog not in list(StateHolder.config.keys()) and modify:
-            ColorPrint.exit_after_print_messages('Catalog with name %s not exists in config', catalog)
+            ColorPrint.exit_after_print_messages('Catalog with name: "' + str(catalog) + '" not exists in config')
         if catalog in list(StateHolder.config.keys()) and not modify:
-            ColorPrint.exit_after_print_messages('Catalog with name %s is exists', catalog)
+            ColorPrint.exit_after_print_messages('Catalog with name: "' + str(catalog) + '" is exists')
         StateHolder.config[catalog] = new_config
         YamlUtils.write(file=StateHolder.catalog_config_file, data=StateHolder.config)
         ColorPrint.print_info(ConfigHandler.print_config())
