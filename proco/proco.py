@@ -29,7 +29,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'proco help <command>' for more information on a specific command."""
-__version__ = '0.95.2'
+__version__ = '0.95.3'
 
 
 class Proco(object):
