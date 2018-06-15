@@ -57,6 +57,7 @@ class StateUtils:
                 StateHolder.catalog_element = StateHolder.catalogs[catalog].get(StateHolder.name)
         if StateHolder.catalog_element is None:
             return
+        StateHolder.work_dir = StateHolder.base_work_dir  # set back if exists
         StateHolder.repository = ProjectUtils.get_project_repository(StateHolder.catalog_element)
 
     @staticmethod

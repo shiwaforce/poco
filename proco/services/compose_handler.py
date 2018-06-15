@@ -99,4 +99,11 @@ class ComposeHandler:
         ColorPrint.print_with_lvl(message="---------------------------------------------------------------", lvl=-1)
 
         for key in self.compose_project['plan'].keys():
+            ComposeHandler.print_message(key=key, plan=self.compose_project['plan'][key])
+
+    @staticmethod
+    def print_message(key, plan):
+        if isinstance(plan, dict) and 'description' in plan:
+            ColorPrint.print_with_lvl(message=key + "\t\t" + plan['description'], lvl=-1)
+        else:
             ColorPrint.print_with_lvl(message=key, lvl=-1)
