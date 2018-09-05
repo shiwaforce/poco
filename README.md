@@ -1,4 +1,4 @@
-# PROCO
+# POCO
 [![Build Status](https://travis-ci.org/shiwaforce/proco.svg?branch=master)](https://travis-ci.org/shiwaforce/proco)
 [![pypi](https://img.shields.io/pypi/v/proco.svg)](https://pypi.python.org/pypi/proco)
 [![pypi](https://img.shields.io/pypi/pyversions/proco.svg)](https://pypi.python.org/pypi/proco)
@@ -6,10 +6,10 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/maintainability)](https://codeclimate.com/github/shiwaforce/proco/maintainability)
 
 <p align="center">
-  <img width="200" height="200" title="Proco Logo" src="https://raw.githubusercontent.com/shiwaforce/pocok/master/logo.svg?sanitize=true"/>
+  <img width="200" height="200" title="Poco Logo" src="https://raw.githubusercontent.com/shiwaforce/poco/master/logo.svg?sanitize=true"/>
 </p>
 
-**Proco** helps to organise and manage Docker, Docker-Compose, Kubernetes projects of any complexity using simple YAML config files to shorten the route from finding your project to initialising it in your local environment.
+**Poco** helps to organise and manage Docker, Docker-Compose, Kubernetes projects of any complexity using simple YAML config files to shorten the route from finding your project to initialising it in your local environment.
 
 - **Simple**. Configure, run and switch between projects with a very simple command line interface.     
 - **Flexibility**. Manage, scale, maintain projects of any complexity with ease.
@@ -20,7 +20,7 @@
 - **Git, SVN** support out of the box.
 - **Project Catalog, Multiple Catalogues**. Create your own project catalog. Organise and your projects without additional tools.
 - **Multiple Plans**. Create multiple plans for different environments or even environments for demo purposes. Switch between plans (environments) with ease.
-- **Simple Config Files**. Proco helps to split config files, so it is easy to maintain and scale them any time.
+- **Simple Config Files**. Poco helps to split config files, so it is easy to maintain and scale them any time.
 - **Script Support (Hooks)**. Add additional scripts any time.
 
 
@@ -40,43 +40,43 @@ All documentation is available on [proco.app](https://proco.app)
 - helm, for helm functionality support
 
 ## Quick start
-Install `proco`:
+Install `poco`:
 ```
-$:~ pip install proco
+$:~ pip install poco
 ```
 
 Init project:
 ```
 $:~ mkdir my-project
 $:~ cd my-project
-$:~ proco init
+$:~ poco init
 ```
-`proco.yml` and `docker-compose.yml` example files will be created.
+`poco.yml` and `docker-compose.yml` example files will be created.
 
 Start project:
 ```
-$:~ proco up
+$:~ poco up
 ```
 
-Before adding your project to Proco Repo create new empty git repository,
-add repository to your local Proco Repo config:
+Before adding your project to Poco Repo create new empty git repository,
+add repository to your local Poco Repo config:
 ```
-$:~ proco repo add <name> <git-url>
+$:~ poco repo add <name> <git-url>
 ```
 
 Now you can add you project to repo:
 ```
-$:~ proco project add [<target-dir>] [<catalog>]
+$:~ poco project add [<target-dir>] [<catalog>]
 ```
 
 Publish your changes:
 ```
-$:~ proco repo push
+$:~ poco repo push
 ```
 
 Stop your project:
 ```
-$:~ proco stop
+$:~ poco stop
 ```
 
 ## Licence
