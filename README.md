@@ -1,9 +1,9 @@
 # POCO
-[![Build Status](https://travis-ci.org/shiwaforce/proco.svg?branch=master)](https://travis-ci.org/shiwaforce/proco)
-[![pypi](https://img.shields.io/pypi/v/proco.svg)](https://pypi.python.org/pypi/proco)
-[![pypi](https://img.shields.io/pypi/pyversions/proco.svg)](https://pypi.python.org/pypi/proco)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/test_coverage)](https://codeclimate.com/github/shiwaforce/proco/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/maintainability)](https://codeclimate.com/github/shiwaforce/proco/maintainability)
+[![Build Status](https://travis-ci.org/shiwaforce/proco.svg?branch=master)](https://travis-ci.org/shiwaforce/poco)
+[![pypi](https://img.shields.io/pypi/v/proco.svg)](https://pypi.python.org/pypi/poco)
+[![pypi](https://img.shields.io/pypi/pyversions/proco.svg)](https://pypi.python.org/pypi/poco)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/test_coverage)](https://codeclimate.com/github/shiwaforce/poco/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/maintainability)](https://codeclimate.com/github/shiwaforce/poco/maintainability)
 
 <p align="center">
   <img width="200" height="200" title="Poco Logo" src="https://raw.githubusercontent.com/shiwaforce/poco/master/logo.svg?sanitize=true"/>
