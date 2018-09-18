@@ -81,7 +81,8 @@ class StateUtils:
             StateHolder.work_dir = os.getcwd()
             StateHolder.name = FileUtils.get_directory_name()
         elif '/' in arg:  # if have '/'
-            project_and_plan = arg.split("/", 2)
+            project_and_plan = arg.split("/", 1)
+
             StateHolder.name = project_and_plan[0]
             StateHolder.plan = project_and_plan[1]
             StateHolder.work_dir = StateHolder.base_work_dir  # check if not default
