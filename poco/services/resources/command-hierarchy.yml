@@ -11,14 +11,14 @@
   },
   start: {
     before: true,
-    docker: ["build", "pull", "config", ["up", "-d"], "ps"],
+    docker: ["build", ["pull", "--ignore-pull-failures"] , "config", ["up", "-d"], "ps"],
     kubernetes: ["apply", ["get", "all", "--all-namespaces"]],
     helm: [["install", "--name"]],
     after: true
   },
   restart: {
     before: true,
-    docker: ["stop", "ps", "build", "pull", "config", ["up", "-d"], "ps"],
+    docker: ["stop", "ps", "build", ["pull", "--ignore-pull-failures"], "config", ["up", "-d"], "ps"],
     kubernetes: ["apply", ["get", "all", "--all-namespaces"]],
     helm: ["upgrade"],
     after: true
