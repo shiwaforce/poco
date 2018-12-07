@@ -4,6 +4,7 @@ from .console_logger import *
 from .git_repository import GitRepository
 from .project_utils import ProjectUtils
 from .state import StateHolder
+from .yaml_utils import YamlUtils
 
 
 class ComposeHandler:
@@ -29,7 +30,7 @@ class ComposeHandler:
             return
         with open(self.compose_file) as stream:
             try:
-                self.compose_project = yaml.load(stream=stream)
+                self.compose_project = YamlUtils.ordered_load(stream, yaml.SafeLoader)
 
                 if 'plan' not in self.compose_project:
                     ColorPrint.exit_after_print_messages(
