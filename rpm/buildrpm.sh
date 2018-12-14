@@ -1,1 +1,0 @@
-fpm -s python -t rpm --vendor "Shiwaforce.com Zrt." --python-bin python3 --python-easyinstall easy_install-3.7 --no-python-dependencies -d "docker-compose" poco
