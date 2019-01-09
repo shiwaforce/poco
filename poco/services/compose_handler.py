@@ -64,12 +64,15 @@ class ComposeHandler:
     @staticmethod
     def run_checkouts():
         for checkout in StateHolder.compose_handler.get_checkouts():
-            if " " not in checkout:
+            args = checkout.split(" ")
+            if not 2 <= len(args) <= 3:
                 ColorPrint.exit_after_print_messages(message="Wrong checkout command: " + checkout)
-            directory, repository = checkout.split(" ")
+            directory = args[0]
+            repository = args[1]
             target_dir = os.path.join(StateHolder.compose_handler.get_working_directory(), directory)
             if not StateHolder.offline:
-                GitRepository(target_dir=target_dir, url=repository, branch="master")
+                branch = args[2] if len(args) == 3 else "master"
+                GitRepository(target_dir=target_dir, url=repository, branch=branch)
             if not os.path.exists(target_dir):
                 ColorPrint.exit_after_print_messages("checkout directory is empty: " + str(directory))
 
