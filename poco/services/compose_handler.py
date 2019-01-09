@@ -66,7 +66,8 @@ class ComposeHandler:
         for checkout in StateHolder.compose_handler.get_checkouts():
             args = checkout.split(" ")
             if not 2 <= len(args) <= 3:
-                ColorPrint.exit_after_print_messages(message="Wrong checkout command: " + checkout)
+                ColorPrint.exit_after_print_messages(message="Wrong checkout command: " + checkout
+                                                             + "\nExpected arguments: directory repository [branch]")
             directory = args[0]
             repository = args[1]
             target_dir = os.path.join(StateHolder.compose_handler.get_working_directory(), directory)
