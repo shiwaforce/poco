@@ -11,6 +11,16 @@ class EnvironmentUtils:
         return os.environ.get(key, default)
 
     @staticmethod
+    def set_variable(key, value):
+        os.environ[key] = value
+
+    @staticmethod
+    def set_poco_uid_and_gid():
+        if os.name == "posix":
+            EnvironmentUtils.set_variable("POCO_UID", str(os.getuid()))
+            EnvironmentUtils.set_variable("POCO_GID", str(os.getgid()))
+
+    @staticmethod
     def check_docker():
         p = Popen("docker version -f {{.Server.Version}}", stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
