@@ -50,8 +50,9 @@ class ComposeHandler:
                     else:
                         self.plan = list(self.compose_project['plan'].keys())[0]
                 if self.plan not in self.compose_project['plan']:
+                    self.get_plan_list()
                     ColorPrint.exit_after_print_messages(
-                        message="stages section must contains the selected stage: " + str(self.plan), doc=Doc.POCO)
+                        message="Plan " + str(self.plan) + " does not exist")
 
                 actual_plan = self.compose_project['plan'].get(self.plan)
                 if actual_plan is None:
@@ -72,7 +73,7 @@ class ComposeHandler:
             repository = args[1]
             target_dir = os.path.join(StateHolder.compose_handler.get_working_directory(), directory)
             if not StateHolder.offline:
-                branch = args[2] if len(args) == 3 else "master"
+                branch = args[2] if len(args) == 3 else "origin/master"
                 GitRepository(target_dir=target_dir, url=repository, branch=branch)
             if not os.path.exists(target_dir):
                 ColorPrint.exit_after_print_messages("checkout directory is empty: " + str(directory))
