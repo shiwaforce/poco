@@ -126,7 +126,8 @@ class Poco(object):
         else:
             args = self.get_args(command=None, classes=self.command_classes[None], argv=[command] + argv)
             if args is None:
-                ColorPrint.exit_after_print_messages("%r is not a poco command. See 'poco help'." % command)
+                argv.append('-h')
+                docopt(self.get_full_doc() + "\n\n" + "%r is not a poco command." % command, argv=argv)
         return args
 
     @staticmethod

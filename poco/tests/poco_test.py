@@ -74,7 +74,8 @@ class PocoTestSuite(AbstractTestSuite):
             with self.assertRaises(SystemExit) as context:
                 self.run_poco_command("notexistcommand")
             self.assertIsNotNone(context.exception)
-        self.assertIn("is not a poco command. See 'poco help'.", out.getvalue().strip())
+        self.assertIn(poco.__doc__.strip(), out.getvalue().strip())
+        self.assertIn("\'notexistcommand\' is not a poco command.", out.getvalue().strip())
 
     def test_config_without_config(self):
         with self.captured_output() as (out, err):
