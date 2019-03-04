@@ -40,6 +40,7 @@ class Poco(object):
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.poco'),
                  argv=sys.argv[1:]):
         EnvironmentUtils.check_version(__version__)
+        EnvironmentUtils.set_poco_uid_and_gid()
 
         StateHolder.home_dir = home_dir
         self.argv = argv
