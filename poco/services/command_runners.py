@@ -5,6 +5,7 @@ from .console_logger import ColorPrint
 from .file_utils import FileUtils
 from .project_utils import ProjectUtils
 from .state import StateHolder
+from .environment_utils import EnvironmentUtils
 
 
 class AbstractPlanRunner(object):
@@ -77,7 +78,7 @@ class ScriptPlanRunner(AbstractPlanRunner):
         command_array.append("HOST_SYSTEM="+platform.system())
         if not platform.system() == 'Windows':
             command_array.append("-u")
-            command_array.append("${UID}")
+            command_array.append(EnvironmentUtils.get_variable("UID", "1000"))
         command_array.append("-v")
         command_array.append(str(self.working_directory) + ":/usr/local")
         command_array.append("-w")
