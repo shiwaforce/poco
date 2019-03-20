@@ -82,7 +82,7 @@ class Doc:
         For example:
 
             version: '2.0'
-            stage: GSE
+            stage: example
             maintainer: "operation@shiwaforce.com"
             containers:
                 sample: dc-sample.yml
