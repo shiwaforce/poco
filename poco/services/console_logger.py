@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 
 
@@ -149,6 +150,11 @@ class ColorPrint:
                 print(color + "\n" + message + "\n" + Colors.END)
             else:
                 print(message)
+
+    @staticmethod
+    def print_overwrite_line(message, lvl=0):
+        if ColorPrint.log_lvl >= lvl:
+            print(message, end="\r", flush=True)
 
     @staticmethod
     def exit_after_print_messages(message, doc=None, msg_type="error"):
