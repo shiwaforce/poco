@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import git
 import shutil
@@ -148,4 +149,4 @@ class GitRepository(AbstractRepository):
 class Progress(git.remote.RemoteProgress):
 
     def update(self, op_code, cur_count, max_count=None, message=''):
-        ColorPrint.print_overwrite_line(self._cur_line)
+        print(self._cur_line, end="\r")
