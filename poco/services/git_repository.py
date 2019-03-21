@@ -22,7 +22,11 @@ class GitRepository(AbstractRepository):
             with git.Git().custom_environment(GIT_SSH=git_ssh_identity_file):
                 if not os.path.exists(target_dir) or not os.listdir(target_dir):
                     silent = False  # clone never can be silent
-                    self.repo = git.Repo.clone_from(url=url, to_path=target_dir)
+                    progress = None
+                    if not self.is_catalog():
+                        ColorPrint.print_info("Cloning into \'" + target_dir + "\'...")
+                        progress = Progress()
+                    self.repo = git.Repo.clone_from(url=url, to_path=target_dir, progress=progress, branch=branch)
                 else:
                     self.repo = git.Repo(target_dir)
                     old_url = self.repo.remotes.origin.url
@@ -86,8 +90,10 @@ class GitRepository(AbstractRepository):
         ColorPrint.print_with_lvl(message=self.repo.git.pull(), lvl=1)
 
     def is_developer_mode(self):
-        return not self.target_dir.startswith(os.path.join(StateHolder.home_dir, 'catalogHome')) \
-               and not StateHolder.always_update
+        return not self.is_catalog() and not StateHolder.always_update
+
+    def is_catalog(self):
+        return self.target_dir.startswith(os.path.join(StateHolder.home_dir, 'catalogHome'))
 
     def get_actual_branch(self):
         return str(self.repo.active_branch)
@@ -137,3 +143,9 @@ class GitRepository(AbstractRepository):
             url = url[:idx] + url[idx+4:]
 
         return url
+
+
+class Progress(git.remote.RemoteProgress):
+
+    def update(self, op_code, cur_count, max_count=None, message=''):
+        print(self._cur_line, end="\r", flush=True)
