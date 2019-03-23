@@ -1,5 +1,4 @@
 import os
-import yaml
 import platform
 from .console_logger import ColorPrint, Doc
 from .file_utils import FileUtils

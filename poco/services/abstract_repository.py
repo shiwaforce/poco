@@ -1,5 +1,4 @@
 import os
-import yaml
 import sys
 import platform
 from .console_logger import ColorPrint
