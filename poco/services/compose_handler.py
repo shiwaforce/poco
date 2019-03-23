@@ -30,7 +30,7 @@ class ComposeHandler:
             return
         with open(self.compose_file) as stream:
             try:
-                self.compose_project = YamlUtils.ordered_load(stream, yaml.SafeLoader)
+                self.compose_project = YamlUtils.ordered_load(stream)
 
                 if 'plan' not in self.compose_project:
                     ColorPrint.exit_after_print_messages(
