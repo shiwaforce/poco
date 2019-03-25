@@ -40,7 +40,7 @@ class CommandHandler(object):
     @staticmethod
     def load_hierarchy():
         return YamlUtils.read(os.path.join(os.path.dirname(__file__), 'resources/command-hierarchy.yml'),
-                              doc=Doc.POCO, fault_tolerant=True)
+                              doc=Doc.POCO)
 
     def run_script(self, script):
         self.script_runner.run(plan=self.project_compose['plan'][self.plan], script_type=script)

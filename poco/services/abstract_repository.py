@@ -27,7 +27,7 @@ class AbstractRepository(object):
                 FileUtils.make_empty_file_with_empty_dict(directory=self.target_dir, file=file)
             else:
                 return None
-        return YamlUtils.read(result, fault_tolerant=True)
+        return YamlUtils.read(result)
 
     def write_yaml_file(self, file, content, overwrite=True, create=False):
         result = self.get_file(file)
