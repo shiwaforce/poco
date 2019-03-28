@@ -5,7 +5,7 @@ import yaml
 
 class YamlUtils:
 
-    loader = yaml.FullLoader
+    loader = yaml.Loader if not hasattr(yaml, 'FullLoader') else yaml.FullLoader
 
     @staticmethod
     def read(file, doc=None, fault_tolerant=False):
