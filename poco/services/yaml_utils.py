@@ -5,15 +5,16 @@ import yaml
 
 class YamlUtils:
 
+    loader = yaml.FullLoader
+
     @staticmethod
-    def read(file, doc=None):
+    def read(file, doc=None, fault_tolerant=False):
         with open(file) as stream:
             try:
-                content = yaml.load(stream=stream)
-                if content is None:
-                    ColorPrint.exit_after_print_messages(message="Error: Wrong YAML format", doc=doc)
-                return content
+                return yaml.load(stream=stream, Loader=YamlUtils.loader)
             except yaml.YAMLError as exc:
+                if fault_tolerant:
+                    return None
                 ColorPrint.exit_after_print_messages(message="Error: Wrong YAML format:\n" + str(exc), doc=doc)
 
     @staticmethod
@@ -28,7 +29,7 @@ class YamlUtils:
 
     @staticmethod
     def check_file(file, plan):
-        project_config = YamlUtils.read_without_exception(file=file)
+        project_config = YamlUtils.read(file=file, fault_tolerant=True)
         if project_config is None:
             return False
         if 'plan' not in project_config:
@@ -38,16 +39,8 @@ class YamlUtils:
         return plan in project_config['plan']
 
     @staticmethod
-    def read_without_exception(file):
-        with open(file) as stream:
-            try:
-                return yaml.load(stream=stream)
-            except yaml.YAMLError:
-                return None
-
-    @staticmethod
-    def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
-        class OrderedLoader(Loader):
+    def ordered_load(stream, object_pairs_hook=OrderedDict):
+        class OrderedLoader(yaml.SafeLoader):
             pass
 
         def construct_mapping(loader, node):

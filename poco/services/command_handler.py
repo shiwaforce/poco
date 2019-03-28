@@ -1,5 +1,4 @@
 import os
-import yaml
 import platform
 from .console_logger import ColorPrint, Doc
 from .file_utils import FileUtils
@@ -8,6 +7,7 @@ from .environment_utils import EnvironmentUtils
 from .package_handler import PackageHandler
 from .state import StateHolder
 from .command_runners import ScriptPlanRunner, DockerPlanRunner, KubernetesRunner, HelmRunner
+from .yaml_utils import YamlUtils
 
 
 class CommandHandler(object):
@@ -39,12 +39,8 @@ class CommandHandler(object):
 
     @staticmethod
     def load_hierarchy():
-        with open(os.path.join(os.path.dirname(__file__), 'resources/command-hierarchy.yml')) as stream:
-            try:
-                return yaml.load(stream=stream)
-            except yaml.YAMLError as exc:
-                ColorPrint.exit_after_print_messages(message="Error: Wrong YAML format:\n " + str(exc),
-                                                     doc=Doc.POCO)
+        return YamlUtils.read(os.path.join(os.path.dirname(__file__), 'resources/command-hierarchy.yml'),
+                              doc=Doc.POCO)
 
     def run_script(self, script):
         self.script_runner.run(plan=self.project_compose['plan'][self.plan], script_type=script)

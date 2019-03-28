@@ -53,7 +53,7 @@ setup_options = dict(
       'console_scripts': ['poco=poco.poco:main'],
     },
     license="Apache License 2.0",
-    classifiers=(
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
@@ -66,7 +66,7 @@ setup_options = dict(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-    ),
+    ],
 )
 
 setup(**setup_options)

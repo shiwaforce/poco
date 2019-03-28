@@ -1,9 +1,9 @@
 import os
-import yaml
 import sys
 import platform
 from .console_logger import ColorPrint
 from .file_utils import FileUtils
+from .yaml_utils import YamlUtils
 from subprocess import Popen, PIPE
 if sys.version_info[0] < 3:
     import urlparse
@@ -27,12 +27,7 @@ class AbstractRepository(object):
                 FileUtils.make_empty_file_with_empty_dict(directory=self.target_dir, file=file)
             else:
                 return None
-        try:
-            with open(result) as stream:
-                return yaml.load(stream)
-        except yaml.YAMLError as exc:
-            ColorPrint.exit_after_print_messages(
-                message="Error: Wrong YAML format:\n " + str(exc), msg_type="warn")
+        return YamlUtils.read(result)
 
     def write_yaml_file(self, file, content, overwrite=True, create=False):
         result = self.get_file(file)
