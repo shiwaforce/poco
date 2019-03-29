@@ -73,7 +73,7 @@ class ComposeHandler:
             repository = args[1]
             target_dir = os.path.join(StateHolder.compose_handler.get_working_directory(), directory)
             if not StateHolder.offline:
-                branch = args[2] if len(args) == 3 else "origin/master"
+                branch = args[2] if len(args) == 3 else "master"
                 GitRepository(target_dir=target_dir, url=repository, branch=branch)
             if not os.path.exists(target_dir):
                 ColorPrint.exit_after_print_messages("checkout directory is empty: " + str(directory))
