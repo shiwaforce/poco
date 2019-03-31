@@ -6,9 +6,9 @@ Usage:
 
 
 Options:
-  --version         Print version of POCO
+  -v --version         Print version of POCO
   -h --help         Show this screen.
-  -v --verbose      Print more text.
+  -V --verbose      Print more text.
   -q --quiet        Print less text.
   --always-update   Project repository handle by user
   --offline         Offline mode
@@ -224,7 +224,8 @@ def main():
             ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex))
         else:
             ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args)
-                                                         + "\nRun with '-v' for more information.")
+                                                         + "\nRun with '-V' for more information.")
+
 
 if __name__ == '__main__':
     sys.exit(main())
