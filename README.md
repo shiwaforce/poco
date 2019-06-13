@@ -1,4 +1,5 @@
 # POCO
+
 [![Build Status](https://travis-ci.org/shiwaforce/poco.svg?branch=master)](https://travis-ci.org/shiwaforce/poco)
 [![pypi](https://img.shields.io/pypi/v/poco.svg)](https://pypi.python.org/pypi/poco)
 [![pypi](https://img.shields.io/pypi/pyversions/poco.svg)](https://pypi.python.org/pypi/poco)
@@ -11,11 +12,12 @@
 
 **Poco** helps to organise and manage Docker, Docker-Compose, Kubernetes projects of any complexity using simple YAML config files to shorten the route from finding your project to initialising it in your local environment.
 
-- **Simple**. Configure, run and switch between projects with a very simple command line interface.     
+- **Simple**. Configure, run and switch between projects with a very simple command line interface.
 - **Flexibility**. Manage, scale, maintain projects of any complexity with ease.
-- **Configure Once, Use Everywhere**. Configure project once so the rest of your team will feel the value of zero configuration. 
+- **Configure Once, Use Everywhere**. Configure project once so the rest of your team will feel the value of zero configuration.
 
 ## Features
+
 - **Docker, Docker-Compose, Kubernetes, Helm** support out of the box.
 - **Git, SVN** support out of the box.
 - **Project Catalog, Multiple Catalogues**. Create your own project catalog. Organise and your projects without additional tools.
@@ -23,16 +25,17 @@
 - **Simple Config Files**. Poco helps to split config files, so it is easy to maintain and scale them any time.
 - **Script Support (Hooks)**. Add additional scripts any time.
 
-
 ## Documentation
-All documentation is available on [proco.app](https://proco.app)
-- [Documentation](http://proco.app/documentation) 
-- [Overview](http://proco.app/documentation/) 
-- [Tutorials](http://proco.app/tutorials/) 
-- [Github, Gitlab Integration](http://proco.app/documentation/third-party-integrations/) 
 
+All documentation is available on [getpoco.io](https://getpoco.io/)
+
+- [Documentation](https://getpoco.io/documentation/)
+- [Install](https://getpoco.io/documentation/install/)
+- [Tutorials](https://getpoco.io/tutorials/hello-world/)
+- [Github, Gitlab Integration](https://getpoco.io/documentation/third-party-integrations/)
 
 ## Requirements
+
 - Git or SVN
 - SSH
 - Docker (17.0.0 or higher version is recommended)
@@ -40,45 +43,55 @@ All documentation is available on [proco.app](https://proco.app)
 - helm, for helm functionality support
 
 ## Quick start
+
 Install `poco`:
+
 ```
 $:~ pip install poco
 ```
 
 Init project:
+
 ```
 $:~ mkdir my-project
 $:~ cd my-project
 $:~ poco init
 ```
+
 `poco.yml` and `docker-compose.yml` example files will be created.
 
 Start project:
+
 ```
 $:~ poco up
 ```
 
 Before adding your project to Poco Repo create new empty git repository,
 add repository to your local Poco Repo config:
+
 ```
 $:~ poco repo add <name> <git-url>
 ```
 
 Now you can add you project to repo:
+
 ```
 $:~ poco project add [<target-dir>] [<catalog>]
 ```
 
 Publish your changes:
+
 ```
 $:~ poco repo push
 ```
 
 Stop your project:
+
 ```
 $:~ poco stop
 ```
 
 ## Licence
+
 [MIT](http://opensource.org/licenses/MIT)
-Copyright (c) 2017-present, [Shiwaforce.com](https://www.shiwaforce.com/en)
+Copyright (c) 2017-present, [Shiwaforce.com](https://www.shiwaforce.com/en/)
