@@ -78,7 +78,7 @@ class ScriptPlanRunner(AbstractPlanRunner):
         command_array.append("HOST_SYSTEM="+platform.system())
         if not platform.system() == 'Windows':
             command_array.append("-u")
-            command_array.append(EnvironmentUtils.get_variable("POCO_UID", "1000"))
+            command_array.append(EnvironmentUtils.get_variable("POCO_UID", "1000") + ":" + EnvironmentUtils.get_variable("POCO_GID", "1000"))
         command_array.append("--rm")
         command_array.append("-v")
         command_array.append(str(self.working_directory) + ":/usr/local")
