@@ -49,7 +49,8 @@ class ConfigHandler(object):
         if 'mode' in config and str(config['mode']).lower() in ConfigHandler.MODES.keys():
             StateHolder.mode = str(config['mode']).lower()
             for key, value in ConfigHandler.MODES[StateHolder.mode].items():
-                setattr(StateHolder, key, value)
+                if not StateHolder.has_args("--" + key):
+                    setattr(StateHolder, key, value)
 
     @staticmethod
     def check_wd(config):
