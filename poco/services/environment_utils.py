@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from subprocess import Popen, PIPE
 from .console_logger import ColorPrint
@@ -47,8 +48,6 @@ class EnvironmentUtils:
 
     @staticmethod
     def check_version(version):
-
-        newest_version = "0.0.0"
         # check pip
         p = Popen("pip install poco==", stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
@@ -63,14 +62,8 @@ class EnvironmentUtils:
 
     @staticmethod
     def parse_version(pip_content):
-        if "(from versions: " in pip_content:
-            first_line = pip_content.strip().splitlines()[0]
-            versions = first_line.split(",")
-            if len(versions[-1]) > 0:
-                if ": " in versions[-1]:
-                    return versions[-1][versions[-1].find(': ')+1:versions[-1].find(')')].strip()
-                return versions[-1][0:versions[-1].find(')')].strip()
-        return "0.0.0"
+        matches = re.findall("^.*\\(from versions:.*(\\d+\\.\\d+\\.\\d+)\\).*$", pip_content)
+        return matches[0] if len(matches) > 0 else "0.0.0"
 
     @staticmethod
     def decode(text_string):
