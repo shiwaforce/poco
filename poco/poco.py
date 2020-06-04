@@ -96,8 +96,6 @@ class Poco(object):
                                                          argv=[] + StateHolder.args['<args>']))
         ColorPrint.set_log_level(StateHolder.args)
         ColorPrint.print_info('arguments:\n' + str(StateHolder.args), 1)
-        StateHolder.offline = StateHolder.has_args("--offline")
-        StateHolder.always_update = StateHolder.has_args("--always-update")
 
     def get_full_doc(self):
         doc = __doc__
