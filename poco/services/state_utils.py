@@ -20,6 +20,7 @@ class StateUtils:
             return
 
         StateUtils.prepare_config()
+        StateHolder.process_extra_args()
         if prepareable is not "config":
             StateUtils.prepare_catalog(prepareable)
         if prepareable not in ["config", "catalog_read", "catalog"]:
@@ -28,7 +29,6 @@ class StateUtils:
             StateUtils.prepare_project_file()
         if prepareable is "compose_handler":
             StateHolder.compose_handler = ComposeHandler(StateHolder.poco_file)
-        StateHolder.process_extra_args()
 
     @staticmethod
     def prepare_config():

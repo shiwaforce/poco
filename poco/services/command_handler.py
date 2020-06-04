@@ -68,10 +68,11 @@ class CommandHandler(object):
         runner = DockerPlanRunner(project_compose=self.project_compose,
                                   working_directory=self.working_directory,
                                   repo_dir=self.repo_dir)
-        if StateHolder.always_update and cmd in ('start', 'up', 'restart'):  # Pull before start in developer mode
+        # Pull before start in developer mode
+        if StateHolder.always_update and cmd in ('start', 'up', 'restart') and not StateHolder.offline:
             runner.run(plan=plan, commands='pull', envs=self.get_environment_variables(plan=plan))
         for cmd in command_list['docker']:
-            if cmd == 'pull' and StateHolder.offline:  # Skip pull in offline mode
+            if isinstance(cmd, list) and 'pull' in cmd and StateHolder.offline:  # Skip pull in offline mode
                 continue
             runner.run(plan=plan, commands=cmd,
                        envs=self.get_environment_variables(plan=plan))
