@@ -221,7 +221,7 @@ def main():
     except Exception as ex:
         if ColorPrint.log_lvl > 0:
             ColorPrint.print_error("Unexpected error: " + type(ex).__name__ + "\n" + str(ex))
-            traceback.format_exc()
+            traceback.print_exc()
             sys.exit(1)
         else:
             ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args)
