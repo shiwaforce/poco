@@ -402,7 +402,7 @@ class PocoTestSuite(AbstractTestSuite):
             with self.assertRaises(SystemExit) as context:
                 self.run_poco_command("project", "add", test_dir)
             self.assertIsNotNone(context.exception)
-        self.assertIn("Directory not contains Poco file!", out.getvalue().strip())
+        self.assertIn("Directory does not contain Poco file!", out.getvalue().strip())
 
     def test_add_and_remove(self):
         self.init_with_local_catalog()
@@ -483,7 +483,7 @@ class PocoTestSuite(AbstractTestSuite):
             with self.assertRaises(SystemExit) as context:
                 self.run_poco_command("plan", "ls")
             self.assertIsNotNone(context.exception)
-        self.assertIn("Poco file not found in directory:", out.getvalue())
+        self.assertIn("Poco file not found:", out.getvalue())
 
     def test_plan_list(self):
         self.init_with_remote_catalog()
