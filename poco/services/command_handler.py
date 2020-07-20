@@ -130,7 +130,12 @@ class CommandHandler(object):
         environment = dict()
         '''First the default, if exists'''
         if "environment" in self.project_compose:
-            self.parse_environment_dict(path=self.project_compose["environment"]["include"], env=environment)
+            env_include = self.project_compose["environment"]["include"]
+            if isinstance(env_include, list):
+                for incl in env_include:
+                    self.parse_environment_dict(path=incl, env=environment)
+            else:
+                self.parse_environment_dict(path=env_include, env=environment)
         for env in envs:
             self.parse_environment_dict(path=env, env=environment)
         return environment
@@ -140,7 +145,7 @@ class CommandHandler(object):
         envs = list()
         if isinstance(plan, dict):
             if 'environment' in plan and 'include' in plan['environment']:
-                    envs.extend(ProjectUtils.get_list_value(plan['environment']['include']))
+                envs.extend(ProjectUtils.get_list_value(plan['environment']['include']))
             if 'docker-compose-dir' in plan:
                 envs.extend(FileUtils.get_filtered_sorted_alter_from_base_dir(base_dir=self.repo_dir,
                                                                               actual_dir=self.working_directory,
