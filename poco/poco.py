@@ -18,6 +18,7 @@ The available poco commands are:
 import inspect
 import importlib
 import pkgutil
+import traceback
 import os
 import sys
 from docopt import docopt
@@ -219,7 +220,9 @@ def main():
         poco.start_flow()
     except Exception as ex:
         if ColorPrint.log_lvl > 0:
-            ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex))
+            ColorPrint.print_error("Unexpected error: " + type(ex).__name__ + "\n" + str(ex))
+            traceback.format_exc()
+            sys.exit(1)
         else:
             ColorPrint.exit_after_print_messages(message="Unexpected error: " + type(ex).__name__ + "\n" + str(ex.args)
                                                          + "\nRun with '-V' for more information.")
