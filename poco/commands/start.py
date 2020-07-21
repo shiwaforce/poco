@@ -37,9 +37,9 @@ class Start(AbstractCommand):
     @staticmethod
     def check_poco_file():
         if not StateUtils.check_variable('poco_file'):
-            ColorPrint.print_error(message="Poco file not found in directory: " +
-                                           str(StateHolder.repository.target_dir if StateHolder.repository is not None
-                                               else os.getcwd()))
+            poco_file = str(StateHolder.repository.target_dir if StateHolder.repository is not None
+                            else os.getcwd()) + '/poco.yml'
+            ColorPrint.print_error(message="Poco file not found: " + poco_file)
             ColorPrint.exit_after_print_messages(message="Use 'poco init " + StateHolder.name +
-                                                         "', that will be generate a default poco file for you",
+                                                         "', that will generate a default poco file for you",
                                                  msg_type="warn")

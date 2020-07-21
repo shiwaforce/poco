@@ -126,4 +126,4 @@ class FileUtils:
                                       ") is deprecated! Use 'poco.yaml/yml' instead.")
             return file
         if throw_exception:
-            ColorPrint.exit_after_print_messages("Directory not contains Poco file!")
+            ColorPrint.exit_after_print_messages("Directory does not contain Poco file!")

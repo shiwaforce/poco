@@ -119,18 +119,33 @@ class CommandHandler(object):
             ColorPrint.exit_after_print_messages(
                 message="Environment file (" + str(file_name) + ") not exists in repository: " + StateHolder.name)
         with open(env_file) as stream:
+            lineno = 0
             for line in stream.readlines():
-                if not line.startswith("#"):
-                    data = line.split("=", 1)
-                    if len(data) > 1:
-                        env[data[0].strip()] = data[1].strip()
+                lineno += 1
+                if not line.strip() or line.startswith("#"):
+                    continue
+                data = line.split("=", 1)
+                if len(data) == 2:
+                    key = data[0].strip()
+                    value = data[1].split("#")[0].strip()
+                    if key and value:
+                        env[key] = value
+                        continue
+                ColorPrint.exit_after_print_messages("Environment file (" + str(env_file) +
+                                                     ") is malformed, error at line " + str(lineno) +
+                                                     ", value: " + line)
 
     def get_environment_dict(self, envs):
         """Process environment files. Environment for selected plan will be override the defaults"""
         environment = dict()
         '''First the default, if exists'''
         if "environment" in self.project_compose:
-            self.parse_environment_dict(path=self.project_compose["environment"]["include"], env=environment)
+            env_include = self.project_compose["environment"]["include"]
+            if isinstance(env_include, list):
+                for incl in env_include:
+                    self.parse_environment_dict(path=incl, env=environment)
+            else:
+                self.parse_environment_dict(path=env_include, env=environment)
         for env in envs:
             self.parse_environment_dict(path=env, env=environment)
         return environment
@@ -140,7 +155,7 @@ class CommandHandler(object):
         envs = list()
         if isinstance(plan, dict):
             if 'environment' in plan and 'include' in plan['environment']:
-                    envs.extend(ProjectUtils.get_list_value(plan['environment']['include']))
+                envs.extend(ProjectUtils.get_list_value(plan['environment']['include']))
             if 'docker-compose-dir' in plan:
                 envs.extend(FileUtils.get_filtered_sorted_alter_from_base_dir(base_dir=self.repo_dir,
                                                                               actual_dir=self.working_directory,

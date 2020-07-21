@@ -3,7 +3,7 @@ pyaml==18.11.0
 gitpython>=2.1.11
 svn>=0.3.46
 docopt>=0.6.2
-docker-compose>=1.23.2
+docker-compose==1.23.2
 pygithub>=1.43.5
 python-gitlab>=1.8.0
 pytest-cov
