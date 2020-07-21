@@ -1,6 +1,6 @@
 pyyaml==3.13
 pyaml==18.11.0
-gitpython==2.1.11
+gitpython==2.1.15
 svn==0.3.46
 docopt==0.6.2
 docker-compose==1.23.2
