@@ -128,7 +128,7 @@ class CommandHandler(object):
                 if len(data) == 2:
                     key = data[0].strip()
                     value = data[1].split("#")[0].strip()
-                    if key and value:
+                    if key and value is not None:
                         env[key] = value
                         continue
                 ColorPrint.exit_after_print_messages("Environment file (" + str(env_file) +
