@@ -1,4 +1,5 @@
 import os
+import dotenv
 import platform
 from .console_logger import ColorPrint, Doc
 from .file_utils import FileUtils
@@ -119,11 +120,21 @@ class CommandHandler(object):
             ColorPrint.exit_after_print_messages(
                 message="Environment file (" + str(file_name) + ") not exists in repository: " + StateHolder.name)
         with open(env_file) as stream:
+            lineno = 0
             for line in stream.readlines():
-                if not line.startswith("#"):
-                    data = line.split("=", 1)
-                    if len(data) > 1:
-                        env[data[0].strip()] = data[1].strip()
+                lineno += 1
+                if not line.strip() or line.startswith("#"):
+                    continue
+                data = line.split("=", 1)
+                if len(data) == 2:
+                    key = data[0].strip()
+                    value = data[1].split("#")[0].strip()
+                    if key and value:
+                        env[key] = value
+                        continue
+                ColorPrint.exit_after_print_messages("Environment file (" + str(env_file) +
+                                                     ") is malformed, error at line " + str(lineno) +
+                                                     ", value: " + line)
 
     def get_environment_dict(self, envs):
         """Process environment files. Environment for selected plan will be override the defaults"""
