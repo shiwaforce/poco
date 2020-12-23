@@ -52,11 +52,36 @@ class ScriptPlanRunner(AbstractPlanRunner):
         scripts = self.get_native_scripts(plan=plan, script_type=script_type)
         if len(scripts) > 0:
             for script in scripts:
-                cmd = self.get_script_base()
-                cmd.append("\"")
-                cmd.append(script)
-                cmd.append("\"")
+                command = self.get_script_command(script)
+                base_image = self.get_script_image(script)
+                cmd = self.get_script_base(base_image, command)
                 self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=os.environ.copy())
+
+    def get_script_image(self, script):
+        base_image = "alpine:latest"
+        if isinstance(script, dict) and 'image' in script:
+            base_image = script['image']
+        return base_image
+
+    def get_script_command(self, script):
+        if isinstance(script, dict) and 'command' in script:
+            command = script['command']
+        else:
+            command = script
+        return self.get_script_command_array(command)
+
+    def get_script_command_array(self, command):
+        command_array = list()
+        if isinstance(command, list):
+            for c in command:
+                command_array.append(c)
+        else:
+            command_array.append("/bin/sh")
+            command_array.append("-c")
+            command_array.append("\"")
+            command_array.append(command)
+            command_array.append("\"")
+        return command_array
 
     def get_native_scripts(self, plan, script_type):
         """Get scripts """
@@ -68,7 +93,7 @@ class ScriptPlanRunner(AbstractPlanRunner):
 
         return scripts
 
-    def get_script_base(self):
+    def get_script_base(self, base_image, command):
         command_array = list()
         command_array.append("docker")
         command_array.append("run")
@@ -84,9 +109,9 @@ class ScriptPlanRunner(AbstractPlanRunner):
         command_array.append(str(self.working_directory) + ":/usr/local")
         command_array.append("-w")
         command_array.append("/usr/local")
-        command_array.append("alpine:latest")
-        command_array.append("/bin/sh")
-        command_array.append("-c")
+        command_array.append(base_image)
+        for c in command:
+            command_array.append(c)
         return command_array
 
 
