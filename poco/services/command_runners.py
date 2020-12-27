@@ -64,10 +64,9 @@ class ScriptPlanRunner(AbstractPlanRunner):
         return base_image
 
     def get_script_command(self, script):
+        command = script
         if isinstance(script, dict) and 'command' in script:
             command = script['command']
-        else:
-            command = script
         return self.get_script_command_array(command)
 
     def get_script_command_array(self, command):
