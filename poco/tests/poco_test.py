@@ -466,17 +466,6 @@ class PocoTestSuite(AbstractTestSuite):
         self.assertEqual(0, len(err.getvalue().strip()))
         self.assertTrue(os.path.exists(directory))
 
-    def test_install_with_before_script(self):
-        self.init_with_remote_catalog()
-        base_dir = os.path.join(self.ws_dir, 'poco-example')
-        dir = os.path.join(base_dir, 'nginx')
-        self.assertFalse(os.path.exists(dir))
-        with self.captured_output() as (out, err):
-            self.run_poco_command("install", "nginx")
-        self.assertIn("Install completed to " + base_dir, out.getvalue().strip())
-        self.assertEqual(0, len(err.getvalue().strip()))
-        self.assertTrue(os.path.exists(dir))
-
     def test_plan_list_with_not_exists_project(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
