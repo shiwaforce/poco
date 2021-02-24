@@ -52,9 +52,11 @@ class ScriptPlanRunner(AbstractPlanRunner):
         scripts = self.get_native_scripts(plan=plan, script_type=script_type)
         if len(scripts) > 0:
             for script in scripts:
-                command = self.get_script_command(script)
                 base_image = self.get_script_image(script)
+                ColorPrint.print_with_lvl(message="Executing " + script_type + " in " + base_image + " image")
+                command = self.get_script_command(script)
                 cmd = self.get_script_base(base_image, command)
+                ColorPrint.print_with_lvl(message= "Docker command: " + str(cmd), lvl=1)
                 self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=os.environ.copy())
 
     def get_script_image(self, script):
@@ -73,8 +75,10 @@ class ScriptPlanRunner(AbstractPlanRunner):
         command_array = list()
         if isinstance(command, list):
             for c in command:
+                ColorPrint.print_with_lvl(" - " + str(c))
                 command_array.append(c)
         else:
+            ColorPrint.print_with_lvl(" - " + str(command))
             command_array.append("/bin/sh")
             command_array.append("-c")
             command_array.append("\"")
