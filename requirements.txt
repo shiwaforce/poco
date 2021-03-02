@@ -4,7 +4,7 @@ gitpython==2.1.15
 svn==1.0.1
 docopt==0.6.2
 docker-compose==1.25.4
-pygithub==1.46
+pygithub==1.45
 python-gitlab==2.0.1
 pytest-cov
 mock; python_version < '3'
