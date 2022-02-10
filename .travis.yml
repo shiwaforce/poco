@@ -1,13 +1,13 @@
 env:
   global:
     - CC_TEST_REPORTER_ID=9d39e517e2a74afe27c5d9b783a86db53babf6c3bd498fab51605c661be3c271
+dist: focal
 language: python
 python:
-- '2.7'
-- '3.6'
 - '3.7'
 - '3.8'
 - '3.9'
+- '3.10'
 install:
 - "pip install -r requirements.txt"
 before_script:
@@ -26,4 +26,4 @@ deploy:
   on:
     tags: true
     branch: master
-    python: '3.6'
+    python: '3.10'
