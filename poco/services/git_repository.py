@@ -25,7 +25,7 @@ class GitRepository(AbstractRepository):
                 if not os.path.exists(target_dir) or not os.listdir(target_dir):
                     silent = False  # clone never can be silent
                     progress = None
-                    if not self.is_catalog():
+                    if not self.target_dir.startswith(os.path.join(StateHolder.home_dir, 'catalogHome')):
                         ColorPrint.print_info("Cloning into \'" + target_dir + "\'...")
                         progress = Progress()
                     self.repo = git.Repo.clone_from(url=url, to_path=target_dir, progress=progress, branch=branch)
@@ -41,6 +41,7 @@ class GitRepository(AbstractRepository):
                             shutil.rmtree(target_dir, onerror=FileUtils.remove_readonly)
                             self.repo = git.Repo.clone_from(url=url, to_path=target_dir)
                 self.set_branch(branch=branch, force=force)
+
         except git.GitCommandError as exc:
             ColorPrint.print_error("Problem with repository: " + target_dir + " (" + url + ")")
             if silent:
@@ -91,11 +92,9 @@ class GitRepository(AbstractRepository):
 
         ColorPrint.print_with_lvl(message=self.repo.git.pull(), lvl=1)
 
-    def is_developer_mode(self):
-        return not self.is_catalog() and not StateHolder.always_update
-
-    def is_catalog(self):
-        return self.target_dir.startswith(os.path.join(StateHolder.home_dir, 'catalogHome'))
+    @staticmethod
+    def is_developer_mode():
+        return not StateHolder.always_update
 
     def get_actual_branch(self):
         return str(self.repo.active_branch)

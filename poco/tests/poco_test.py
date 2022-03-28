@@ -348,6 +348,13 @@ class PocoTestSuite(AbstractTestSuite):
             self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
                           out.getvalue().strip())
 
+    def test_catalog_update(self):
+        self.init_with_local_catalog()
+        with self.captured_output() as (out, err):
+            self.run_poco_command("catalog-update")
+        self.assertEqual(0, len(err.getvalue().strip()))
+        self.assertIn('Pull completed', out.getvalue().strip())
+
     def test_branches_with_local_config(self):
         self.init_with_local_catalog()
         with self.captured_output() as (out, err):
