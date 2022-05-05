@@ -48,6 +48,9 @@ class StateHolder:
     catalog_repositories = dict()
     default_catalog_repository = None
 
+    # Version update
+    version_check_mode = 'default'
+
     @staticmethod
     def has_args(*args):
         for arg in args:
