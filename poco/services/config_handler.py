@@ -45,11 +45,14 @@ class ConfigHandler(object):
         if check_wd:
             ConfigHandler.check_wd(config=config)
 
-        ''' mode and specific parameters '''
+        # Check mode and set specific parameters with mode configuration
         if 'mode' in config and str(config['mode']).lower() in ConfigHandler.MODES.keys():
             StateHolder.mode = str(config['mode']).lower()
             for key, value in ConfigHandler.MODES[StateHolder.mode].items():
                 setattr(StateHolder, key, value)
+
+        if 'version_check_mode' in config:
+            StateHolder.version_check_mode = str(config['version_check_mode']).lower()
 
     @staticmethod
     def check_wd(config):

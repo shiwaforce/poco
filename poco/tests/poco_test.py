@@ -17,13 +17,6 @@ class PocoTestSuite(AbstractTestSuite):
         self.assertIn(poco.__doc__.strip(), out.getvalue().strip())
         self.assertIn(poco.END_STRING.strip(), out.getvalue().strip())
 
-    def test_version(self):
-        with self.captured_output() as (out, err):
-            with self.assertRaises(SystemExit) as context:
-                self.run_poco_command("--version")
-            self.assertIsNotNone(context.exception)
-        self.assertIn(poco.__version__, out.getvalue().strip())
-
     def test_help_command(self):
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
