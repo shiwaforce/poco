@@ -47,12 +47,12 @@ class EnvironmentUtils:
         ColorPrint.print_with_lvl(message=message_head + "\n " + str(out).strip(), lvl=1)
 
     @staticmethod
-    def check_version(version, version_check_mode):
+    def check_version(version, is_beta_tester):
         # check pip
         p = Popen("pip install poco==", stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
         if not len(err) == 0:
-            newest_version = EnvironmentUtils.parse_version(str(err), version_check_mode)
+            newest_version = EnvironmentUtils.parse_version(str(err), is_beta_tester)
         else:
             # maybe installed from source
             return
@@ -61,7 +61,7 @@ class EnvironmentUtils:
                                      "Please upgrade with: pip install -U poco" % newest_version)
 
     @staticmethod
-    def parse_version(pip_content, version_check_mode):
+    def parse_version(pip_content, is_beta_tester):
         """PIP response variations and expected versions:
         * '(from versions: 0.0.1,0.0.2)' - noDev: 0.0.2 isDev: 0.0.2
         * '(from versions: 0.0.1.dev1,0.0.2)' - noDev: 0.0.2 isDev: 0.0.2
@@ -70,8 +70,8 @@ class EnvironmentUtils:
         not dev support : ^.*\\(from versions:.*(\\d+.\\d+.\\d+)[\\),].*$
         is dev support  : ^.*\\(from versions:.*(\\d+.\\d+.\\d+(\\.dev\\d+)?)[\\),].*$
         """
-        version_expression = "^.*\\(from versions:.*(\\d+\\.\\d+\\.\\d+)\\).*$"
-        if version_check_mode == 'update-to-dev':
+        version_expression = "^.*\\(from versions:.*(\\d+.\\d+.\\d+)[\\),].*$"
+        if is_beta_tester:
             version_expression = "^.*\\(from versions:.*(\\d+.\\d+.\\d+(\\.dev\\d+)?)[\\),].*$"
         matches = re.findall(version_expression, pip_content)
 

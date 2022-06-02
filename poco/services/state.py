@@ -49,7 +49,7 @@ class StateHolder:
     default_catalog_repository = None
 
     # Version update
-    version_check_mode = 'default'
+    is_beta_tester = False
 
     @staticmethod
     def has_args(*args):

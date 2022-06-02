@@ -51,8 +51,8 @@ class ConfigHandler(object):
             for key, value in ConfigHandler.MODES[StateHolder.mode].items():
                 setattr(StateHolder, key, value)
 
-        if 'version_check_mode' in config:
-            StateHolder.version_check_mode = str(config['version_check_mode']).lower()
+        if 'beta_tester' in config and str(config['beta_tester']).lower() == 'true':
+            StateHolder.is_beta_tester = True
 
     @staticmethod
     def check_wd(config):

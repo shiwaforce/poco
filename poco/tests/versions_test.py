@@ -11,9 +11,9 @@ class VersionsTestSuite(AbstractTestSuite):
             self.assertIsNotNone(context.exception)
         self.assertIn(poco.__version__, out.getvalue().strip())
 
-    def test_version_update_to_dev(self):
+    def test_version_update_to_beta_tester(self):
         extra_config = dict()
-        extra_config['version_check_mode'] = 'update-to-dev'
+        extra_config['beta_tester'] = 'True'
         self.init_poco_config(extra_config)
 
         with self.captured_output() as (out, err):
