@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+from packaging import version
 from subprocess import Popen, PIPE
 from .console_logger import ColorPrint
 
@@ -47,7 +48,7 @@ class EnvironmentUtils:
         ColorPrint.print_with_lvl(message=message_head + "\n " + str(out).strip(), lvl=1)
 
     @staticmethod
-    def check_version(version, is_beta_tester):
+    def check_version(current_version, is_beta_tester):
         # check pip
         p = Popen("pip install poco==", stdout=PIPE, stderr=PIPE, shell=True)
         out, err = p.communicate()
@@ -56,7 +57,7 @@ class EnvironmentUtils:
         else:
             # maybe installed from source
             return
-        if version < newest_version:
+        if version.parse(current_version) < version.parse(newest_version):
             ColorPrint.print_warning("New version of poco is available (%r). \n "
                                      "Please upgrade with: pip install -U poco" % newest_version)
 
