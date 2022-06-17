@@ -42,8 +42,7 @@ jobs:
 
     - name: Test package
       run: |
-        py.test
-        TEST_RESULT=${?}
+        py.test --cov poco --cov-report=xml
 
     - name: Upload coverage riport
       run: |
