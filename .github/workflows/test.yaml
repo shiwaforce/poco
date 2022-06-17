@@ -47,4 +47,4 @@ jobs:
 
     - name: Upload coverage riport
       run: |
-        ./cc-test-reporter after-build --exit-code ${TEST_RESULT}
+        ./cc-test-reporter after-build
