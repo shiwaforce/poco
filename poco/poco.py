@@ -22,6 +22,8 @@ import traceback
 import os
 import sys
 from docopt import docopt
+
+from poco.services.state_utils import StateUtils
 from .commands.abstract_command import AbstractCommand, CommandState
 from .services.cta_utils import CTAUtils
 from .services.environment_utils import EnvironmentUtils
@@ -30,7 +32,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'poco help <command>' for more information on a specific command."""
-__version__ = '0.98.1'
+__version__ = '0.99.0'
 
 
 class Poco(object):
@@ -40,10 +42,20 @@ class Poco(object):
 
     def __init__(self, home_dir=os.path.join(os.path.expanduser(path='~'), '.poco'),
                  argv=sys.argv[1:]):
-        EnvironmentUtils.check_version(__version__)
+
+        # Set home directory to .poco in OS user home directory (~/.poco)
+        StateHolder.home_dir = home_dir
+
+        # Read common configuration from .poco file (~/.poco/.poco)
+        StateUtils.prepare_config()
+
+        # If not offline, check new version
+        if not StateHolder.offline:
+            EnvironmentUtils.check_version(__version__, StateHolder.is_beta_tester)
+
+        # Set OS user id to POCO_UID and POCO_GUI environment variables
         EnvironmentUtils.set_poco_uid_and_gid()
 
-        StateHolder.home_dir = home_dir
         self.argv = argv
         self.collect_commands()
 

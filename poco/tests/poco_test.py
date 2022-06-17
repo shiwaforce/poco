@@ -17,13 +17,6 @@ class PocoTestSuite(AbstractTestSuite):
         self.assertIn(poco.__doc__.strip(), out.getvalue().strip())
         self.assertIn(poco.END_STRING.strip(), out.getvalue().strip())
 
-    def test_version(self):
-        with self.captured_output() as (out, err):
-            with self.assertRaises(SystemExit) as context:
-                self.run_poco_command("--version")
-            self.assertIsNotNone(context.exception)
-        self.assertIn(poco.__version__, out.getvalue().strip())
-
     def test_help_command(self):
         with self.captured_output() as (out, err):
             with self.assertRaises(SystemExit) as context:
@@ -347,6 +340,13 @@ class PocoTestSuite(AbstractTestSuite):
 
             self.assertIn(yaml.dump(data, default_flow_style=False, default_style='', indent=4).strip(),
                           out.getvalue().strip())
+
+    def test_catalog_update(self):
+        self.init_with_local_catalog()
+        with self.captured_output() as (out, err):
+            self.run_poco_command("catalog-update")
+        self.assertEqual(0, len(err.getvalue().strip()))
+        self.assertIn('Pull completed', out.getvalue().strip())
 
     def test_branches_with_local_config(self):
         self.init_with_local_catalog()

@@ -152,11 +152,11 @@ class ColorPrint:
 
     @staticmethod
     def exit_after_print_messages(message, doc=None, msg_type="error"):
-        if "error" is msg_type:
+        if "error" == msg_type:
             ColorPrint.print_error(message)
-        elif "warn" is msg_type:
+        elif "warn" == msg_type:
             ColorPrint.print_warning(message)
-        elif "info" is msg_type:
+        elif "info" == msg_type:
             ColorPrint.print_info(message)
         else:
             print(message)
