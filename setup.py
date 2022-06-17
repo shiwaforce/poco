@@ -5,8 +5,8 @@ import platform
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-requires = ['pyyaml==3.13', 'pyaml==18.11.0', 'svn==0.3.46', 'gitpython==2.1.15', 'docopt==0.6.2',
-            'docker-compose==1.23.2', 'pygithub==1.43.5', 'python-gitlab==1.8.0']
+requires = ['pyyaml==5.3', 'pyaml==19.12.0', 'svn==1.0.1', 'gitpython==2.1.15', 'docopt==0.6.2',
+            'docker-compose==1.25.4', 'pygithub==1.45', 'python-gitlab==1.15.0']
 test_requires = ['pytest==3.1.2', 'pytest-cov==2.5.1']
 
 if sys.version_info[0] < 3:
@@ -50,7 +50,7 @@ setup_options = dict(
     tests_require=test_requires,
     cmdclass={'test': PyTestCommand},
     entry_points={
-      'console_scripts': ['poco=poco.poco:main'],
+      'console_scripts': ['poco=poco.poco:main']
     },
     license="Apache License 2.0",
     classifiers=[
@@ -60,13 +60,12 @@ setup_options = dict(
         'Natural Language :: English',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-    ],
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9'
+    ]
 )
 
 setup(**setup_options)
