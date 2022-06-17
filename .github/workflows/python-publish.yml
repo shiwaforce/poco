@@ -32,8 +32,19 @@ jobs:
         pip install -r requirements.txt
     - name: Build package
       run: python -m build
+    - name: Setup CodeClimate
+      run: |
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        chmod +x ./cc-test-reporter
+        ./cc-test-reporter before-build
     - name: Test package
-      run: py.test
+      run: |
+        py.test --cov poco --cov-report=xml
+    - name: Upload coverage riport
+      env:
+        CC_TEST_REPORTER_ID: 9d39e517e2a74afe27c5d9b783a86db53babf6c3bd498fab51605c661be3c271
+      run: |
+        ./cc-test-reporter after-build
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
