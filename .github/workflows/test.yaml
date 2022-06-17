@@ -46,6 +46,6 @@ jobs:
 
     - name: Upload coverage riport
       env:
-        CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        CC_TEST_REPORTER_ID: 9d39e517e2a74afe27c5d9b783a86db53babf6c3bd498fab51605c661be3c271
       run: |
         ./cc-test-reporter after-build
