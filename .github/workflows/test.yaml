@@ -16,9 +16,9 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [ '3.6', '3.7' ]
+        python-version: [ '3.7', '3.8', '3.9', '3.10' ]
 
-    name: Python ${{ matrix.python-version }} sample
+    name: Python ${{ matrix.python-version }}
 
     steps:
     - name: Checkout
@@ -34,5 +34,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Setup CodeClimate
+      run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+          ./cc-test-reporter before-build
+
     - name: Test package
-      run: py.test
+      run: |
+        py.test
+        TEST_RESULT=${?}
+
+    - name: Upload coverage riport
+      run: |
+        ./cc-test-reporter after-build --exit-code ${TEST_RESULT}
