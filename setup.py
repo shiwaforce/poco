@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 requires = ['pyyaml==5.3', 'pyaml==19.12.0', 'svn==1.0.1', 'gitpython==2.1.15', 'docopt==0.6.2',
-            'docker-compose==1.25.4', 'pygithub==1.45', 'python-gitlab==1.15.0']
+            'docker-compose==1.25.4', 'pygithub==1.45', 'python-gitlab==1.15.0', 'packaging==21.3']
 test_requires = ['pytest==3.1.2', 'pytest-cov==2.5.1']
 
 if sys.version_info[0] < 3:
