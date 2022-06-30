@@ -15,28 +15,25 @@ Options:
 
 The available poco commands are:
 """
-import inspect
-import importlib
-import pkgutil
-import traceback
 import os
 import sys
+import traceback
+
 from docopt import docopt
 
 from poco.services.state_utils import StateUtils
-from .commands.abstract_command import AbstractCommand, CommandState
+from .commands.abstract_command import CommandState
+from .services.command_holder import CommandHolder
+from .services.console_logger import ColorPrint
 from .services.cta_utils import CTAUtils
 from .services.environment_utils import EnvironmentUtils
-from .services.console_logger import ColorPrint
 from .services.state import StateHolder
-
 
 END_STRING = """See 'poco help <command>' for more information on a specific command."""
 __version__ = '0.99.1'
 
 
 class Poco(object):
-
     command_classes = dict()
     active_object = None
 
@@ -57,7 +54,7 @@ class Poco(object):
         EnvironmentUtils.set_poco_uid_and_gid()
 
         self.argv = argv
-        self.collect_commands()
+        CommandHolder()
 
     def start_flow(self):
 
@@ -104,61 +101,32 @@ class Poco(object):
     def check_command(self):
         if len(self.argv) == 0:
             self.argv.append('-h')
-        StateHolder.args = docopt(self.get_full_doc(), version=__version__, options_first=True, argv=self.argv)
+        StateHolder.args = docopt(CommandHolder.get_full_doc(__doc__), version=__version__, options_first=True,
+                                  argv=self.argv)
         StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'],
                                                          argv=[] + StateHolder.args['<args>']))
         ColorPrint.set_log_level(StateHolder.args)
         ColorPrint.print_info('arguments:\n' + str(StateHolder.args), 1)
 
-    def get_full_doc(self):
-        doc = __doc__
-        commands = []
-        for sub_cmd in self.command_classes.keys():
-            if sub_cmd is None:
-                [Poco.build_command(commands=commands, cls=cls) for cls in self.command_classes[None]]
-                continue
-            sub = "  " + sub_cmd + " [<subcommand>]"
-            doc += sub + (42-len(sub)) * " " + "See 'poco help " + sub_cmd + "' for more.\n"
-        doc += "".join(commands) + "\n" + END_STRING
-        return doc
-
     def command_interpreter(self, command, argv):
         if command == 'help':
             argv.append('-h')
             if len(argv) == 1:
-                docopt(self.get_full_doc() + "\n" + CTAUtils.get_cta(), argv=argv)
+                docopt(CommandHolder.get_full_doc(__doc__) + "\n" + CTAUtils.get_cta(), argv=argv)
             self.command_interpreter(argv[0], argv[1:])
-        if command in self.command_classes.keys():
+        if command in CommandHolder.command_classes.keys():
             if len(argv) == 0:
                 argv.append("-h")
-            args = self.get_args(command=command, classes=self.command_classes[command], argv=argv)
+            args = self.get_args(command=command, classes=CommandHolder.command_classes[command], argv=argv)
             if args is None:
-                docopt(self.build_sub_commands_help(command, classes=self.command_classes[command]),
+                docopt(CommandHolder.build_sub_commands_help(command, classes=CommandHolder.command_classes[command]),
                        argv=[command] + argv)
         else:
-            args = self.get_args(command=None, classes=self.command_classes[None], argv=[command] + argv)
+            args = self.get_args(command=None, classes=CommandHolder.command_classes[None], argv=[command] + argv)
             if args is None:
                 argv.append('-h')
-                docopt(self.get_full_doc() + "\n\n" + "%r is not a poco command." % command, argv=argv)
+                docopt(CommandHolder.get_full_doc(__doc__) + "\n\n" + "%r is not a poco command." % command, argv=argv)
         return args
-
-    @staticmethod
-    def build_command(commands, cls):
-        sub_command = getattr(cls, 'sub_command')
-        command = getattr(cls, 'command')
-        description = getattr(cls, 'description')
-
-        if command is None:
-            ColorPrint.print_info("Command class not contains command: " + str(cls), lvl=1)
-            return
-        if isinstance(command, list):
-            cmd = "(" + "|".join(command) + ")"
-        else:
-            cmd = command
-        if sub_command is not None:
-            cmd = "poco " + sub_command + " " + cmd
-        cmd += (40 - len(cmd)) * " "
-        commands.append("  " + cmd + description + "\n")
 
     def get_args(self, command, classes, argv):
         for cls in classes:
@@ -195,35 +163,6 @@ class Poco(object):
         for arg in args:
             des = descriptions[arg] if arg in descriptions else " "
             doc += "    " + arg + (40 - len(arg)) * " " + des + "\n"
-
-    @staticmethod
-    def build_sub_commands_help(sub_command, classes):
-        doc = "Poco " + sub_command + " commands\n\nUsage:\n"
-        commands = []
-        [Poco.build_command(commands=commands, cls=cls) for cls in classes]
-        return doc + "".join(commands)
-
-    def collect_commands(self):
-        try:
-            command_packages = importlib.import_module('poco.commands', package='poco')
-            for importer, modname, ispkg in pkgutil.iter_modules(command_packages.__path__):
-                if not ispkg:
-                    mod = importlib.import_module('poco.commands.' + modname, 'poco')
-                    for name, cls in inspect.getmembers(mod,
-                                                        lambda member: inspect.isclass(member) and
-                                                        member.__module__ == mod.__name__):
-                        self.check_base_class(cls)
-        except ImportError as ex:
-            ColorPrint.exit_after_print_messages("Commands import error: " + str(ex.args))
-
-    def check_base_class(self, cls):
-        for base_class in inspect.getmro(cls)[1:]:
-            if base_class == AbstractCommand:
-                sub_command = getattr(cls, 'sub_command')
-                if sub_command not in self.command_classes.keys():
-                    self.command_classes[sub_command] = list()
-                self.command_classes[sub_command].append(cls)
-                break
 
 
 def main():
