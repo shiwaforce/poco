@@ -49,6 +49,8 @@ setup_options = dict(
     install_requires=requires,
     tests_require=test_requires,
     cmdclass={'test': PyTestCommand},
+    scripts=['poco/scripts/poco_auto_complete.sh'],
+    data_files=[('share/bash-completion/completions', ['poco/scripts/poco_auto_complete.sh'])],
     entry_points={
       'console_scripts': ['poco=poco.poco:main']
     },
