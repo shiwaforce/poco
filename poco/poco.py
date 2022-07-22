@@ -51,7 +51,7 @@ class Poco(object):
 
         # If not offline, check new version
         if not StateHolder.offline:
-            EnvironmentUtils.check_version(__version__, StateHolder.is_beta_tester)
+            EnvironmentUtils.check_version(__version__, StateHolder.is_beta_tester, False)
 
         # Set OS user id to POCO_UID and POCO_GUI environment variables
         EnvironmentUtils.set_poco_uid_and_gid()

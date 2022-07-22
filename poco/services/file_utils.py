@@ -127,3 +127,21 @@ class FileUtils:
             return file
         if throw_exception:
             ColorPrint.exit_after_print_messages("Directory does not contain Poco file!")
+
+    @staticmethod
+    def get_file_content(dir):
+        try:
+            file=open(dir, "r")
+            content=file.read()
+        except:
+            file=open(dir, "w")
+            content=""
+        finally:
+            file.close()
+            return content
+
+    @staticmethod
+    def write_to_file(dir, content):
+        file=open(dir, "w")
+        file.write(str(content))
+        file.close()
