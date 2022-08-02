@@ -93,7 +93,7 @@ class EnvironmentUtils:
 
     @staticmethod
     def need_check():
-        dir=os.path.join(StateHolder.home_dir,"timestamp")
+        dir=os.path.join(StateHolder.home_dir,"latest_update_check_date")
         latest_check_date = FileUtils.get_file_content(dir)
         today=str(date.today())
         if (len(latest_check_date) == 0 or latest_check_date < today):
