@@ -52,7 +52,7 @@ class EnvironmentUtils:
 
     @staticmethod
     def check_version(current_version, is_beta_tester, is_force_check):
-        if(EnvironmentUtils.need_check() or is_force_check):
+        if (EnvironmentUtils.need_check() or is_force_check):
             # check pip
             p = Popen("pip install poco==", stdout=PIPE, stderr=PIPE, shell=True)
             out, err = p.communicate()
@@ -64,6 +64,8 @@ class EnvironmentUtils:
             if version.parse(current_version) < version.parse(newest_version):
                 ColorPrint.print_warning("New version of poco is available (%r). \n "
                                         "Please upgrade with: pip install -U poco" % newest_version)
+            elif is_force_check:
+                ColorPrint.print_warning("Poco is up to date")
 
     @staticmethod
     def parse_version(pip_content, is_beta_tester):
@@ -94,7 +96,7 @@ class EnvironmentUtils:
         dir=os.path.join(StateHolder.home_dir,"timestamp")
         latest_check_date = FileUtils.get_file_content(dir)
         today=str(date.today())
-        if(len(latest_check_date) == 0 or latest_check_date < today):
+        if (len(latest_check_date) == 0 or latest_check_date < today):
             FileUtils.write_to_file(dir, today)
             return True
         return False
