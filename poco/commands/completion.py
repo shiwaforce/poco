@@ -6,6 +6,9 @@ Koncepció:
   - a bash és zsh kiegészítéshez ne keljen függőség az OS-en. Nem biztos, hogy azonos Mac-en vagy Linuxon.
   - a completion command az argumentumok alapján adjon választ. Így a Poco képes lesz a planek listázására is
 
+Extra info:
+  - https://github.com/CumulusNetworks/NetworkDocopt/blob/master/bin/network-docopt-example
+
 """
 
 from .abstract_command import AbstractCommand
