@@ -62,8 +62,8 @@ class EnvironmentUtils:
                 # maybe installed from source
                 return
             if version.parse(current_version) < version.parse(newest_version):
-                ColorPrint.print_warning("New version of poco is available (%r). \n "
-                                        "Please upgrade with: pip install -U poco" % newest_version)
+                ColorPrint.print_warning("New version of poco is available. \n "
+                                        "Please upgrade with: pip install poco==" + newest_version)
             elif is_force_check:
                 ColorPrint.print_warning("Poco is up to date")
 
