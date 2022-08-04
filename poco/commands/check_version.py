@@ -3,12 +3,12 @@ from poco.services.state import StateHolder
 from .abstract_command import AbstractCommand
 from poco.poco import __version__
 
-class Update(AbstractCommand):
+class CheckVersion(AbstractCommand):
 
-    command = "getupdate"
+    command = "check-version"
     args = None
     args_descriptions = {}
-    description = "Run: 'poco getupdate' to check for poco updates."
+    description = "Run: 'poco check-version' to check for poco updates."
 
     def prepare_states(self):
         pass
