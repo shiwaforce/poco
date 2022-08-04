@@ -32,7 +32,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'poco help <command>' for more information on a specific command."""
-__version__ = '0.99.1'
+__version__ = '0.99.2.dev1'
 
 
 class Poco(object):
@@ -51,7 +51,7 @@ class Poco(object):
 
         # If not offline, check new version
         if not StateHolder.offline:
-            EnvironmentUtils.check_version(__version__, StateHolder.is_beta_tester)
+            EnvironmentUtils.check_version(__version__, StateHolder.is_beta_tester, False)
 
         # Set OS user id to POCO_UID and POCO_GUI environment variables
         EnvironmentUtils.set_poco_uid_and_gid()
