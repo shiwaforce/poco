@@ -70,13 +70,3 @@ class CommandHolder:
         commands = []
         [CommandHolder.build_command(commands=commands, cls=cls) for cls in classes]
         return doc + "".join(commands)
-
-
-def check_base_class(class_name):
-    for base_class in inspect.getmro(class_name)[1:]:
-        if base_class == AbstractCommand:
-            sub_command = getattr(class_name, 'sub_command')
-            if sub_command not in CommandHolder.command_classes.keys():
-                CommandHolder.command_classes[sub_command] = list()
-            CommandHolder.command_classes[sub_command].append(class_name)
-            break
