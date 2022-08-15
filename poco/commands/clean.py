@@ -25,6 +25,9 @@ class Clean(AbstractCommand):
         self.check_volumes()
         ColorPrint.print_info(message="Clean complete")
 
+    def completion(self):
+        pass
+
     def check_container(self, status):
         out = check_output(" ".join(["docker", "ps", "-qf", "status=" + str(status)]), shell=True)
 

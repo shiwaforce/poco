@@ -26,6 +26,9 @@ class RepoAdd(AbstractCommand):
         config = self.get_config_with_type('git', [('server', '<git-url>'), ('branch', '<branch>'), ('file', '<file>')])
         ConfigHandler.add(new_config=config)
 
+    def completion(self):
+        pass
+
     @staticmethod
     def get_config_with_type(repo_type, add_param):
         config = dict()

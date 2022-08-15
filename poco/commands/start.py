@@ -34,6 +34,9 @@ class Start(AbstractCommand):
         if hasattr(self, "end_message"):
             ColorPrint.print_info(getattr(self, "end_message"))
 
+    def completion(self):
+        pass
+
     @staticmethod
     def check_poco_file():
         if not StateUtils.check_variable('poco_file'):

@@ -25,3 +25,6 @@ class RepoBranch(AbstractCommand):
     def execute(self):
         ConfigHandler.set_branch(StateHolder.args.get('<branch>'), StateHolder.args.get('<name>'))
         ColorPrint.print_info("Branch changed")
+
+    def completion(self):
+        pass

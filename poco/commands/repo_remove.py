@@ -24,6 +24,9 @@ class RepoRemove(AbstractCommand):
     def execute(self):
         RepoRemove.remove()
 
+    def completion(self):
+        pass
+
     @staticmethod
     def remove():
         del StateHolder.config[StateHolder.name]

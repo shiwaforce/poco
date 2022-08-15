@@ -1,4 +1,5 @@
 import abc
+
 from ..services.console_logger import ColorPrint
 
 
@@ -27,6 +28,10 @@ class AbstractCommand(object):
 
     def cleanup(self):
         pass
+
+    @abc.abstractmethod
+    def completion(self):
+        ColorPrint.print_info("Abstract completion")
 
 
 class CommandState:

@@ -18,3 +18,6 @@ class RepoLs(AbstractCommand):
 
     def execute(self):
         ColorPrint.print_info(message=ConfigHandler.print_config())
+
+    def completion(self):
+        pass

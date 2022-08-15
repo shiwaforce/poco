@@ -22,3 +22,6 @@ class RepoBranches(AbstractCommand):
     def execute(self):
         repository = CatalogHandler.get_catalog_repository(StateHolder.args.get('<name>'))
         repository.print_branches()
+
+    def completion(self):
+        pass

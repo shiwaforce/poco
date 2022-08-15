@@ -22,3 +22,6 @@ class CatalogUpdate(AbstractCommand):
         CatalogHandler.load()
 
         ColorPrint.print_info("Pull completed")
+
+    def completion(self):
+        pass

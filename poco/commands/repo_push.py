@@ -23,3 +23,6 @@ class RepoPush(AbstractCommand):
         repository = CatalogHandler.get_catalog_repository(StateHolder.args.get('<name>'))
         repository.push()
         ColorPrint.print_info("Push completed")
+
+    def completion(self):
+        pass

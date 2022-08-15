@@ -22,6 +22,9 @@ class Checkout(AbstractCommand):
         self.checkout()
         ColorPrint.print_info("Project checkout complete " + StateHolder.repository.target_dir)
 
+    def completion(self):
+        pass
+
     @staticmethod
     def checkout(dry_run=False):
 

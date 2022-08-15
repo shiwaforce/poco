@@ -25,3 +25,6 @@ class Branch(AbstractCommand):
     def execute(self):
         StateHolder.repository.set_branch(StateHolder.args.get('<branch>'), StateHolder.args.get('-f'))
         ColorPrint.print_info("Branch changed")
+
+    def completion(self):
+        pass

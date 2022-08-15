@@ -47,6 +47,9 @@ class ProjectAdd(AbstractCommand):
                                    url=self.repo.remotes.origin.url, file=self.file, repo_name=self.repo_name)
         ColorPrint.print_info("Project added")
 
+    def completion(self):
+        pass
+
     def get_normalized_dir(self):
         target_dir = StateHolder.args.get('<target-dir>')
         if target_dir is not None:

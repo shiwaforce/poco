@@ -37,6 +37,9 @@ class Init(AbstractCommand):
 
         ColorPrint.print_info("Project init completed")
 
+    def completion(self):
+        pass
+
     @staticmethod
     def fix_file(target_file):
         if not os.path.exists(target_file):
