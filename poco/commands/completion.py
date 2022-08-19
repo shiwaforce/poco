@@ -10,10 +10,12 @@ Extra info:
   - https://github.com/CumulusNetworks/NetworkDocopt/blob/master/bin/network-docopt-example
 
 """
+import os
 
 from .abstract_command import AbstractCommand
 from ..services.command_holder import CommandHolder
 from ..services.state import StateHolder
+from ..services.state_utils import StateUtils
 
 
 class Completion(AbstractCommand):
@@ -23,11 +25,16 @@ class Completion(AbstractCommand):
     args_descriptions = {"[<comp_line>]": "command line competition"}
     description = "Run: 'poco completion' to get all poco command or " \
                   "'poco completion plan' to get plan commands."
+
     def prepare_states(self):
-        pass
+        StateUtils.calculate_name_and_work_dir()
+        StateUtils.prepare("compose_handler")
 
     def resolve_dependencies(self):
-        pass
+        if StateHolder.catalog_element is not None and not StateUtils.check_variable('repository'):
+            # Repository not found
+            exit(1)
+        self.check_poco_file()
 
     def completion(self):
         pass
@@ -77,3 +84,10 @@ class Completion(AbstractCommand):
                 cmd = [cmd]
             if argv[0] in cmd:
                 return cls()
+
+    @staticmethod
+    def check_poco_file():
+        if not StateUtils.check_variable('poco_file'):
+            poco_file = str(StateHolder.repository.target_dir if StateHolder.repository is not None
+                            else os.getcwd()) + '/poco.yml'
+            exit(1)

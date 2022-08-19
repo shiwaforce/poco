@@ -1,5 +1,7 @@
 import os
+
 import yaml
+
 from .console_logger import *
 from .git_repository import GitRepository
 from .project_utils import ProjectUtils
@@ -113,3 +115,8 @@ class ComposeHandler:
             ColorPrint.print_with_lvl(message=key + "\t\t" + plan['description'], lvl=-1)
         else:
             ColorPrint.print_with_lvl(message=key, lvl=-1)
+
+    def get_plan_list_completion(self):
+        self.get_compose_project()
+        for key in self.compose_project['plan'].keys():
+            print(key)

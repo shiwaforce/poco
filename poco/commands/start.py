@@ -1,13 +1,14 @@
 import os
+
 from .abstract_command import AbstractCommand
-from ..services.state_utils import StateUtils
-from ..services.state import StateHolder
 from ..services.command_handler import CommandHandler
+from ..services.compose_handler import ComposeHandler
 from ..services.console_logger import ColorPrint
+from ..services.state import StateHolder
+from ..services.state_utils import StateUtils
 
 
 class Start(AbstractCommand):
-
     command = ["start", "up"]
     args = ["[<project/plan>]"]
     args_descriptions = {"[<project/plan>]": "Name of the project in the catalog and/or name of the project's plan"}
@@ -35,7 +36,8 @@ class Start(AbstractCommand):
             ColorPrint.print_info(getattr(self, "end_message"))
 
     def completion(self):
-        pass
+        compose_handler = ComposeHandler(StateHolder.poco_file)
+        compose_handler.get_plan_list_completion()
 
     @staticmethod
     def check_poco_file():
