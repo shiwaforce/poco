@@ -135,6 +135,7 @@ class ConfigHandler(object):
         config += "Mode: " + str(StateHolder.mode) + "\n"
         config += "Offline: " + str(StateHolder.offline) + "\n"
         config += "Always update: " + str(StateHolder.always_update) + "\n"
+        config += "Follow logs: " + str(StateHolder.follow) + "\n"
         if StateHolder.config is not None:
             config += "Config location: " + str(StateHolder.catalog_config_file) + "\n"
             config += "Config:\n"

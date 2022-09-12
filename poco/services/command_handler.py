@@ -1,3 +1,4 @@
+from imaplib import Commands
 import os
 import platform
 from .console_logger import ColorPrint, Doc
@@ -74,6 +75,8 @@ class CommandHandler(object):
         for cmd in command_list['docker']:
             if isinstance(cmd, list) and 'pull' in cmd and StateHolder.offline:  # Skip pull in offline mode
                 continue
+            if ('log' in cmd and StateHolder.follow):
+                cmd += ' -f'
             runner.run(plan=plan, commands=cmd,
                        envs=self.get_environment_variables(plan=plan))
 

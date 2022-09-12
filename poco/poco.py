@@ -6,12 +6,13 @@ Usage:
 
 
 Options:
-  -v --version         Print version of POCO
+  -v --version      Print version of POCO
   -h --help         Show this screen.
   -V --verbose      Print more text.
   -q --quiet        Print less text.
   --always-update   Project repository handle by user
   --offline         Offline mode
+  -f --follow       Follow logs
 
 The available poco commands are:
 """

@@ -26,9 +26,10 @@ class StateHolder:
 
     # Mode and mode properties
     mode = None
-    mode_properties = ['offline', 'always_update']  # TODO maybe more dynamic
+    mode_properties = ['offline', 'always_update', 'follow']  # TODO maybe more dynamic
     offline = False
     always_update = True
+    follow = False
 
     # Project properties
     name = None
