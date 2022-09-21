@@ -3,7 +3,10 @@ import re
 import sys
 from packaging import version
 from subprocess import Popen, PIPE
+from poco.services.file_utils import FileUtils
+from poco.services.state import StateHolder
 from .console_logger import ColorPrint
+from datetime import *
 
 
 class EnvironmentUtils:
@@ -48,18 +51,21 @@ class EnvironmentUtils:
         ColorPrint.print_with_lvl(message=message_head + "\n " + str(out).strip(), lvl=1)
 
     @staticmethod
-    def check_version(current_version, is_beta_tester):
-        # check pip
-        p = Popen("pip install poco==", stdout=PIPE, stderr=PIPE, shell=True)
-        out, err = p.communicate()
-        if not len(err) == 0:
-            newest_version = EnvironmentUtils.parse_version(str(err), is_beta_tester)
-        else:
-            # maybe installed from source
-            return
-        if version.parse(current_version) < version.parse(newest_version):
-            ColorPrint.print_warning("New version of poco is available (%r). \n "
-                                     "Please upgrade with: pip install -U poco" % newest_version)
+    def check_version(current_version, is_beta_tester, is_force_check):
+        if (EnvironmentUtils.need_check() or is_force_check):
+            # check pip
+            p = Popen("pip install poco==", stdout=PIPE, stderr=PIPE, shell=True)
+            out, err = p.communicate()
+            if not len(err) == 0:
+                newest_version = EnvironmentUtils.parse_version(str(err), is_beta_tester)
+            else:
+                # maybe installed from source
+                return
+            if version.parse(current_version) < version.parse(newest_version):
+                ColorPrint.print_warning("New version of poco is available. \n "
+                                        "Please upgrade with: pip install poco==" + newest_version)
+            elif is_force_check:
+                ColorPrint.print_warning("Poco is up to date")
 
     @staticmethod
     def parse_version(pip_content, is_beta_tester):
@@ -84,3 +90,14 @@ class EnvironmentUtils:
         if sys.version_info[0] == 3:
             return text_string.decode("utf-8")
         return text_string
+
+    @staticmethod
+    def need_check():
+        directory = StateHolder.home_dir
+        filename = "latest_update_check_date"
+        latest_check_date = FileUtils.get_file_content(directory, filename)
+        today = str(date.today())
+        if (latest_check_date < today):
+            FileUtils.write_to_file(directory, filename, today)
+            return True
+        return False
