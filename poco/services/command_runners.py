@@ -56,10 +56,11 @@ class ScriptPlanRunner(AbstractPlanRunner):
                 ColorPrint.print_with_lvl(message="Executing " + script_type + " in " + base_image + " image")
                 command = self.get_script_command(script)
                 cmd = self.get_script_base(base_image, command)
-                ColorPrint.print_with_lvl(message= "Docker command: " + str(cmd), lvl=1)
+                ColorPrint.print_with_lvl(message="Docker command: " + str(cmd), lvl=1)
                 self.run_script_with_check(cmd=cmd, working_directory=self.working_directory, envs=os.environ.copy())
 
-    def get_script_image(self, script):
+    @staticmethod
+    def get_script_image(script):
         base_image = "alpine:latest"
         if isinstance(script, dict) and 'image' in script:
             base_image = script['image']
@@ -71,7 +72,8 @@ class ScriptPlanRunner(AbstractPlanRunner):
             command = script['command']
         return self.get_script_command_array(command)
 
-    def get_script_command_array(self, command):
+    @staticmethod
+    def get_script_command_array(command):
         command_array = list()
         if isinstance(command, list):
             for c in command:
@@ -106,7 +108,8 @@ class ScriptPlanRunner(AbstractPlanRunner):
         command_array.append("HOST_SYSTEM="+platform.system())
         if not platform.system() == 'Windows':
             command_array.append("-u")
-            command_array.append(EnvironmentUtils.get_variable("POCO_UID", "1000") + ":" + EnvironmentUtils.get_variable("POCO_GID", "1000"))
+            command_array.append(EnvironmentUtils.get_variable("POCO_UID", "1000") + ":" +
+                                 EnvironmentUtils.get_variable("POCO_GID", "1000"))
         command_array.append("--rm")
         command_array.append("-v")
         command_array.append(str(self.working_directory) + ":/usr/local")
@@ -198,7 +201,7 @@ class DockerPlanRunner(AbstractPlanRunner):
 
         """Compose docker command array with project name and compose files"""
         cmd = list()
-        cmd.append("docker-compose")
+        cmd.append("docker compose")
         cmd.append("--project-name")
         cmd.append(StateHolder.name)
         for compose_file in docker_files:

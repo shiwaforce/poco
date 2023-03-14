@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 requires = ['PyYAML==5.4.1', 'pyaml==21.10.1', 'gitpython==3.1.27', 'svn==1.0.1', 'docopt==0.6.2',
-            'docker-compose==1.29.2', 'pygithub==1.55', 'python-gitlab==3.9.0', 'packaging==21.3']
+            'pygithub==1.55', 'python-gitlab==3.9.0', 'packaging==21.3']
 test_requires = ['pytest==7.1.3', 'pytest-cov==3.0.0']
 
 # MacOS
