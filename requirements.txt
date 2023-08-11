@@ -1,6 +1,6 @@
 PyYAML==5.4.1
 pyaml==21.10.1
-gitpython==3.1.30
+gitpython==3.1.32
 svn==1.0.1
 docopt==0.6.2
 pygithub==1.55
