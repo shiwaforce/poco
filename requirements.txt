@@ -1,4 +1,4 @@
-PyYAML==5.4.1
+PyYAML==6.0.1
 pyaml==21.10.1
 gitpython==3.1.30
 svn==1.0.1
