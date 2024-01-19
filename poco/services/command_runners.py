@@ -12,6 +12,8 @@ class AbstractPlanRunner(object):
 
     @staticmethod
     def run_script_with_check(cmd, working_directory, envs):
+        envs['GID']=os.environ.get('GID', '')
+        envs['UID']=os.environ.get('UID', '')
         res = check_call(" ".join(cmd), cwd=working_directory, env=envs, shell=True)
         if res > 0:
             ColorPrint.exit_after_print_messages(message=res)
