@@ -35,8 +35,9 @@ jobs:
       run: python -m build
     - name: Setup CodeClimate
       run: |
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-        chmod +x ./cc-test-reporter
+        curl -fkLO https://github.com/codeclimate/test-reporter/releases/download/v0.11.1/artifacts.tar.gz
+        tar xvf artifacts.tar.gz ./artifacts/bin/test-reporter-0.11.1-linux-amd64 --strip-components=3
+        mv test-reporter-0.11.1-linux-amd64 cc-test-reporter
         ./cc-test-reporter before-build
     - name: Test package
       run: |
