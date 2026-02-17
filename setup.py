@@ -5,9 +5,9 @@ import platform
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-requires = ['PyYAML==6.0.1', 'pyaml==21.10.1', 'gitpython==3.1.30', 'svn==1.0.1', 'docopt==0.6.2',
-            'pygithub==1.55', 'python-gitlab==3.9.0', 'packaging==21.3']
-test_requires = ['pytest==7.1.3', 'pytest-cov==3.0.0']
+requires = ['PyYAML>=6.0.2', 'pyaml==21.10.1', 'gitpython==3.1.30', 'svn==1.0.1', 'docopt==0.6.2',
+            'pygithub==1.55', 'python-gitlab==3.9.0', 'packaging>=24.0']
+test_requires = ['pytest>=7.4.0', 'pytest-cov>=4.1.0']
 
 # MacOS
 if platform.system() == "Darwin" and sys.version_info[0] == 3:
@@ -43,6 +43,7 @@ setup_options = dict(
                        'command-hierarchy.yml',
                        'config']},
     include_package_data=True,
+    python_requires='>=3.12.3',
     install_requires=requires,
     tests_require=test_requires,
     cmdclass={'test': PyTestCommand},
@@ -58,10 +59,9 @@ setup_options = dict(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10'
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14'
     ]
 )
 

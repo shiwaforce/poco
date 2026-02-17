@@ -21,13 +21,13 @@ class StateUtils:
 
         StateUtils.prepare_config()
         StateHolder.process_extra_args()
-        if prepareable is not "config":
+        if prepareable != "config":
             StateUtils.prepare_catalog(prepareable)
         if prepareable not in ["config", "catalog_read", "catalog"]:
             StateUtils.prepare_project_repo()
         if prepareable not in ["config", "catalog_read", "catalog", "project_repo"]:
             StateUtils.prepare_project_file()
-        if prepareable is "compose_handler":
+        if prepareable == "compose_handler":
             StateHolder.compose_handler = ComposeHandler(StateHolder.poco_file)
 
     @staticmethod
@@ -44,7 +44,7 @@ class StateUtils:
         StateUtils.prepare_config_handler()
         if os.path.exists(StateHolder.catalog_config_file):
             ConfigHandler.read_catalogs()
-            if elem is not "catalog_read":
+            if elem != "catalog_read":
                 CatalogHandler.load()
 
     @staticmethod

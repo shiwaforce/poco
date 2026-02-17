@@ -21,6 +21,23 @@ import pkgutil
 import traceback
 import os
 import sys
+
+# Require Python 3.12.3 or newer
+if sys.version_info < (3, 12, 3):
+    sys.exit(
+        "poco requires Python 3.12.3 or newer. "
+        "Current version: {0}.{1}.{2}".format(*sys.version_info[:3])
+    )
+
+# Supported version is 3.14.3; notify when running on older
+if sys.version_info < (3, 14, 3):
+    print(
+        "poco: supported Python version is 3.14.3 (you are running {0}.{1}.{2}).".format(
+            *sys.version_info[:3]
+        ),
+        file=sys.stderr,
+    )
+
 from docopt import docopt
 
 from poco.services.state_utils import StateUtils
@@ -32,7 +49,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'poco help <command>' for more information on a specific command."""
-__version__ = '0.99.3'
+__version__ = '0.99.4'
 
 
 class Poco(object):

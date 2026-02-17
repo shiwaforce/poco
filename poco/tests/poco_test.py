@@ -434,6 +434,28 @@ class PocoTestSuite(AbstractTestSuite):
             self.assertTrue(key in out.getvalue().strip())
         self.assertNotIn("test-directory", out.getvalue())
 
+    def test_project_name_with_dot_in_catalog(self):
+        """Project names (folder names) containing a dot must be recognized in catalog and commands."""
+        self.init_with_local_catalog()
+        test_dir = os.path.join(self.tmpdir, "sometest.project")
+        os.makedirs(test_dir)
+        git.Repo.clone_from(url=AbstractTestSuite.STACK_LIST_SAMPLE['nginx']['git'], to_path=test_dir)
+        os.rename(
+            os.path.join(test_dir, 'nginx', 'poco.yml'),
+            os.path.join(test_dir, 'poco.yml')
+        )
+        with self.captured_output() as (out, err):
+            self.run_poco_command("project", "add", test_dir)
+        self.assertIn("Project added", out.getvalue())
+        self.clean_states()
+        with self.captured_output() as (out, err):
+            self.run_poco_command("catalog")
+        self.assertIn("sometest.project", out.getvalue())
+        self.clean_states()
+        with self.captured_output() as (out, err):
+            self.run_poco_command("project", "ls")
+        self.assertIn("sometest.project", out.getvalue())
+
     def test_init_without_catalog(self):
         self.init_with_local_catalog()
         self.assertIsNone(FileUtils.get_file_with_extension('poco', directory=self.ws_dir))

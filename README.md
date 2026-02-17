@@ -1,6 +1,6 @@
 # POCO
 
-[![Build Status](https://travis-ci.org/shiwaforce/poco.svg?branch=master)](https://travis-ci.org/shiwaforce/poco)
+[![Test](https://github.com/shiwaforce/poco/actions/workflows/test.yaml/badge.svg)](https://github.com/shiwaforce/poco/actions/workflows/test.yaml)
 [![pypi](https://img.shields.io/pypi/v/poco.svg)](https://pypi.python.org/pypi/poco)
 [![pypi](https://img.shields.io/pypi/pyversions/poco.svg)](https://pypi.python.org/pypi/poco)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/62a09af060af69ece1d2/test_coverage)](https://codeclimate.com/github/shiwaforce/poco/test_coverage)
@@ -36,9 +36,11 @@ All documentation is available on [getpoco.io](https://getpoco.io/)
 
 ## Requirements
 
+- **Python 3.12.3** or newer (supported version: **3.14.3**)
 - Git or SVN
 - SSH
 - Docker (17.0.0 or higher version is recommended)
+- Docker Compose V2 (plugin: `docker compose`), for compose support
 - kubectl, for Kubernetes support
 - helm, for helm functionality support
 

@@ -9,6 +9,7 @@ from .bitbucket_repository import BitbucketRepository
 from .svn_repository import SvnRepository
 from .environment_utils import EnvironmentUtils
 from .state import StateHolder
+from .yaml_utils import YamlUtils
 
 
 class CatalogHandler:
@@ -52,11 +53,12 @@ class CatalogHandler:
 
     @staticmethod
     def write_catalog(catalog):
-        """Write catalog file"""
+        """Write catalog file (project names with dots are quoted so they are read back as single keys)."""
         if catalog is not None and catalog in StateHolder.catalogs:
-            string_format = yaml.dump(data=StateHolder.catalogs[catalog], default_flow_style=False)
-            StateHolder.catalog_repositories[catalog].repository.write_yaml_file(CatalogHandler.get_catalog_file(
-                StateHolder.catalog_repositories[catalog].config), string_format)
+            catalog_file = CatalogHandler.get_catalog_file(StateHolder.catalog_repositories[catalog].config)
+            catalog_data = StateHolder.catalogs[catalog]
+            out_path = StateHolder.catalog_repositories[catalog].repository.get_file(catalog_file)
+            YamlUtils.write_catalog_safe(file=out_path, data=catalog_data)
 
     @staticmethod
     def set(modified):

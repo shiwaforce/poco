@@ -71,16 +71,18 @@ class PackageHandler(object):
             ColorPrint.exit_after_print_messages(message=".poco file not exists in current directory")
 
         cmd = list()
+        tar_file = os.path.splitext(poco_file)[0] + ".tar"
         cmd.append("docker")
         cmd.append("load")
         cmd.append("-i")
-        cmd.append(poco_file.rstrip("poco") + "tar")
+        cmd.append(tar_file)
         self.run_script(cmd=cmd)
 
     @staticmethod
     def get_compose_base_cmd(docker_files):
         cmd = list()
-        cmd.append("docker-compose")
+        cmd.append("docker")
+        cmd.append("compose")
         for compose_file in docker_files:
             cmd.append("-f")
             cmd.append(str(compose_file))
