@@ -19,7 +19,7 @@ jobs:
         python-version:
           - '3.12.3'
           - '3.12.11'
-          - '3.14.3'
+          # 3.14.3: add when available on GitHub Actions runners (was exit 255)
 
     name: Python ${{ matrix.python-version }}
 
