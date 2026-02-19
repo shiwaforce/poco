@@ -19,7 +19,7 @@ jobs:
         python-version:
           - '3.12.3'
           - '3.12.11'
-          # 3.14.3: add when available on GitHub Actions runners (was exit 255)
+          - '3.14'
 
     name: Python ${{ matrix.python-version }}
 
@@ -39,6 +39,7 @@ jobs:
         pip install -e .
 
     - name: Setup CodeClimate
+      continue-on-error: true
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       run: |
@@ -54,6 +55,7 @@ jobs:
         py.test --cov poco --cov-report=xml
 
     - name: Upload coverage riport
+      continue-on-error: true
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       run: |
