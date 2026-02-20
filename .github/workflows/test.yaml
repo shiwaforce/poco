@@ -24,11 +24,12 @@ jobs:
     name: Python ${{ matrix.python-version }}
 
     steps:
+    # v6 actions: updated deps, avoids node-tar CVE (Arbitrary File Read/Write via Hardlink)
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
 
