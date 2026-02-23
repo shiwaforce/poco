@@ -144,6 +144,11 @@ When a command can show a list, use `-i` to pick from a menu (or fzf if installe
 - `poco preset use -i` — Choose preset from list.
 - `poco helm-list -i` — Choose release, then show `helm status`.
 
+## Security
+
+- **Dependencies:** We track known vulnerabilities and bump affected packages (e.g. GitPython ≥3.1.41 for CVE fixes). To audit your install: `pip install pip-audit && pip-audit` (or `pip-audit -r requirements.txt`).
+- **Build tools:** Keep setuptools and wheel up to date: `pip install -U setuptools wheel` to address CVEs in the toolchain.
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for release history. Recent: **0.99.7** — Presets (list/use/save), kube-get, interactive mode (`-i`) for kubectx/kubens/preset/helm-list.

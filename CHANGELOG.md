@@ -2,6 +2,18 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.9.2] - 2026-02-25
+
+### Security
+
+- **GitPython** — Bumped from 3.1.30 to 3.1.41 to address PYSEC-2024-4, PYSEC-2023-137, PYSEC-2023-161, PYSEC-2023-165 (Windows path, clone options, path traversal). Run `pip-audit -r requirements.txt` to verify; no known vulnerabilities in declared dependencies.
+- **README** — Added Security section: recommend `pip-audit` and `pip install -U setuptools wheel` for the toolchain.
+
+### Changed
+
+- Pytest: filter DeprecationWarnings (e.g. from PyGithub) so test runs are warning-clean.
+- CI: upgrade setuptools and wheel before install; run `pip-audit` and fail on vulnerabilities.
+
 ## [0.99.9.1] - 2026-02-25
 
 ### Fixed
