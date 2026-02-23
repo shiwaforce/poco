@@ -42,11 +42,12 @@ jobs:
     - name: Test package
       run: |
         py.test --cov poco --cov-report=xml
-    - name: Upload coverage riport
+    - name: Upload coverage to Code Climate (best-effort)
+      continue-on-error: true
       env:
         CC_TEST_REPORTER_ID: 9d39e517e2a74afe27c5d9b783a86db53babf6c3bd498fab51605c661be3c271
       run: |
-        ./cc-test-reporter after-build
+        ./cc-test-reporter after-build || true
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:

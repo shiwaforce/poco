@@ -55,9 +55,9 @@ jobs:
       run: |
         py.test --cov poco --cov-report=xml
 
-    - name: Upload coverage riport
+    - name: Upload coverage to Code Climate (best-effort)
       continue-on-error: true
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       run: |
-        if [ -n "$CC_TEST_REPORTER_ID" ]; then ./cc-test-reporter after-build; fi
+        if [ -n "$CC_TEST_REPORTER_ID" ]; then ./cc-test-reporter after-build || true; fi
