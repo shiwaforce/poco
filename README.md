@@ -10,7 +10,11 @@
   <img width="200" height="200" title="Poco Logo" src="https://raw.githubusercontent.com/shiwaforce/poco/master/logo.svg?sanitize=true"/>
 </p>
 
-**Poco** helps to organise and manage Docker, Docker-Compose, Kubernetes projects of any complexity using simple YAML config files to shorten the route from finding your project to initialising it in your local environment.
+**Poco** is one CLI for **Docker**, **Kubernetes** and **Helm**: catalogue and run compose projects, switch kubectl context and namespace, and list Helm repos and releases — without leaving your terminal or remembering three different tools.
+
+- **Docker** — `poco up`, `poco down`, `poco ps`, compose config, build, pull; YAML catalog and plans.
+- **Kubernetes** — `poco kubectx`, `poco kubens` (list/switch context and namespace); `poco kube-get pods|ns|svc|...`; presets (context+namespace in one command).
+- **Helm** — `poco helm-repos`, `poco helm-list` (releases; optional `--all-namespaces`, `-i` to pick and show status).
 
 - **Simple**. Configure, run and switch between projects with a very simple command line interface.
 - **Flexibility**. Manage, scale, maintain projects of any complexity with ease.
@@ -18,7 +22,7 @@
 
 ## Features
 
-- **Docker, Docker-Compose, Kubernetes, Helm** support out of the box.
+- **Docker, Kubernetes, Helm in one place** — Compose projects, kubectl context/namespace, Helm repos and releases.
 - **Git, SVN** support out of the box.
 - **Project Catalog, Multiple Catalogues**. Create your own project catalog. Organise your projects without additional tools.
 - **Multiple Plans**. Create multiple plans for different environments or even environments for demo purposes. Switch between plans (environments) with ease.
@@ -27,6 +31,7 @@
 
 ## Global options
 
+- `-i`, `--interactive` — Interactive menu: choose actions step by step without typing commands (`poco -i`).
 - `-V`, `--verbose` — Print more (e.g. merged docker compose config for `up`/`down`).
 - `-VV` or `--no-matrix` — No matrix effect, show full output (for `up`/`down`). Implies verbose.
 - `-q`, `--quiet` — Print less.
@@ -103,18 +108,45 @@ Stop your project:
 $:~ poco stop
 ```
 
-## Kubernetes & Helm helpers
+## One CLI: Docker, kubectl, Helm
 
-- **kubectx** — List or switch kubectl context: `poco kubectx` (list), `poco kubectx <context>` (switch).
-- **kubens** — List or switch namespace: `poco kubens` (list), `poco kubens <namespace>` (set current context namespace).
-- **helm-repos** — List Helm repositories: `poco helm-repos`.
-- **helm-list** — List Helm releases: `poco helm-list`, `poco helm-list --all-namespaces` for all namespaces.
+| Stack    | Poco commands | What you get |
+|----------|----------------|--------------|
+| **Docker** | `poco up`, `poco down`, `poco ps`, `poco config`, … | Compose projects from a YAML catalog; matrix-style run; verbose merged config. |
+| **Kubernetes** | `poco kubectx`, `poco kubens` | List/switch context and namespace (kubectx/kubens-style). |
+| **Helm** | `poco helm-repos`, `poco helm-list` | List repos and releases; `helm-list --all-namespaces` for all. |
 
-Requires `kubectl` and/or `helm` installed and configured.
+Requires Docker and/or `kubectl`/`helm` installed. Poco checks availability and works with different kubectl/helm versions.
+
+### Presets (workflow)
+
+Save and switch context + namespace in one step:
+
+- `poco preset list` — List saved presets.
+- `poco preset use <name>` — Switch to a preset (context and namespace).
+- `poco preset save <name>` — Save current context and namespace as a preset.
+
+Presets are stored in `~/.poco/presets.yml`.
+
+### Kube-get
+
+Shortcut for common `kubectl get` usage:
+
+- `poco kube-get <resource> [name]` — e.g. `poco kube-get pods`, `poco kube-get ns`, `poco kube-get svc`.
+- Use `-n <namespace>` or `-A` (all namespaces) when needed.
+
+### Interactive mode (`-i` / `--choose`)
+
+When a command can show a list, use `-i` to pick from a menu (or fzf if installed):
+
+- `poco kubectx -i` — Choose context from list.
+- `poco kubens -i` — Choose namespace from list.
+- `poco preset use -i` — Choose preset from list.
+- `poco helm-list -i` — Choose release, then show `helm status`.
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for release history. Recent: **0.99.6** — kubectx/kubens/helm helpers, matrix 20-line TTY-adaptive effect, verbose merged compose, `-VV`/`--no-matrix`.
+See [CHANGELOG.md](CHANGELOG.md) for release history. Recent: **0.99.7** — Presets (list/use/save), kube-get, interactive mode (`-i`) for kubectx/kubens/preset/helm-list.
 
 ## Licence
 

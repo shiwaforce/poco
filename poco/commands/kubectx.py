@@ -4,6 +4,7 @@ from ..services.state_utils import StateUtils
 from ..services.state import StateHolder
 from ..services.console_logger import ColorPrint
 from ..services.environment_utils import EnvironmentUtils
+from ..services.interactive import choose_one
 import subprocess
 import sys
 
@@ -11,9 +12,13 @@ import sys
 class Kubectx(AbstractCommand):
 
     command = "kubectx"
-    args = ["[<context>]"]
-    args_descriptions = {"[<context>]": "Context name to switch to. Omit to list contexts."}
-    description = "Run: 'poco kubectx' to list kubectl contexts, 'poco kubectx <context>' to switch context."
+    args = ["[<context>]", "[-i]", "[--choose]"]
+    args_descriptions = {
+        "[<context>]": "Context name to switch to. Omit to list contexts.",
+        "[-i]": "Interactive: choose context from menu/fzf.",
+        "[--choose]": "Same as -i.",
+    }
+    description = "Run: 'poco kubectx' to list contexts, 'poco kubectx <context>' to switch. Use -i to choose interactively."
 
     def prepare_states(self):
         StateUtils.prepare("config")
@@ -24,6 +29,20 @@ class Kubectx(AbstractCommand):
 
     def execute(self):
         context = StateHolder.args.get("<context>")
+        interactive = StateHolder.args.get("-i") or StateHolder.args.get("--choose")
+        if not context and interactive:
+            rc = subprocess.run(
+                ["kubectl", "config", "get-contexts", "-o", "name"],
+                capture_output=True,
+                text=True,
+                shell=False,
+            )
+            if rc.returncode != 0 or not rc.stdout.strip():
+                ColorPrint.exit_after_print_messages(message="No contexts or kubectl failed.")
+            lines = [s.strip() for s in rc.stdout.strip().splitlines() if s.strip()]
+            context = choose_one(lines, prompt="Context number: ")
+            if not context:
+                return
         if context:
             rc = subprocess.run(
                 ["kubectl", "config", "use-context", context],

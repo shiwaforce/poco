@@ -1,13 +1,18 @@
 #!/usr/bin/env python
-"""POCO - project compose.
+"""POCO - one CLI for Docker, Kubernetes and Helm.
+
+  Docker: poco up, poco down, poco ps, config, build, pull (compose + catalog).
+  Kubernetes: poco kubectx, poco kubens (context and namespace).
+  Helm: poco helm-repos, poco helm-list (repos and releases).
 
 Usage:
-  poco [options] <command> [<args>...]
+  poco [options] [-i] [<command> [<args>...]]
 
 
 Options:
   -v --version        Print version of POCO
   -h --help           Show this screen.
+  -i --interactive    Interactive menu: choose actions without typing commands.
   -V --verbose        Print more text.
   -VV                 No matrix effect, show full output (for `up`/`down`). Implies verbose.
   --no-matrix         No matrix effect, show full output (implies verbose). Use -VV as short form.
@@ -51,7 +56,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'poco help <command>' for more information on a specific command."""
-__version__ = '0.99.6'
+__version__ = '0.99.7'
 
 
 class Poco(object):
@@ -88,8 +93,7 @@ class Poco(object):
 
         counter = 0
         if self.active_object is None:
-            ColorPrint.exit_after_print_messages("Something went wrong. Command class not found for command: " +
-                                                 sys.argv[1:])
+            return  # e.g. interactive menu was shown and user quit
 
         while counter < 10:  # for tests
             counter += 1
@@ -129,8 +133,14 @@ class Poco(object):
         StateHolder.args = docopt(self.get_full_doc(), version=__version__, options_first=True, argv=self.argv)
         if StateHolder.args.get("--no-matrix"):
             StateHolder.args["--verbose"] = True
-        StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'],
-                                                         argv=[] + StateHolder.args['<args>']))
+        command = StateHolder.args.get("<command>")
+        if command is None and StateHolder.args.get("--interactive"):
+            from poco.services.interactive_menu import run_interactive_menu
+            run_interactive_menu(self)
+            return
+        if command is None:
+            docopt(self.get_full_doc() + "\n" + CTAUtils.get_cta(), argv=["-h"])
+        StateHolder.args.update(self.command_interpreter(command=command, argv=[] + (StateHolder.args.get("<args>") or [])))
         ColorPrint.set_log_level(StateHolder.args)
         ColorPrint.print_info('arguments:\n' + str(StateHolder.args), 1)
 
@@ -172,7 +182,12 @@ class Poco(object):
             args = self.get_args(command=None, classes=self.command_classes[None], argv=[command] + argv)
             if args is None:
                 argv.append('-h')
-                docopt(self.get_full_doc() + "\n\n" + "%r is not a poco command." % command, argv=argv)
+                hint = ""
+                if command == "kubectl":
+                    hint = "\n\nFor kubectl, try: poco kubectx, poco kubens"
+                elif command == "helm":
+                    hint = "\n\nFor Helm, try: poco helm-repos, poco helm-list"
+                docopt(self.get_full_doc() + "\n\n" + "%r is not a poco command." % command + hint, argv=argv)
         return args
 
     @staticmethod

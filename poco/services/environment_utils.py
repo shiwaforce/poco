@@ -36,11 +36,45 @@ class EnvironmentUtils:
 
     @staticmethod
     def check_kubernetes():
-        EnvironmentUtils.check_base(command="kubectl version --short", message_head="Kubernetes")
+        # Try commands in order; different kubectl versions support different flags
+        EnvironmentUtils._check_command_with_fallback(
+            ["kubectl version --client", "kubectl version"],
+            "Kubernetes",
+        )
 
     @staticmethod
     def check_helm():
-        EnvironmentUtils.check_base(command="helm version -s --short", message_head="Helm")
+        # Try commands in order; different helm versions support different flags
+        EnvironmentUtils._check_command_with_fallback(
+            ["helm version", "helm version --short", "helm --version"],
+            "Helm",
+        )
+
+    @staticmethod
+    def _check_command_with_fallback(commands, message_head):
+        """Try each command until one returns 0. Makes checks work across kubectl/helm versions."""
+        last_err = None
+        for command in commands:
+            p = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
+            out, err = p.communicate()
+            if p.returncode == 0:
+                text = (out or err or b"").decode("utf-8", errors="replace").strip()
+                if text:
+                    ColorPrint.print_with_lvl(message=message_head + "\n " + text, lvl=1)
+                return
+            last_err = (err or out or b"command failed").decode("utf-8", errors="replace").strip()
+        ColorPrint.exit_after_print_messages(message=last_err or "command failed")
+
+    @staticmethod
+    def _check_command_ok(command, message_head):
+        """Run command; require returncode 0. Many CLIs write version to stderr, so we accept either stdout or stderr."""
+        p = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
+        out, err = p.communicate()
+        if p.returncode != 0:
+            ColorPrint.exit_after_print_messages(message=(err or out or b"command failed").decode("utf-8", errors="replace").strip())
+        text = (out or err or b"").decode("utf-8", errors="replace").strip()
+        if text:
+            ColorPrint.print_with_lvl(message=message_head + "\n " + text, lvl=1)
 
     @staticmethod
     def check_base(command, message_head):

@@ -2,6 +2,19 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.7] - 2026-02-17
+
+### Added
+
+- **Presets** — Save and switch kubectl context + namespace in one command: `poco preset list`, `poco preset use <name>`, `poco preset save <name>`. Config: `~/.poco/presets.yml`.
+- **kube-get** — Shortcut for `kubectl get`: `poco kube-get <resource> [name]` with optional `-n <namespace>` and `-A` (all namespaces). E.g. `poco kube-get pods`, `poco kube-get ns`.
+- **Interactive mode (`-i` / `--choose`)** — Choose from list via menu or fzf (if installed): `poco kubectx -i`, `poco kubens -i`, `poco preset use -i`, `poco helm-list -i` (pick release then show helm status).
+- **Interactive menu (`poco -i`)** — Step-by-step menu: start/stop project, Kubernetes (kubectx, kubens, kube-get, preset), Helm, catalog. Colored, multi-column lists; stays in menu when a command has nothing to show.
+
+### Changed
+
+- Help and README: Presets, Kube-get, and Interactive mode sections; updated Kubernetes/Helm intro.
+
 ## [0.99.6] - 2026-02-24
 
 ### Added

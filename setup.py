@@ -31,8 +31,7 @@ class PyTestCommand(TestCommand):
 setup_options = dict(
     name='poco',
     version=poco.__version__,
-    description='poco lets you catalogue and manage your Docker projects using simple YAML files to shorten the route '
-                'from finding your project to initialising it in your environment.',
+    description='One CLI for Docker, Kubernetes and Helm: compose projects (up/down/ps), kubectx/kubens, helm-repos/helm-list.',
     long_description=open('README.md').read(),
     long_description_content_type="text/markdown",
     author='Shiwaforce.com',
