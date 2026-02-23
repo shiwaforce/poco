@@ -107,7 +107,10 @@ class Start(AbstractCommand):
             if tty_stream is None:
                 use_matrix_capture = False
 
-        if use_matrix_capture and tty_stream:
+        # On Windows, dup2(pipe, stdout) can raise OSError 22; skip pipe capture and run matrix without redirecting.
+        use_pipe_capture = use_matrix_capture and tty_stream and sys.platform != "win32"
+
+        if use_pipe_capture:
             pipe_r, pipe_w = os.pipe()
             saved_stdout = os.dup(1)
             saved_stderr = os.dup(2)
@@ -121,9 +124,23 @@ class Start(AbstractCommand):
                 daemon=True,
             )
             matrix_thread.start()
+        elif use_matrix_capture and tty_stream:
+            # Windows: matrix to CON, command output to real stdout/stderr (no pipe)
+            stop_matrix = threading.Event()
+            matrix_thread = threading.Thread(
+                target=run_matrix_effect_until,
+                args=(stop_matrix,),
+                kwargs={"stream": tty_stream},
+                daemon=True,
+            )
+            matrix_thread.start()
+            pipe_r = pipe_w = None
+            saved_stdout = saved_stderr = None
         else:
             stop_matrix = None
             matrix_thread = None
+            pipe_r = pipe_w = None
+            saved_stdout = saved_stderr = None
 
         failed = False
         try:
@@ -198,6 +215,8 @@ class Start(AbstractCommand):
                             sys.stdout.flush()
                 except Exception:
                     pass
+            elif failed and tty_stream is not None:
+                show_glitch_message(tty_stream)
             if tty_stream is not None and tty_stream not in (sys.stdout, sys.stderr):
                 try:
                     tty_stream.close()

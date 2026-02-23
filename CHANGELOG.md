@@ -2,6 +2,12 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.9.1] - 2026-02-25
+
+### Fixed
+
+- **Matrix on Windows** — Avoid `OSError (22, 'Incorrect function')` by not using pipe/dup2 on Windows; matrix runs to CON while command output goes to real stdout/stderr (no capture on win32).
+
 ## [0.99.9] - 2026-02-25
 
 ### Fixed
