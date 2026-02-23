@@ -12,6 +12,27 @@ from ..services.matrix_effect import show_glitch_message
 from ..services.command_runners import DockerPlanRunner
 
 
+def _get_tty_stream():
+    """Return a writable stream to the terminal for matrix effect; None if not available (e.g. no TTY or Windows without CON)."""
+    # Unix / Git Bash: ctermid or /dev/tty
+    if hasattr(os, "ctermid"):
+        try:
+            return open(os.ctermid(), "w")
+        except (OSError, AttributeError):
+            pass
+    try:
+        return open("/dev/tty", "w")
+    except (OSError, FileNotFoundError):
+        pass
+    # Windows native: CON is the console
+    if sys.platform == "win32":
+        try:
+            return open("CON", "w")
+        except (OSError, FileNotFoundError):
+            pass
+    return None
+
+
 def _get_merged_compose_config():
     """Return merged docker compose YAML string when in Docker mode, else None."""
     if getattr(StateHolder, "container_mode", None) != "Docker":
@@ -82,9 +103,8 @@ class Start(AbstractCommand):
         saved_stdout = saved_stderr = None
 
         if use_matrix_capture:
-            try:
-                tty_stream = open(os.ctermid() if hasattr(os, "ctermid") else "/dev/tty", "w")
-            except (OSError, AttributeError):
+            tty_stream = _get_tty_stream()
+            if tty_stream is None:
                 use_matrix_capture = False
 
         if use_matrix_capture and tty_stream:
