@@ -20,10 +20,20 @@
 
 - **Docker, Docker-Compose, Kubernetes, Helm** support out of the box.
 - **Git, SVN** support out of the box.
-- **Project Catalog, Multiple Catalogues**. Create your own project catalog. Organise and your projects without additional tools.
+- **Project Catalog, Multiple Catalogues**. Create your own project catalog. Organise your projects without additional tools.
 - **Multiple Plans**. Create multiple plans for different environments or even environments for demo purposes. Switch between plans (environments) with ease.
 - **Simple Config Files**. Poco helps to split config files, so it is easy to maintain and scale them any time.
 - **Script Support (Hooks)**. Add additional scripts any time.
+
+## Global options
+
+- `-V`, `--verbose` — Print more (e.g. merged docker compose config for `up`/`down`).
+- `-VV` or `--no-matrix` — No matrix effect, show full output (for `up`/`down`). Implies verbose.
+- `-q`, `--quiet` — Print less.
+- `--offline` — Offline mode.
+- `--always-update` — Project repository handle by user.
+
+For `poco up` / `poco down`, a matrix-style effect runs by default; only the final result is shown. Set `POCO_MATRIX=0` to disable the effect, or use `-VV` / `--no-matrix` to disable it and see the full log.
 
 ## Documentation
 
@@ -75,7 +85,7 @@ add repository to your local Poco Repo config:
 $:~ poco repo add <name> <git-url>
 ```
 
-Now you can add you project to repo:
+Now you can add your project to repo:
 
 ```
 $:~ poco project add [<target-dir>] [<catalog>]
@@ -92,6 +102,19 @@ Stop your project:
 ```
 $:~ poco stop
 ```
+
+## Kubernetes & Helm helpers
+
+- **kubectx** — List or switch kubectl context: `poco kubectx` (list), `poco kubectx <context>` (switch).
+- **kubens** — List or switch namespace: `poco kubens` (list), `poco kubens <namespace>` (set current context namespace).
+- **helm-repos** — List Helm repositories: `poco helm-repos`.
+- **helm-list** — List Helm releases: `poco helm-list`, `poco helm-list --all-namespaces` for all namespaces.
+
+Requires `kubectl` and/or `helm` installed and configured.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for release history. Recent: **0.99.6** — kubectx/kubens/helm helpers, matrix 20-line TTY-adaptive effect, verbose merged compose, `-VV`/`--no-matrix`.
 
 ## Licence
 

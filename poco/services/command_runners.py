@@ -1,6 +1,6 @@
 import os
 import platform
-from subprocess import check_call, CalledProcessError
+from subprocess import check_call, check_output, CalledProcessError
 from .console_logger import ColorPrint
 from .file_utils import FileUtils
 from .project_utils import ProjectUtils
@@ -241,3 +241,21 @@ class DockerPlanRunner(AbstractPlanRunner):
         if 'containers' in self.project_compose and service in self.project_compose['containers']:
             return self.project_compose['containers'].get(service)
         return service
+
+    def get_merged_config(self, plan, envs):
+        """Run docker compose config and return merged YAML string, or None on error."""
+        docker_files = self.get_docker_files(plan=plan)
+        cmd = list()
+        cmd.append("docker")
+        cmd.append("compose")
+        cmd.append("--project-name")
+        cmd.append(StateHolder.name)
+        for compose_file in docker_files:
+            cmd.append("-f")
+            cmd.append(str(compose_file))
+        cmd.append("config")
+        try:
+            out = check_output(" ".join(cmd), cwd=self.working_directory, env=envs, shell=True)
+            return EnvironmentUtils.decode(out)
+        except (CalledProcessError, OSError):
+            return None

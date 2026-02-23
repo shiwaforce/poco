@@ -6,12 +6,14 @@ Usage:
 
 
 Options:
-  -v --version         Print version of POCO
-  -h --help         Show this screen.
-  -V --verbose      Print more text.
-  -q --quiet        Print less text.
-  --always-update   Project repository handle by user
-  --offline         Offline mode
+  -v --version        Print version of POCO
+  -h --help           Show this screen.
+  -V --verbose        Print more text.
+  -VV                 No matrix effect, show full output (for `up`/`down`). Implies verbose.
+  --no-matrix         No matrix effect, show full output (implies verbose). Use -VV as short form.
+  -q --quiet          Print less text.
+  --always-update     Project repository handle by user
+  --offline           Offline mode
 
 The available poco commands are:
 """
@@ -49,7 +51,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'poco help <command>' for more information on a specific command."""
-__version__ = '0.99.5'
+__version__ = '0.99.6'
 
 
 class Poco(object):
@@ -62,6 +64,9 @@ class Poco(object):
 
         # Set home directory to .poco in OS user home directory (~/.poco)
         StateHolder.home_dir = home_dir
+
+        # -VV is short for --no-matrix (preprocess before docopt)
+        argv = ["--no-matrix" if a == "-VV" else a for a in argv]
 
         # Read common configuration from .poco file (~/.poco/.poco)
         StateUtils.prepare_config()
@@ -122,6 +127,8 @@ class Poco(object):
         if len(self.argv) == 0:
             self.argv.append('-h')
         StateHolder.args = docopt(self.get_full_doc(), version=__version__, options_first=True, argv=self.argv)
+        if StateHolder.args.get("--no-matrix"):
+            StateHolder.args["--verbose"] = True
         StateHolder.args.update(self.command_interpreter(command=StateHolder.args['<command>'],
                                                          argv=[] + StateHolder.args['<args>']))
         ColorPrint.set_log_level(StateHolder.args)
@@ -146,12 +153,21 @@ class Poco(object):
                 docopt(self.get_full_doc() + "\n" + CTAUtils.get_cta(), argv=argv)
             self.command_interpreter(argv[0], argv[1:])
         if command in self.command_classes.keys():
-            if len(argv) == 0:
-                argv.append("-h")
-            args = self.get_args(command=command, classes=self.command_classes[command], argv=argv)
+            sub_argv = list(argv)
+            if StateHolder.args.get("--verbose"):
+                sub_argv.append("--verbose")
+            if StateHolder.args.get("--quiet"):
+                sub_argv.append("--quiet")
+            if StateHolder.args.get("--no-matrix"):
+                sub_argv.append("--no-matrix")
+            # Commands that accept no args (list/run with defaults); others show help when argv empty
+            no_arg_ok = ("helm-repos", "kubectx", "kubens", "helm-list", "catalog")
+            if len(sub_argv) == 0 and command not in no_arg_ok:
+                sub_argv.append("-h")
+            args = self.get_args(command=command, classes=self.command_classes[command], argv=sub_argv)
             if args is None:
                 docopt(self.build_sub_commands_help(command, classes=self.command_classes[command]),
-                       argv=[command] + argv)
+                       argv=[command] + sub_argv)
         else:
             args = self.get_args(command=None, classes=self.command_classes[None], argv=[command] + argv)
             if args is None:
@@ -182,9 +198,17 @@ class Poco(object):
             cmd = getattr(cls, 'command')
             if not isinstance(cmd, list):
                 cmd = [cmd]
-            if argv[0] in cmd:
+            if argv and argv[0] in cmd:
                 self.active_object = cls()
                 return docopt(Poco.build_command_help(cls), argv=[command] + argv if command is not None else argv)
+            # argv only contains options (e.g. poco --no-matrix up)
+            if command is not None and argv and argv[0].startswith("-") and command in cmd:
+                self.active_object = cls()
+                return docopt(Poco.build_command_help(cls), argv=[command] + argv)
+            # empty argv, command name already known (e.g. poco helm-repos)
+            if command is not None and not argv and command in cmd:
+                self.active_object = cls()
+                return docopt(Poco.build_command_help(cls), argv=[command])
 
     @staticmethod
     def build_command_help(cls):
@@ -200,6 +224,9 @@ class Poco(object):
         if args is not None:
             doc += " " + " ".join(args)
         doc += "\n\n  -h, --help"
+        doc += "\n  -V, --verbose     Print more text (e.g. merged compose config for up/down)."
+        doc += "\n  -VV --no-matrix   No matrix effect, show full output (up/down only)."
+        doc += "\n  -q, --quiet      Print less text."
         if args is not None:
             Poco.build_command_help_from_args(cls=cls, doc=doc, args=args)
         doc += "\n  " + desc

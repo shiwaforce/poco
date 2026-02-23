@@ -9,6 +9,25 @@ from ..services.console_logger import ColorPrint
 from ..services.matrix_effect import run_matrix_effect_until
 from ..services.matrix_effect import _matrix_enabled
 from ..services.matrix_effect import show_glitch_message
+from ..services.command_runners import DockerPlanRunner
+
+
+def _get_merged_compose_config():
+    """Return merged docker compose YAML string when in Docker mode, else None."""
+    if getattr(StateHolder, "container_mode", None) != "Docker":
+        return None
+    try:
+        handler = CommandHandler()
+        plan = handler.project_compose["plan"][handler.plan]
+        envs = handler.get_environment_variables(plan)
+        runner = DockerPlanRunner(
+            project_compose=handler.project_compose,
+            working_directory=handler.working_directory,
+            repo_dir=handler.repo_dir,
+        )
+        return runner.get_merged_config(plan, envs)
+    except Exception:
+        return None
 
 
 def _extract_final_output(text):
@@ -37,7 +56,7 @@ class Start(AbstractCommand):
     args = ["[<project/plan>]"]
     args_descriptions = {"[<project/plan>]": "Name of the project in the catalog and/or name of the project's plan"}
     description = "Run: 'poco start nginx/default' or 'poco up nginx/default' to start nginx project (docker, helm " \
-                  "or kubernetes) with the default plan."
+                  "or kubernetes) with the default plan. Use -V for verbose (merged compose), -VV or --no-matrix for full log."
 
     run_command = "start"
     need_checkout = True
@@ -54,7 +73,9 @@ class Start(AbstractCommand):
 
     def execute(self):
         use_matrix_capture = (
-            self.run_command in ("start", "stop") and _matrix_enabled()
+            self.run_command in ("start", "stop")
+            and _matrix_enabled()
+            and not StateHolder.args.get("--no-matrix")
         )
         tty_stream = None
         pipe_r = pipe_w = None
@@ -88,7 +109,22 @@ class Start(AbstractCommand):
         try:
             if self.need_checkout:
                 StateHolder.compose_handler.run_checkouts()
-            CommandHandler().run(self.run_command)
+            handler = CommandHandler()
+            if StateHolder.args.get("--verbose") and not use_matrix_capture and StateHolder.container_mode == "Docker":
+                plan = handler.project_compose["plan"][handler.plan]
+                envs = handler.get_environment_variables(plan)
+                runner = DockerPlanRunner(
+                    project_compose=handler.project_compose,
+                    working_directory=handler.working_directory,
+                    repo_dir=handler.repo_dir,
+                )
+                merged = runner.get_merged_config(plan, envs)
+                if merged:
+                    sys.stdout.write(merged)
+                    if not merged.endswith("\n"):
+                        sys.stdout.write("\n")
+                    sys.stdout.flush()
+            handler.run(self.run_command)
             if hasattr(self, "end_message"):
                 ColorPrint.print_info(getattr(self, "end_message"))
         except Exception:
@@ -125,6 +161,15 @@ class Start(AbstractCommand):
                                 sys.stdout.write("\n")
                             sys.stdout.flush()
                     else:
+                        if StateHolder.args.get("--verbose"):
+                            merged = _get_merged_compose_config()
+                            if merged:
+                                sys.stdout.write("--- Merged docker compose config ---\n")
+                                sys.stdout.write(merged)
+                                if not merged.endswith("\n"):
+                                    sys.stdout.write("\n")
+                                sys.stdout.write("\n")
+                                sys.stdout.flush()
                         tail = _extract_final_output(text)
                         if tail:
                             sys.stdout.write(tail)
