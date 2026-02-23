@@ -125,8 +125,25 @@ class Start(AbstractCommand):
             )
             matrix_thread.start()
         elif use_matrix_capture and tty_stream:
-            # Windows: matrix to CON; capture subprocess output via pipe (no dup2)
+            # Windows: matrix to CON; capture subprocess output via pipe (no dup2).
+            # Read pipe in a background thread to avoid deadlock when subprocess writes a lot (e.g. docker compose up).
             pipe_r, pipe_w = os.pipe()
+            pipe_data = []
+
+            def _read_pipe_into_list():
+                try:
+                    while True:
+                        chunk = os.read(pipe_r, 4096)
+                        if not chunk:
+                            break
+                        pipe_data.append(chunk)
+                except OSError:
+                    pass
+
+            pipe_reader_thread = threading.Thread(target=_read_pipe_into_list, daemon=True)
+            pipe_reader_thread.start()
+            self._pipe_reader_thread = pipe_reader_thread
+            self._pipe_data = pipe_data
             StateHolder.matrix_capture_pipe = pipe_w
             stop_matrix = threading.Event()
             matrix_thread = threading.Thread(
@@ -183,19 +200,30 @@ class Start(AbstractCommand):
                 except OSError:
                     pass
                 StateHolder.matrix_capture_pipe = None
-                data = b""
-                while True:
+                # On Windows we read in a background thread; wait for it and use collected data.
+                if saved_stdout is None:
+                    prt = getattr(self, "_pipe_reader_thread", None)
+                    if prt is not None and prt.is_alive():
+                        prt.join(timeout=2.0)
                     try:
-                        chunk = os.read(pipe_r, 4096)
+                        os.close(pipe_r)
                     except OSError:
-                        break
-                    if not chunk:
-                        break
-                    data += chunk
-                try:
-                    os.close(pipe_r)
-                except OSError:
-                    pass
+                        pass
+                    data = b"".join(getattr(self, "_pipe_data", []))
+                else:
+                    data = b""
+                    while True:
+                        try:
+                            chunk = os.read(pipe_r, 4096)
+                        except OSError:
+                            break
+                        if not chunk:
+                            break
+                        data += chunk
+                    try:
+                        os.close(pipe_r)
+                    except OSError:
+                        pass
                 try:
                     text = data.decode("utf-8", errors="replace")
                     if failed and tty_stream is not None:
