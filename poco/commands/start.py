@@ -72,7 +72,7 @@ def _extract_final_output(text):
 
 
 def _filter_matrix_noise(text):
-    """Drop 'Executing before_script...' and ' - ...' lines when showing matrix result."""
+    """Drop noisy lines when showing matrix result: Executing..., ' - ...', 'Docker command: [...]'."""
     if not text or not text.strip():
         return text
     kept = []
@@ -81,6 +81,8 @@ def _filter_matrix_noise(text):
         if s.startswith("Executing ") and " in " in s and " image" in s:
             continue
         if s.startswith("- ") and len(s) > 2:
+            continue
+        if s.startswith("Docker command:"):
             continue
         kept.append(line)
     return "\n".join(kept) if kept else text

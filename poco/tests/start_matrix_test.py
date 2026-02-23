@@ -54,6 +54,18 @@ def test_filter_matrix_noise_removes_executing_and_dash_lines():
     assert "simpl-a-1" in out
 
 
+def test_filter_matrix_noise_removes_docker_command_lines():
+    text = (
+        "Docker command: ['docker', 'compose', 'up', '-d']\n"
+        "[+] up 10/10\n"
+        "NAME\tIMAGE\n"
+    )
+    out = _filter_matrix_noise(text)
+    assert "Docker command:" not in out
+    assert "[+] up 10/10" in out
+    assert "NAME" in out
+
+
 def test_show_glitch_message_none_stream():
     show_glitch_message(None)  # must not raise
 

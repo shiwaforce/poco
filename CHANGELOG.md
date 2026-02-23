@@ -2,6 +2,12 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.9.7] - 2026-02-25
+
+### Changed
+
+- **Matrix / verbose result** — "Docker command: [...]" lines are now filtered out when showing the final block after the matrix; with `-V` you only see the merged compose and the result ([+] up/down, container table).
+
 ## [0.99.9.6] - 2026-02-25
 
 ### Changed
