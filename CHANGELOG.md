@@ -2,6 +2,16 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.9] - 2026-02-25
+
+### Fixed
+
+- **Matrix effect on Windows / Git Bash** — TTY stream is now obtained via `CON` on Windows and `/dev/tty` on Unix/Git Bash so the matrix rain works in Git Bash and native Windows console.
+
+### Changed
+
+- Added unit tests for `_get_tty_stream` (never raise, Unix path, all fail, Windows CON).
+
 ## [0.99.8] - 2026-02-25
 
 ### Improved
