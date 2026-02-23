@@ -125,7 +125,9 @@ class Start(AbstractCommand):
             )
             matrix_thread.start()
         elif use_matrix_capture and tty_stream:
-            # Windows: matrix to CON, command output to real stdout/stderr (no pipe)
+            # Windows: matrix to CON; capture subprocess output via pipe (no dup2)
+            pipe_r, pipe_w = os.pipe()
+            StateHolder.matrix_capture_pipe = pipe_w
             stop_matrix = threading.Event()
             matrix_thread = threading.Thread(
                 target=run_matrix_effect_until,
@@ -134,7 +136,6 @@ class Start(AbstractCommand):
                 daemon=True,
             )
             matrix_thread.start()
-            pipe_r = pipe_w = None
             saved_stdout = saved_stderr = None
         else:
             stop_matrix = None
@@ -172,11 +173,16 @@ class Start(AbstractCommand):
                 stop_matrix.set()
                 matrix_thread.join(timeout=1.0)
             if pipe_w is not None:
-                os.dup2(saved_stdout, 1)
-                os.dup2(saved_stderr, 2)
-                os.close(pipe_w)
-                os.close(saved_stdout)
-                os.close(saved_stderr)
+                if saved_stdout is not None:
+                    os.dup2(saved_stdout, 1)
+                    os.dup2(saved_stderr, 2)
+                    os.close(saved_stdout)
+                    os.close(saved_stderr)
+                try:
+                    os.close(pipe_w)
+                except OSError:
+                    pass
+                StateHolder.matrix_capture_pipe = None
                 data = b""
                 while True:
                     try:
@@ -186,7 +192,10 @@ class Start(AbstractCommand):
                     if not chunk:
                         break
                     data += chunk
-                os.close(pipe_r)
+                try:
+                    os.close(pipe_r)
+                except OSError:
+                    pass
                 try:
                     text = data.decode("utf-8", errors="replace")
                     if failed and tty_stream is not None:
@@ -217,6 +226,8 @@ class Start(AbstractCommand):
                     pass
             elif failed and tty_stream is not None:
                 show_glitch_message(tty_stream)
+            if getattr(StateHolder, "matrix_capture_pipe", None) is not None:
+                StateHolder.matrix_capture_pipe = None
             if tty_stream is not None and tty_stream not in (sys.stdout, sys.stderr):
                 try:
                     tty_stream.close()

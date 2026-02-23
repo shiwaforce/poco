@@ -2,6 +2,16 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.9.3] - 2026-02-25
+
+### Fixed
+
+- **Matrix on Windows** — Subprocess output (e.g. docker compose) is now captured via pipe so it no longer flashes through during the matrix; only the final result block is shown. No dup2 (avoids OSError 22).
+
+### Changed
+
+- **Matrix effect** — Smoother on Windows: longer refresh interval (0.05s) and explicit flush; avoids choppy display on CON/console.
+
 ## [0.99.9.2] - 2026-02-25
 
 ### Security

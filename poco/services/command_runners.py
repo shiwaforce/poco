@@ -1,6 +1,6 @@
 import os
 import platform
-from subprocess import check_call, check_output, CalledProcessError
+from subprocess import check_call, check_output, CalledProcessError, Popen
 from .console_logger import ColorPrint
 from .file_utils import FileUtils
 from .project_utils import ProjectUtils
@@ -12,6 +12,20 @@ class AbstractPlanRunner(object):
 
     @staticmethod
     def run_script_with_check(cmd, working_directory, envs):
+        pipe_w = getattr(StateHolder, "matrix_capture_pipe", None)
+        if pipe_w is not None:
+            p = Popen(
+                " ".join(cmd),
+                cwd=working_directory,
+                env=envs,
+                shell=True,
+                stdout=pipe_w,
+                stderr=pipe_w,
+            )
+            res = p.wait()
+            if res > 0:
+                ColorPrint.exit_after_print_messages(message=res)
+            return
         res = check_call(" ".join(cmd), cwd=working_directory, env=envs, shell=True)
         if res > 0:
             ColorPrint.exit_after_print_messages(message=res)

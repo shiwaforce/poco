@@ -12,6 +12,9 @@ import random
 import sys
 import time
 
+# Slightly slower refresh on Windows for smoother display (CON/console redraw)
+_MATRIX_SLEEP = 0.05 if sys.platform == "win32" else 0.035
+
 MAX_LINES = 20
 
 GREEN = "\033[92m"
@@ -77,7 +80,10 @@ def _generate_line(width):
 def _draw_lines(out, lines, prefix="  "):
     for line in lines:
         out.write(ERASE_LINE + prefix + line + "\n")
-    out.flush()
+    try:
+        out.flush()
+    except (OSError, BrokenPipeError):
+        pass
 
 
 def run_matrix_effect(seconds=None):
@@ -102,7 +108,7 @@ def run_matrix_effect(seconds=None):
         buffer = [_generate_line(width) for _ in range(MAX_LINES)]
         _draw_lines(out, buffer)
         while time.time() < end_time:
-            time.sleep(0.035)
+            time.sleep(_MATRIX_SLEEP)
             width = _width(stream=out)
             buffer = buffer[1:] + [_generate_line(width)]
             out.write(CURSOR_UP % MAX_LINES)
@@ -132,7 +138,7 @@ def run_matrix_effect_until(stop_event, stream=None):
         buffer = [_generate_line(width) for _ in range(MAX_LINES)]
         _draw_lines(out, buffer)
         while not stop_event.is_set():
-            stop_event.wait(timeout=0.035)
+            stop_event.wait(timeout=_MATRIX_SLEEP)
             if stop_event.is_set():
                 break
             width = _width(stream=out)
