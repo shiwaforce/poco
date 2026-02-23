@@ -1,4 +1,5 @@
 """Interactive menu for poco: choose actions without typing commands."""
+import subprocess
 from .state import StateHolder
 from .state_utils import StateUtils
 from .console_logger import ColorPrint
@@ -6,7 +7,32 @@ from .interactive import choose_one
 
 # ANSI for menu headers (independent of ColorPrint log level)
 _MENU_HEADER = "\033[1;36m"
+_DIM = "\033[2m"
 _RESET = "\033[0m"
+
+
+def _current_k8s_context():
+    """Return (context, namespace) if kubectl is available and config is readable, else (None, None)."""
+    try:
+        ctx = subprocess.run(
+            ["kubectl", "config", "current-context"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        if ctx.returncode != 0 or not ctx.stdout or ctx.stdout.strip() == "":
+            return None, None
+        context = ctx.stdout.strip()
+        ns = subprocess.run(
+            ["kubectl", "config", "view", "--minify", "-o", "jsonpath={..namespace}"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        namespace = (ns.stdout.strip() or "default") if ns.returncode == 0 else "default"
+        return context, namespace
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        return None, None
 
 
 def _option_flags():
@@ -107,6 +133,9 @@ def run_interactive_menu(poco):
     while True:
         print()
         print(_MENU_HEADER + "  POCO — Interactive menu" + _RESET)
+        ctx, ns = _current_k8s_context()
+        if ctx is not None:
+            print(_DIM + "  Current: context %s, namespace %s" % (ctx, ns) + _RESET)
         print("  " + "-" * 40)
         choice = choose_one(
             _main_menu(),

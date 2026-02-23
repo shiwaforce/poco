@@ -2,6 +2,12 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.8] - 2026-02-25
+
+### Improved
+
+- **Interactive menu (`poco -i`)** — Shows current Kubernetes context and namespace at the top when kubectl is available, so you always know where you are.
+
 ## [0.99.7] - 2026-02-17
 
 ### Added
