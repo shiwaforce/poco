@@ -2,6 +2,12 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.9.4] - 2026-02-25
+
+### Fixed
+
+- **Windows `poco up` + matrix** — Matrix no longer runs forever: subprocess output is now read in a background thread so the pipe buffer never fills and the process can finish (avoids deadlock when docker compose writes a lot).
+
 ## [0.99.9.3] - 2026-02-25
 
 ### Fixed
