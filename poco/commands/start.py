@@ -125,10 +125,25 @@ class Start(AbstractCommand):
             )
             matrix_thread.start()
         elif use_matrix_capture and tty_stream:
-            # Windows: matrix to CON; capture subprocess output via pipe (no dup2).
-            # Read pipe in a background thread to avoid deadlock when subprocess writes a lot (e.g. docker compose up).
+            # Windows: matrix to CON; capture subprocess + our own stdout/stderr via pipe (no dup2).
+            # Redirect sys.stdout/stderr to pipe so "Executing before_script" etc. don't add extra lines on screen.
             pipe_r, pipe_w = os.pipe()
             pipe_data = []
+            pipe_w2 = os.dup(pipe_w)
+            try:
+                pipe_stream = open(pipe_w2, "w", encoding="utf-8", errors="replace")
+            except (OSError, TypeError):
+                pipe_stream = None
+                try:
+                    os.close(pipe_w2)
+                except OSError:
+                    pass
+            if pipe_stream is None:
+                pipe_w2 = None
+            saved_stdout = sys.stdout
+            saved_stderr = sys.stderr
+            if pipe_stream is not None:
+                sys.stdout = sys.stderr = pipe_stream
 
             def _read_pipe_into_list():
                 try:
@@ -144,6 +159,9 @@ class Start(AbstractCommand):
             pipe_reader_thread.start()
             self._pipe_reader_thread = pipe_reader_thread
             self._pipe_data = pipe_data
+            self._pipe_stream = pipe_stream
+            self._saved_stdout = saved_stdout
+            self._saved_stderr = saved_stderr
             StateHolder.matrix_capture_pipe = pipe_w
             stop_matrix = threading.Event()
             matrix_thread = threading.Thread(
@@ -153,7 +171,6 @@ class Start(AbstractCommand):
                 daemon=True,
             )
             matrix_thread.start()
-            saved_stdout = saved_stderr = None
         else:
             stop_matrix = None
             matrix_thread = None
@@ -190,7 +207,17 @@ class Start(AbstractCommand):
                 stop_matrix.set()
                 matrix_thread.join(timeout=1.0)
             if pipe_w is not None:
-                if saved_stdout is not None:
+                # Windows: restore sys.stdout/stderr and close pipe stream so result goes to real console.
+                pipe_stream = getattr(self, "_pipe_stream", None)
+                if pipe_stream is not None:
+                    sys.stdout = getattr(self, "_saved_stdout", sys.stdout)
+                    sys.stderr = getattr(self, "_saved_stderr", sys.stderr)
+                    try:
+                        pipe_stream.flush()
+                        pipe_stream.close()
+                    except OSError:
+                        pass
+                if saved_stdout is not None and getattr(self, "_pipe_stream", None) is None:
                     os.dup2(saved_stdout, 1)
                     os.dup2(saved_stderr, 2)
                     os.close(saved_stdout)
@@ -201,7 +228,7 @@ class Start(AbstractCommand):
                     pass
                 StateHolder.matrix_capture_pipe = None
                 # On Windows we read in a background thread; wait for it and use collected data.
-                if saved_stdout is None:
+                if getattr(self, "_pipe_reader_thread", None) is not None:
                     prt = getattr(self, "_pipe_reader_thread", None)
                     if prt is not None and prt.is_alive():
                         prt.join(timeout=2.0)

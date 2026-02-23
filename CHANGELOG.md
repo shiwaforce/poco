@@ -2,6 +2,12 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.9.5] - 2026-02-25
+
+### Fixed
+
+- **Windows matrix on `poco up`** — Redirect our own stdout/stderr to the pipe so messages like "Executing before_script" and "Docker command" no longer add extra static lines; only the 20-line matrix moves, same as `poco down`.
+
 ## [0.99.9.4] - 2026-02-25
 
 ### Fixed
