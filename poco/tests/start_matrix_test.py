@@ -3,7 +3,7 @@ from io import StringIO
 from unittest.mock import patch
 
 # Import the module-level helper and matrix show_glitch_message
-from poco.commands.start import _extract_final_output, _get_tty_stream
+from poco.commands.start import _extract_final_output, _filter_matrix_noise, _get_tty_stream
 from poco.services.matrix_effect import show_glitch_message
 
 
@@ -36,6 +36,22 @@ def test_extract_final_output_fallback_last_60():
     assert result.strip().startswith("line 40")
     assert "line 99" in result
     assert "line 0" not in result
+
+
+def test_filter_matrix_noise_removes_executing_and_dash_lines():
+    text = (
+        "Executing before_script in alpine:latest image\n"
+        " - mkdir -p docker/mnt/shiwa/log\n"
+        "[+] up 10/10\n"
+        "NAME\tIMAGE\n"
+        "simpl-a-1\timg\n"
+    )
+    out = _filter_matrix_noise(text)
+    assert "Executing " not in out
+    assert " - mkdir" not in out
+    assert "[+] up 10/10" in out
+    assert "NAME" in out
+    assert "simpl-a-1" in out
 
 
 def test_show_glitch_message_none_stream():

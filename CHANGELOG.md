@@ -2,6 +2,12 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.9.6] - 2026-02-25
+
+### Changed
+
+- **Matrix result output** — When showing the final block after the matrix, "Executing before_script..." and " - ..." lines are now filtered out so only the real result ([+] up/down, container table) is printed.
+
 ## [0.99.9.5] - 2026-02-25
 
 ### Fixed

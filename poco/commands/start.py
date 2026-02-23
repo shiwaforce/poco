@@ -71,6 +71,21 @@ def _extract_final_output(text):
     return "\n".join(lines[-60:]) if len(lines) > 60 else text
 
 
+def _filter_matrix_noise(text):
+    """Drop 'Executing before_script...' and ' - ...' lines when showing matrix result."""
+    if not text or not text.strip():
+        return text
+    kept = []
+    for line in text.split("\n"):
+        s = line.strip()
+        if s.startswith("Executing ") and " in " in s and " image" in s:
+            continue
+        if s.startswith("- ") and len(s) > 2:
+            continue
+        kept.append(line)
+    return "\n".join(kept) if kept else text
+
+
 class Start(AbstractCommand):
 
     command = ["start", "up"]
@@ -272,6 +287,7 @@ class Start(AbstractCommand):
                                 sys.stdout.write("\n")
                                 sys.stdout.flush()
                         tail = _extract_final_output(text)
+                        tail = _filter_matrix_noise(tail)
                         if tail:
                             sys.stdout.write(tail)
                             if not tail.endswith("\n"):
