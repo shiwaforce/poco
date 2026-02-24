@@ -96,7 +96,10 @@ ok "poco telepítve: $(command -v poco)"
 # =====================================================
 # Self-update opció
 # =====================================================
-SELF_PATH="${BASH_SOURCE[0]:-}"
+SELF_PATH=""
+set +u
+[[ -n "${BASH_SOURCE[0]:-}" ]] && SELF_PATH="${BASH_SOURCE[0]}"
+set -u
 UPDATE_URL="https://raw.githubusercontent.com/$REPO_OWNER/$REPO_NAME/master/install.sh"
 
 if [[ "${1:-}" == "--update" ]]; then
