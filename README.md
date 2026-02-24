@@ -12,7 +12,7 @@
 
 **Poco** is one CLI for **Docker**, **Kubernetes** and **Helm**: catalogue and run compose projects, switch kubectl context and namespace, and list Helm repos and releases — without leaving your terminal or remembering three different tools.
 
-- **Docker** — `poco up`, `poco down`, `poco ps`, compose config, build, pull; YAML catalog and plans.
+- **Docker** — `poco up`, `poco down`, `poco ps`, `poco status` (overview), compose config, build, pull; YAML catalog and plans.
 - **Kubernetes** — `poco kubectx`, `poco kubens` (list/switch context and namespace); `poco kube-get pods|ns|svc|...`; presets (context+namespace in one command).
 - **Helm** — `poco helm-repos`, `poco helm-list` (releases; optional `--all-namespaces`, `-i` to pick and show status).
 
@@ -151,7 +151,7 @@ When a command can show a list, use `-i` to pick from a menu (or fzf if installe
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for release history. Recent: **0.99.7** — Presets (list/use/save), kube-get, interactive mode (`-i`) for kubectx/kubens/preset/helm-list.
+See [CHANGELOG.md](CHANGELOG.md) for release history. **1.0** — Docker + Kubernetes + Helm in one CLI; presets; kube-get; interactive menu (`poco -i`); `poco status`; matrix effect; before_docker_script; security (GitPython, pip-audit).
 
 ## Licence
 

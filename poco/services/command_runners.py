@@ -8,6 +8,14 @@ from .state import StateHolder
 from .environment_utils import EnvironmentUtils
 
 
+def run_before_docker_script_commands(commands, working_directory):
+    """Run a list of shell commands on the host (before Docker). Exits on first failure."""
+    for cmd_str in commands:
+        if not (cmd_str and str(cmd_str).strip()):
+            continue
+        AbstractPlanRunner.run_script_with_check([str(cmd_str).strip()], working_directory, os.environ.copy())
+
+
 class AbstractPlanRunner(object):
 
     @staticmethod

@@ -6,7 +6,13 @@ from .project_utils import ProjectUtils
 from .environment_utils import EnvironmentUtils
 from .package_handler import PackageHandler
 from .state import StateHolder
-from .command_runners import ScriptPlanRunner, DockerPlanRunner, KubernetesRunner, HelmRunner
+from .command_runners import (
+    ScriptPlanRunner,
+    DockerPlanRunner,
+    KubernetesRunner,
+    HelmRunner,
+    run_before_docker_script_commands,
+)
 from .yaml_utils import YamlUtils
 
 
@@ -96,6 +102,14 @@ class CommandHandler(object):
 
     def pre_run(self, command_list, plan):
         if command_list.get('before', False):
+            if StateHolder.container_mode == "Docker":
+                host_commands = StateHolder.compose_handler.get_before_docker_script_commands(plan)
+                if host_commands:
+                    ColorPrint.print_with_lvl(
+                        message="Executing before_docker_script (" + platform.system().lower() + ") on host",
+                        lvl=0,
+                    )
+                    run_before_docker_script_commands(host_commands, self.working_directory)
             self.script_runner.run(plan=plan, script_type='before_script')
         self.run_method('premethods', command_list)
 

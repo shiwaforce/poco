@@ -1,4 +1,5 @@
 import os
+import platform
 import yaml
 from .console_logger import *
 from .git_repository import GitRepository
@@ -96,6 +97,19 @@ class ComposeHandler:
         if 'checkout' in self.compose_project['plan'][self.plan]:
             return True
         return False
+
+    def get_before_docker_script_commands(self, plan):
+        """Return list of host shell commands for current OS from before_docker_script (windows/darwin/linux)."""
+        self.get_compose_project()
+        merged = dict(self.compose_project.get("before_docker_script") or {})
+        plan_block = (plan or {}).get("before_docker_script") if isinstance(plan, dict) else None
+        if plan_block and isinstance(plan_block, dict):
+            merged.update(plan_block)
+        os_key = platform.system().lower()
+        raw = merged.get(os_key) or (merged.get("mac") if os_key == "darwin" else None)
+        if raw is None:
+            return []
+        return ProjectUtils.get_list_value(raw)
 
     def get_plan_list(self):
         """Print all available plan from project compose file"""

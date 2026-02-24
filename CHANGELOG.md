@@ -2,6 +2,28 @@
 
 All notable changes to poco are documented here.
 
+## [1.0] - 2026-02-25
+
+First stable 1.0 release.
+
+### Summary since 0.99.3
+
+- **Kubernetes & Helm** — `kubectx`, `kubens`, `helm-repos`, `helm-list`; matrix effect and verbose for up/down; `-VV`/`--no-matrix` for full log.
+- **0.99.5–0.99.6** — Matrix effect (20 lines, in-place); verbose merged compose; kubectx/kubens/helm-repos/helm-list.
+- **0.99.7** — Presets (list/use/save); kube-get; interactive `-i` for kubectx/kubens/preset/helm-list; interactive menu `poco -i`.
+- **0.99.8** — Interactive menu shows current k8s context and namespace.
+- **0.99.9** — Matrix on Windows/Git Bash (CON / dev/tty).
+- **0.99.9.1–0.99.9.5** — Windows matrix: no pipe/dup2 (OSError 22 fix); subprocess capture; stdout/stderr to pipe; smoother refresh; no extra static lines.
+- **0.99.9.4–0.99.9.5** — Pipe reader thread (no deadlock on `poco up`); redirect own output so only matrix moves.
+- **0.99.9.6–0.99.9.7** — Filter matrix result: Executing before_script, " - ", Docker command lines; with `-V` only merged compose + result.
+- **0.99.9.2** — Security: GitPython 3.1.41; README Security; pytest filter; CI pip-audit.
+- **0.99.9.8** — Version check timeout (no block without internet); help “Upgrade: pip install --upgrade poco”; new-version message in green blink.
+- **0.99.9.9** — `poco status` (Docker Compose projects overview); `-a`/`--all`; subcommand args merged.
+
+### Added in 1.0
+
+- **before_docker_script** — Optional host scripts before Docker: `windows`, `darwin`, `linux` in poco.yml; runs on host before before_script.
+
 ## [0.99.9.9] - 2026-02-25
 
 ### Added

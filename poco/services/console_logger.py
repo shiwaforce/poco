@@ -107,6 +107,14 @@ class Doc:
                         - dc-app-ambassador-integtest.yml
                         - sample
                         - mysql
+            before_docker_script:  # optional; runs on host before Docker (OS-specific)
+                linux:
+                    - "mkdir -p ./data"
+                    - "chmod +x ./scripts/*.sh"
+                darwin:
+                    - "mkdir -p ./data"
+                windows:
+                    - "if not exist .\\data mkdir .\\data"
         """
 
     COMPOSE_DOC = """
