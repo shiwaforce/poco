@@ -96,10 +96,14 @@ ok "poco telepítve: $(command -v poco)"
 # =====================================================
 # Self-update opció
 # =====================================================
-SELF_PATH="${BASH_SOURCE[0]}"
-UPDATE_URL="https://raw.githubusercontent.com/$REPO_OWNER/$REPO_NAME/main/install.sh"
+SELF_PATH="${BASH_SOURCE[0]:-}"
+UPDATE_URL="https://raw.githubusercontent.com/$REPO_OWNER/$REPO_NAME/master/install.sh"
 
 if [[ "${1:-}" == "--update" ]]; then
+    if [[ -z "$SELF_PATH" ]]; then
+        warn "Self-update only works when run from a saved script file (not from curl pipe). Save install.sh and run: ./install.sh --update"
+        exit 1
+    fi
     warn "Self-update indul..."
     curl -fsSL "$UPDATE_URL" -o "$SELF_PATH"
     chmod +x "$SELF_PATH"

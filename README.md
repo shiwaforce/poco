@@ -70,16 +70,16 @@ $:~ pip install poco
 **Or use the install script (curl one-liner):**
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/main/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/master/install.sh)"
 ```
 
 **Install script options:**
 
 | Option | Description |
 |--------|-------------|
-| **Full reset** | Remove previous install, then install fresh: `bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/main/install.sh)" -- --reset` |
-| **Self-update** | Update the install script itself: `bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/main/install.sh)" -- --update` |
-| **Dev branch** | Install from `dev` branch: `bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/main/install.sh)" -- dev` |
+| **Full reset** | Remove previous install, then install fresh: `bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/master/install.sh)" -- --reset` |
+| **Self-update** | Update the install script itself: `bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/master/install.sh)" -- --update` |
+| **Dev branch** | Install from `dev` branch: `bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/master/install.sh)" -- dev` |
 
 Init project:
 
