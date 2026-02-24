@@ -6,6 +6,7 @@ class Colors:
     FAIL = '\033[91m'
     OKBLUE = '\033[94m'
     END = '\033[0m'
+    GREEN_BLINK = '\033[5;92m'  # bright green + blink (e.g. new version notice)
 
 
 class Doc:
@@ -137,6 +138,11 @@ class ColorPrint:
     @staticmethod
     def print_warning(message, lvl=0):
         ColorPrint.print_with_lvl(message=message, lvl=lvl, color=Colors.WARNING)
+
+    @staticmethod
+    def print_new_version(message, lvl=0):
+        """Print message in blinking green (e.g. new version available)."""
+        ColorPrint.print_with_lvl(message=message, lvl=lvl, color=Colors.GREEN_BLINK)
 
     @staticmethod
     def print_info(message, lvl=0):

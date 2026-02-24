@@ -2,7 +2,7 @@ import os
 import re
 import sys
 from packaging import version
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, TimeoutExpired
 from poco.services.file_utils import FileUtils
 from poco.services.state import StateHolder
 from .console_logger import ColorPrint
@@ -86,18 +86,31 @@ class EnvironmentUtils:
 
     @staticmethod
     def check_version(current_version, is_beta_tester, is_force_check):
-        if (EnvironmentUtils.need_check() or is_force_check):
-            # check pip
+        if not (EnvironmentUtils.need_check() or is_force_check):
+            return
+        try:
             p = Popen("pip install poco==", stdout=PIPE, stderr=PIPE, shell=True)
-            out, err = p.communicate()
-            if not len(err) == 0:
+            out, err = p.communicate(timeout=5)
+        except TimeoutExpired:
+            try:
+                p.kill()
+                p.wait()
+            except Exception:
+                pass
+            return
+        except Exception:
+            return
+        if not len(err) == 0:
+            try:
                 newest_version = EnvironmentUtils.parse_version(str(err), is_beta_tester)
-            else:
-                # maybe installed from source
+            except Exception:
                 return
             if version.parse(current_version) < version.parse(newest_version):
-                ColorPrint.print_warning("New version of poco is available. \n "
-                                        "Please upgrade with: pip install poco==" + newest_version)
+                ColorPrint.print_new_version(
+                    "New version of poco is available.\n "
+                    "Upgrade with: pip install poco==" + newest_version + "\n "
+                    "or: pip install --upgrade poco"
+                )
             elif is_force_check:
                 ColorPrint.print_warning("Poco is up to date")
 

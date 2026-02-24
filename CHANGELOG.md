@@ -2,6 +2,14 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.9.8] - 2026-02-25
+
+### Changed
+
+- **Version check** — Does not block startup when there is no internet (5s timeout); on new version shows upgrade command and "pip install --upgrade poco" in the message.
+- **Help** — "Upgrade: pip install --upgrade poco" added at the top of the help (`poco -h` / `poco help`).
+- **New version notice** — "New version of poco is available" is printed in blinking green in the terminal.
+
 ## [0.99.9.7] - 2026-02-25
 
 ### Changed

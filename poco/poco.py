@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """POCO - one CLI for Docker, Kubernetes and Helm.
 
+  Upgrade: pip install --upgrade poco
+
   Docker: poco up, poco down, poco ps, config, build, pull (compose + catalog).
   Kubernetes: poco kubectx, poco kubens (context and namespace).
   Helm: poco helm-repos, poco helm-list (repos and releases).
@@ -56,7 +58,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'poco help <command>' for more information on a specific command."""
-__version__ = '0.99.9.7'
+__version__ = '0.99.9.8'
 
 
 class Poco(object):
