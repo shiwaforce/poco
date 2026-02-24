@@ -3,7 +3,7 @@
 
   Upgrade: pip install --upgrade poco
 
-  Docker: poco up, poco down, poco ps, config, build, pull (compose + catalog).
+  Docker: poco up, poco down, poco ps, poco status (overview), config, build, pull (compose + catalog).
   Kubernetes: poco kubectx, poco kubens (context and namespace).
   Helm: poco helm-repos, poco helm-list (repos and releases).
 
@@ -19,6 +19,7 @@ Options:
   -VV                 No matrix effect, show full output (for `up`/`down`). Implies verbose.
   --no-matrix         No matrix effect, show full output (implies verbose). Use -VV as short form.
   -q --quiet          Print less text.
+  -a --all            With 'status': show stopped compose projects too.
   --always-update     Project repository handle by user
   --offline           Offline mode
 
@@ -58,7 +59,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'poco help <command>' for more information on a specific command."""
-__version__ = '0.99.9.8'
+__version__ = '0.99.9.9'
 
 
 class Poco(object):
@@ -173,10 +174,12 @@ class Poco(object):
             if StateHolder.args.get("--no-matrix"):
                 sub_argv.append("--no-matrix")
             # Commands that accept no args (list/run with defaults); others show help when argv empty
-            no_arg_ok = ("helm-repos", "kubectx", "kubens", "helm-list", "catalog")
+            no_arg_ok = ("helm-repos", "kubectx", "kubens", "helm-list", "catalog", "status")
             if len(sub_argv) == 0 and command not in no_arg_ok:
                 sub_argv.append("-h")
             args = self.get_args(command=command, classes=self.command_classes[command], argv=sub_argv)
+            if args is not None and isinstance(args, dict):
+                StateHolder.args.update(args)
             if args is None:
                 docopt(self.build_sub_commands_help(command, classes=self.command_classes[command]),
                        argv=[command] + sub_argv)
@@ -244,6 +247,7 @@ class Poco(object):
         doc += "\n  -V, --verbose     Print more text (e.g. merged compose config for up/down)."
         doc += "\n  -VV --no-matrix   No matrix effect, show full output (up/down only)."
         doc += "\n  -q, --quiet      Print less text."
+        doc += getattr(cls, "options_doc", "")
         if args is not None:
             Poco.build_command_help_from_args(cls=cls, doc=doc, args=args)
         doc += "\n  " + desc

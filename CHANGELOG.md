@@ -2,6 +2,16 @@
 
 All notable changes to poco are documented here.
 
+## [0.99.9.9] - 2026-02-25
+
+### Added
+
+- **poco status** — Overview of Docker Compose projects currently running (run from any directory). Use `poco status -a` or `poco status --all` to include stopped projects. Global help: `-a --all` with status.
+
+### Changed
+
+- Subcommand options (e.g. `status -a`) are merged into StateHolder.args so commands see their flags. Main help lists `-a --all` for status.
+
 ## [0.99.9.8] - 2026-02-25
 
 ### Changed
