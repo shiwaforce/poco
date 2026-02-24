@@ -67,6 +67,20 @@ Install `poco`:
 $:~ pip install poco
 ```
 
+**Or use the install script (curl one-liner):**
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/main/install.sh)"
+```
+
+**Install script options:**
+
+| Option | Description |
+|--------|-------------|
+| **Full reset** | Remove previous install, then install fresh: `bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/main/install.sh)" -- --reset` |
+| **Self-update** | Update the install script itself: `bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/main/install.sh)" -- --update` |
+| **Dev branch** | Install from `dev` branch: `bash -c "$(curl -fsSL https://raw.githubusercontent.com/shiwaforce/poco/main/install.sh)" -- dev` |
+
 Init project:
 
 ```
@@ -148,6 +162,10 @@ When a command can show a list, use `-i` to pick from a menu (or fzf if installe
 
 - **Dependencies:** We track known vulnerabilities and bump affected packages (e.g. GitPython ≥3.1.41 for CVE fixes). To audit your install: `pip install pip-audit && pip-audit` (or `pip-audit -r requirements.txt`).
 - **Build tools:** Keep setuptools and wheel up to date: `pip install -U setuptools wheel` to address CVEs in the toolchain.
+
+## Agent Skills
+
+Use Poco with AI coding agents (Cursor, Claude Code, etc.): install [Agent Skills](https://claude.com/blog/equipping-agents-for-the-real-world-with-agent-skills) so the agent knows when and how to run poco. Add the **poco-skills** repo as a Remote Rule: **Settings > Rules > Add Rule > Remote Rule (Github)** with `shiwaforce/poco-skills`. Optionally, run `poco init --with-cursor-skill` in a project to generate a project-specific skill (`.cursor/skills/poco-project/SKILL.md`).
 
 ## Changelog
 
