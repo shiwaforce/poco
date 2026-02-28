@@ -122,7 +122,6 @@ class Doc:
             URL: https://docs.docker.com/compose/
 
             For example:
-                version: '2'
                 services:
                   web:
                     build: .
