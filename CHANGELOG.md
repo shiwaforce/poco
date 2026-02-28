@@ -2,6 +2,17 @@
 
 All notable changes to poco are documented here.
 
+## [1.0.1] - 2026-02-28
+
+### Added
+
+- **Auto-create poco.yml** — When running `poco up` or `poco down` in a directory with `docker-compose.yml` (or `docker-compose.yaml`) but no `poco.yml`, poco automatically creates `poco.yml` from the existing compose file(s). No manual edit needed.
+- **Docker folder support** — Auto-create also discovers compose files in a `docker/` subfolder. When root compose exists, `docker/*.yml` are added; `docker/docker-compose.yml` is skipped (avoids build context issues when app/Dockerfile are in project root).
+
+### Changed
+
+- **Matrix effect** — "SHIWAFORCE" occasionally readable in the falling digits during `poco up`/`poco down` (~0.8% of lines).
+
 ## [1.0] - 2026-02-25
 
 First stable 1.0 release.
