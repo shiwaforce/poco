@@ -23,6 +23,8 @@ GREEN_DIM = "\033[2;92m"
 RED_BRIGHT = "\033[1;91m"
 RESET = "\033[0m"
 CHARS = "0123456789"
+SHIWAFORCE = "SHIWAFORCE"
+SHIWAFORCE_CHANCE = 0.008  # % chance per line to show SHIWAFORCE
 CURSOR_UP = "\033[%dA"
 ERASE_LINE = "\033[K"
 
@@ -66,7 +68,22 @@ def _get_stream():
 
 
 def _generate_line(width):
-    """One line of matrix rain: exactly `width` visible characters."""
+    """One line of matrix rain: exactly `width` visible characters.
+    Occasionally (~8%) embeds SHIWAFORCE in bright green so it's readable."""
+    if width >= len(SHIWAFORCE) and random.random() < SHIWAFORCE_CHANCE:
+        pos = random.randint(0, width - len(SHIWAFORCE))
+        parts = []
+        for i in range(width):
+            if pos <= i < pos + len(SHIWAFORCE):
+                ch = SHIWAFORCE[i - pos]
+                parts.append(GREEN_BRIGHT + ch + RESET)
+            else:
+                ch = random.choice(CHARS)
+                if random.random() < 0.15:
+                    parts.append(GREEN_BRIGHT + ch + RESET)
+                else:
+                    parts.append(GREEN_DIM + ch + RESET)
+        return "".join(parts)
     parts = []
     for _ in range(width):
         ch = random.choice(CHARS)

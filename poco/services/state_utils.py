@@ -64,6 +64,40 @@ class StateUtils:
     def prepare_project_file():
         if StateHolder.repository is None:
             StateHolder.poco_file = FileUtils.get_backward_compatible_poco_file(directory=os.getcwd())
+            if StateHolder.poco_file is None:
+                # Auto-create poco.yml from existing docker-compose and docker/ when running poco up/down.
+                # Root docker-compose takes precedence; docker/ files are added as extras when root exists.
+                cwd = os.getcwd()
+                compose_files = []
+                root_compose = FileUtils.get_file_with_extension('docker-compose', directory=cwd)
+                if root_compose is not None:
+                    compose_files.append(os.path.basename(root_compose))
+                docker_dir = os.path.join(cwd, 'docker')
+                if os.path.isdir(docker_dir):
+                    for name in sorted(os.listdir(docker_dir)):
+                        if name.endswith(('.yml', '.yaml')):
+                            # Skip docker/docker-compose.yml when root compose exists (often a broken copy
+                            # with build: . context = docker/ while app/ is in project root).
+                            if root_compose is not None and name in ('docker-compose.yml', 'docker-compose.yaml'):
+                                continue
+                            compose_files.append(os.path.join('docker', name))
+                if compose_files:
+                    poco_yml = os.path.join(cwd, 'poco.yml')
+                    if len(compose_files) == 1:
+                        plan_default = compose_files[0]
+                    else:
+                        plan_default = {'docker-compose-file': compose_files}
+                    poco_config = {
+                        'version': '3.0',
+                        'maintainer': 'operation@shiwaforce.com',
+                        'plan': {'default': plan_default}
+                    }
+                    YamlUtils.write(poco_yml, poco_config)
+                    StateHolder.poco_file = poco_yml
+                    ColorPrint.print_info(
+                        "Created poco.yml from " + ", ".join(compose_files) + " — no manual edit needed",
+                        lvl=-1
+                    )
             if not StateHolder.name == FileUtils.get_directory_name():  # need check for valid plan handling
                 StateHolder.plan = StateHolder.name
                 StateHolder.name = FileUtils.get_directory_name()
