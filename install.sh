@@ -104,8 +104,12 @@ UPDATE_URL="https://raw.githubusercontent.com/$REPO_OWNER/$REPO_NAME/master/inst
 
 if [[ "${1:-}" == "--update" ]]; then
     if [[ -z "$SELF_PATH" ]]; then
-        warn "Self-update only works when run from a saved script file (not from curl pipe). Save install.sh and run: ./install.sh --update"
-        exit 1
+        SAVED="$HOME/.poco/install.sh"
+        mkdir -p "$(dirname "$SAVED")"
+        curl -fsSL "$UPDATE_URL" -o "$SAVED"
+        chmod +x "$SAVED"
+        ok "Script mentve: $SAVED (következő --update: $SAVED --update)"
+        exit 0
     fi
     warn "Self-update indul..."
     curl -fsSL "$UPDATE_URL" -o "$SELF_PATH"
