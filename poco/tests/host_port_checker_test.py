@@ -155,15 +155,22 @@ class HostPortPlatformTest(unittest.TestCase):
 
     def test_windows_cmd_detection(self):
         env = {"COMSPEC": r"C:\Windows\System32\cmd.exe"}
-        with mock.patch.dict(os.environ, env, clear=False):
+        with mock.patch.dict(os.environ, env, clear=True):
             with mock.patch("poco.services.host_port_checker.sys.platform", "win32"):
-                os.environ.pop("MSYSTEM", None)
-                os.environ.pop("PSModulePath", None)
                 self.assertTrue(is_windows_command_prompt())
 
     def test_git_bash_not_cmd(self):
         env = {"COMSPEC": r"C:\Windows\System32\cmd.exe", "MSYSTEM": "MINGW64"}
-        with mock.patch.dict(os.environ, env, clear=False):
+        with mock.patch.dict(os.environ, env, clear=True):
+            with mock.patch("poco.services.host_port_checker.sys.platform", "win32"):
+                self.assertFalse(is_windows_command_prompt())
+
+    def test_powershell_not_cmd(self):
+        env = {
+            "COMSPEC": r"C:\Windows\System32\cmd.exe",
+            "PSModulePath": r"C:\Program Files\WindowsPowerShell\Modules",
+        }
+        with mock.patch.dict(os.environ, env, clear=True):
             with mock.patch("poco.services.host_port_checker.sys.platform", "win32"):
                 self.assertFalse(is_windows_command_prompt())
 
