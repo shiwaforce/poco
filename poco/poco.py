@@ -59,7 +59,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'poco help <command>' for more information on a specific command."""
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 
 class Poco(object):

@@ -104,6 +104,7 @@ class AbstractTestSuite(unittest.TestCase):
         StateHolder.container_mode = "Docker"
         StateHolder.test_mode = False
         StateHolder.compose_handler = None
+        StateHolder.port_check_done = False
 
         StateHolder.catalog_repositories = dict()
         StateHolder.default_catalog_repository = None

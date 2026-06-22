@@ -11,6 +11,7 @@
   },
   start: {
     before: true,
+    premethods: ["check_host_ports"],
     docker: ["build", ["pull", "--ignore-pull-failures"] , "config", ["up", "-d"], "ps"],
     kubernetes: ["apply", ["get", "all", "--all-namespaces"]],
     helm: [["install", "--name"]],
@@ -18,6 +19,7 @@
   },
   restart: {
     before: true,
+    premethods: ["check_host_ports"],
     docker: ["stop", "ps", "build", ["pull", "--ignore-pull-failures"], "config", ["up", "-d"], "ps"],
     kubernetes: ["apply", ["get", "all", "--all-namespaces"]],
     helm: ["upgrade"],

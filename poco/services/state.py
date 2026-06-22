@@ -51,6 +51,9 @@ class StateHolder:
     # Version update
     is_beta_tester = False
 
+    # Host port preflight (start/restart)
+    port_check_done = False
+
     @staticmethod
     def has_args(*args):
         for arg in args:

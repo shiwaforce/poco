@@ -10,8 +10,10 @@ except ImportError:
 class PocoDockerTestSuite(AbstractTestSuite):
 
     @mock.patch('poco.services.environment_utils.EnvironmentUtils.check_docker')
+    @mock.patch('poco.services.command_handler.CommandHandler.check_host_ports')
     @mock.patch('poco.services.command_runners.AbstractPlanRunner.run_script_with_check')
-    def test_up_and_down_mock(self, run_script_with_check, check_docker):
+    def test_up_and_down_mock(self, run_script_with_check, check_host_ports, check_docker):
+        check_host_ports.return_value = None
         self.init_with_remote_catalog()
         with self.captured_output() as (out, err):
             self.run_poco_command("start", "nginx")
@@ -21,8 +23,10 @@ class PocoDockerTestSuite(AbstractTestSuite):
         self.assertEqual(0, len(err.getvalue()))
 
     @mock.patch('poco.services.environment_utils.EnvironmentUtils.check_docker')
+    @mock.patch('poco.services.command_handler.CommandHandler.check_host_ports')
     @mock.patch('poco.services.command_runners.AbstractPlanRunner.run_script_with_check')
-    def test_pull_mock(self, run_script_with_check, check_docker):
+    def test_pull_mock(self, run_script_with_check, check_host_ports, check_docker):
+        check_host_ports.return_value = None
         self.init_with_remote_catalog()
         with self.captured_output() as (out, err):
             self.run_poco_command("pull", "nginx")
@@ -30,9 +34,11 @@ class PocoDockerTestSuite(AbstractTestSuite):
         self.assertIn("Project pull complete", out.getvalue().strip())
 
     @mock.patch('poco.services.environment_utils.EnvironmentUtils.check_docker')
+    @mock.patch('poco.services.command_handler.CommandHandler.check_host_ports')
     @mock.patch('poco.services.command_runners.AbstractPlanRunner.run_script_with_check')
     @mock.patch('poco.services.package_handler.PackageHandler.run_save_cmd')
-    def test_pack_mock(self, check_docker, run_script, run_save):
+    def test_pack_mock(self, run_save, run_script, check_host_ports, check_docker):
+        check_host_ports.return_value = None
         self.init_with_remote_catalog()
         with mock.patch.object(EnvironmentUtils, 'decode') as mock_method:
             mock_method.return_value = "Test Docker file."

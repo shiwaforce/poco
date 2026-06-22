@@ -10,6 +10,7 @@ from ..services.matrix_effect import run_matrix_effect_until
 from ..services.matrix_effect import _matrix_enabled
 from ..services.matrix_effect import show_glitch_message
 from ..services.command_runners import DockerPlanRunner
+from ..services.host_port_checker import print_port_conflict_at_end
 
 
 def _get_tty_stream():
@@ -110,6 +111,22 @@ class Start(AbstractCommand):
         self.check_poco_file()
 
     def execute(self):
+        if self.need_checkout:
+            StateHolder.compose_handler.run_checkouts()
+
+        handler = CommandHandler()
+        if self.run_command in ("start", "restart"):
+            conflict = handler.check_host_ports()
+            if conflict is not None:
+                tty_stream = _get_tty_stream()
+                print_port_conflict_at_end(conflict, tty_stream=tty_stream)
+                if tty_stream is not None and tty_stream not in (sys.stdout, sys.stderr):
+                    try:
+                        tty_stream.close()
+                    except OSError:
+                        pass
+                sys.exit(1)
+
         use_matrix_capture = (
             self.run_command in ("start", "stop")
             and _matrix_enabled()
@@ -196,9 +213,6 @@ class Start(AbstractCommand):
 
         failed = False
         try:
-            if self.need_checkout:
-                StateHolder.compose_handler.run_checkouts()
-            handler = CommandHandler()
             if StateHolder.args.get("--verbose") and not use_matrix_capture and StateHolder.container_mode == "Docker":
                 plan = handler.project_compose["plan"][handler.plan]
                 envs = handler.get_environment_variables(plan)

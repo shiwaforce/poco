@@ -13,6 +13,7 @@ from .command_runners import (
     HelmRunner,
     run_before_docker_script_commands,
 )
+from .host_port_checker import HostPortChecker
 from .yaml_utils import YamlUtils
 
 
@@ -193,3 +194,29 @@ class CommandHandler(object):
                                   working_directory=self.working_directory,
                                   repo_dir=self.repo_dir)
         PackageHandler().pack(files=runner.get_docker_files(plan=plan), envs=envs)
+
+    def check_host_ports(self):
+        if StateHolder.container_mode != "Docker":
+            return None
+        if getattr(StateHolder, "port_check_done", False):
+            return None
+        plan = self.project_compose['plan'][self.plan]
+        envs = self.get_environment_variables(plan=plan)
+        runner = DockerPlanRunner(project_compose=self.project_compose,
+                                  working_directory=self.working_directory,
+                                  repo_dir=self.repo_dir)
+        merged = runner.get_merged_config(plan=plan, envs=envs)
+        if merged is None:
+            ColorPrint.print_warning(
+                "Host port preflight skipped: docker compose config failed.\n"
+                "Continuing startup - port conflicts may only appear from Docker later."
+            )
+            StateHolder.port_check_done = True
+            return None
+        result = HostPortChecker(
+            project_name=StateHolder.name,
+            plan_name=self.plan,
+            merged_config_text=merged,
+        ).run()
+        StateHolder.port_check_done = True
+        return result

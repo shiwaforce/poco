@@ -2,6 +2,13 @@
 
 All notable changes to poco are documented here.
 
+## [1.0.2] - 2026-06-22
+
+### Added
+
+- **Host port preflight** - Before `poco up` and `poco restart`, poco resolves host ports from the plan's compose files (`docker compose config`) and checks for conflicts. Own project containers are ignored (safe restart / partial stack). Foreign or unknown listeners produce a clear error before containers start.
+- **Graceful degrade** - If socket tools (`ss`, `lsof`, `netstat`) or merged config are unavailable (e.g. Windows CMD), poco warns and continues startup instead of blocking.
+
 ## [1.0.1] - 2026-02-28
 
 ### Added

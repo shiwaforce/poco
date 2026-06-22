@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 # Import the module-level helper and matrix show_glitch_message
 from poco.commands.start import _extract_final_output, _filter_matrix_noise, _get_tty_stream
+from poco.services.host_port_checker import PortConflict, print_port_conflict_at_end
 from poco.services.matrix_effect import show_glitch_message
 
 
@@ -76,6 +77,18 @@ def test_show_glitch_message_writes_red():
     out = buf.getvalue()
     assert "glitch in the matrix" in out
     assert "\033" in out  # ANSI
+
+
+def test_print_port_conflict_visible_on_tty():
+    conflict = PortConflict(
+        "Cannot start project \"demo\" with plan \"default\".\n\n"
+        "Host port conflicts:\n  Port 80:\n    container: other-proxy-1\n"
+    )
+    tty = StringIO()
+    with patch("poco.services.console_logger.ColorPrint.print_error"):
+        print_port_conflict_at_end(conflict, tty_stream=tty)
+    assert "Port 80" in tty.getvalue()
+    assert "other-proxy-1" in tty.getvalue()
 
 
 def test_get_tty_stream_never_raises():
