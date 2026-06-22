@@ -118,15 +118,20 @@ def find_duplicate_host_ports(port_map):
     return lines
 
 
-def is_windows_command_prompt():
-    if sys.platform != "win32":
+def _is_windows_command_prompt_env(runtime_platform, environ):
+    """Detect Windows cmd.exe shell from platform and environment (testable without mocking sys)."""
+    if runtime_platform != "win32":
         return False
-    if os.environ.get("MSYSTEM"):
+    if environ.get("MSYSTEM"):
         return False
-    if os.environ.get("PSModulePath") or os.environ.get("POWERSHELL_DISTRIBUTION_CHANNEL"):
+    if environ.get("PSModulePath") or environ.get("POWERSHELL_DISTRIBUTION_CHANNEL"):
         return False
-    comspec = (os.environ.get("COMSPEC") or "").lower()
+    comspec = (environ.get("COMSPEC") or "").lower()
     return comspec.endswith("cmd.exe") or comspec.endswith("\\cmd.exe")
+
+
+def is_windows_command_prompt():
+    return _is_windows_command_prompt_env(sys.platform, os.environ)
 
 
 def socket_check_command(host_port):

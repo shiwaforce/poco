@@ -1,4 +1,3 @@
-import os
 import unittest
 from io import StringIO
 from unittest import mock
@@ -6,6 +5,7 @@ from unittest import mock
 from poco.services.host_port_checker import (
     PortConflict,
     HostPortChecker,
+    _is_windows_command_prompt_env,
     extract_host_ports_from_merged_config,
     find_duplicate_host_ports,
     format_conflict_message,
@@ -154,25 +154,24 @@ class HostPortCheckerRunTest(unittest.TestCase):
 class HostPortPlatformTest(unittest.TestCase):
 
     def test_windows_cmd_detection(self):
-        env = {"COMSPEC": r"C:\Windows\System32\cmd.exe"}
-        with mock.patch.dict(os.environ, env, clear=True):
-            with mock.patch("poco.services.host_port_checker.sys.platform", "win32"):
-                self.assertTrue(is_windows_command_prompt())
+        environ = {"COMSPEC": r"C:\Windows\System32\cmd.exe"}
+        self.assertTrue(_is_windows_command_prompt_env("win32", environ))
 
     def test_git_bash_not_cmd(self):
-        env = {"COMSPEC": r"C:\Windows\System32\cmd.exe", "MSYSTEM": "MINGW64"}
-        with mock.patch.dict(os.environ, env, clear=True):
-            with mock.patch("poco.services.host_port_checker.sys.platform", "win32"):
-                self.assertFalse(is_windows_command_prompt())
+        environ = {"COMSPEC": r"C:\Windows\System32\cmd.exe", "MSYSTEM": "MINGW64"}
+        self.assertFalse(_is_windows_command_prompt_env("win32", environ))
 
     def test_powershell_not_cmd(self):
-        env = {
+        environ = {
             "COMSPEC": r"C:\Windows\System32\cmd.exe",
             "PSModulePath": r"C:\Program Files\WindowsPowerShell\Modules",
         }
-        with mock.patch.dict(os.environ, env, clear=True):
-            with mock.patch("poco.services.host_port_checker.sys.platform", "win32"):
-                self.assertFalse(is_windows_command_prompt())
+        self.assertFalse(_is_windows_command_prompt_env("win32", environ))
+
+    def test_not_windows_platform(self):
+        environ = {"COMSPEC": r"C:\Windows\System32\cmd.exe"}
+        self.assertFalse(_is_windows_command_prompt_env("linux", environ))
+        self.assertFalse(is_windows_command_prompt())
 
 
 class HostPortMessageTest(unittest.TestCase):
