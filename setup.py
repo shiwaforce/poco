@@ -5,7 +5,7 @@ import platform
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-requires = ['PyYAML>=6.0.2', 'pyaml==21.10.1', 'gitpython==3.1.41', 'svn==1.0.1', 'docopt==0.6.2',
+requires = ['PyYAML>=6.0.2', 'pyaml==21.10.1', 'gitpython==3.1.50', 'svn==1.0.1', 'docopt==0.6.2',
             'pygithub==1.55', 'python-gitlab==3.9.0', 'packaging>=24.0']
 test_requires = ['pytest>=7.4.0', 'pytest-cov>=4.1.0']
 

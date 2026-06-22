@@ -9,6 +9,10 @@ All notable changes to poco are documented here.
 - **Host port preflight** - Before `poco up` and `poco restart`, poco resolves host ports from the plan's compose files (`docker compose config`) and checks for conflicts. Own project containers are ignored (safe restart / partial stack). Foreign or unknown listeners produce a clear error before containers start.
 - **Graceful degrade** - If socket tools (`ss`, `lsof`, `netstat`) or merged config are unavailable (e.g. Windows CMD), poco warns and continues startup instead of blocking.
 
+### Security
+
+- **GitPython** - Bumped from 3.1.41 to 3.1.50 (CVE-2026-42215, CVE-2026-42284, CVE-2026-44244, GHSA-mv93-w799-cj2w).
+
 ## [1.0.1] - 2026-02-28
 
 ### Added

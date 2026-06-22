@@ -160,7 +160,7 @@ When a command can show a list, use `-i` to pick from a menu (or fzf if installe
 
 ## Security
 
-- **Dependencies:** We track known vulnerabilities and bump affected packages (e.g. GitPython ≥3.1.41 for CVE fixes). To audit your install: `pip install pip-audit && pip-audit` (or `pip-audit -r requirements.txt`).
+- **Dependencies:** We track known vulnerabilities and bump affected packages (e.g. GitPython ≥3.1.50 for CVE fixes). To audit your install: `pip install pip-audit && pip-audit` (or `pip-audit -r requirements.txt`).
 - **Build tools:** Keep setuptools and wheel up to date: `pip install -U setuptools wheel` to address CVEs in the toolchain.
 
 ## Agent Skills
