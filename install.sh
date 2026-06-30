@@ -66,26 +66,23 @@ fi
 ok "pipx rendben"
 
 # =====================================================
-# Legfrissebb release lekérése GitHub API-val
-# =====================================================
-LATEST_RELEASE_URL=$(curl -fsSL "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest" \
-    | grep "tarball_url" \
-    | head -n1 \
-    | cut -d '"' -f 4)
-
-[ -n "$LATEST_RELEASE_URL" ] || die "Nem sikerült lekérni a legfrissebb release URL-t"
-
-log "Legfrissebb release URL: $LATEST_RELEASE_URL"
-
-# =====================================================
 # Régi POCO eltávolítása
 # =====================================================
 pipx uninstall poco 2>/dev/null || true
 
 # =====================================================
-# Telepítés pipx-szel
+# Telepítés pipx-szel (PyPI elsődleges – nincs GitHub API rate limit)
 # =====================================================
-pipx install "$LATEST_RELEASE_URL" --python "$PYTHON_BIN" --force
+log "Telepítés PyPI-ról..."
+if pipx install poco --python "$PYTHON_BIN" --force; then
+    ok "poco telepítve PyPI-ról"
+else
+    warn "PyPI telepítés sikertelen, fallback: GitHub master tarball..."
+    TARBALL_URL="https://github.com/$REPO_OWNER/$REPO_NAME/archive/refs/heads/master.tar.gz"
+    log "Fallback URL: $TARBALL_URL"
+    pipx install "$TARBALL_URL" --python "$PYTHON_BIN" --force
+    ok "poco telepítve GitHub tarball-ból (master)"
+fi
 
 # =====================================================
 # Ellenőrzés
@@ -122,4 +119,4 @@ echo ""
 echo "Teszt:"
 echo "  poco --help"
 echo "  poco -V"
-ok "Installation complete. Legfrissebb release telepítve."
+ok "Installation complete."
