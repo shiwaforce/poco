@@ -60,32 +60,62 @@ fi
 # =====================================================
 # pipx install/ensurepath
 # =====================================================
-if ! command -v pipx >/dev/null 2>&1; then
+PIPX_BIN="$(command -v pipx || true)"
+PIPX_AS_MODULE=false
+
+run_pipx() {
+    if [[ "$PIPX_AS_MODULE" == true ]]; then
+        "$PIPX_BIN" -m pipx "$@"
+    else
+        "$PIPX_BIN" "$@"
+    fi
+}
+
+if [[ -z "$PIPX_BIN" ]]; then
     warn "pipx nincs telepítve, telepítés indul..."
-    "$PYTHON_BIN" -m pip install --user pipx
-    "$PYTHON_BIN" -m pipx ensurepath
-    echo "⚠ Nyiss új terminált, majd futtasd újra a scriptet."
-    exit 0
+    if "$PYTHON_BIN" -c 'import sys; raise SystemExit(0 if sys.prefix == sys.base_prefix else 1)'; then
+        "$PYTHON_BIN" -m pip install --user pipx
+        PIPX_BIN="$PYTHON_BIN"
+        PIPX_AS_MODULE=true
+    else
+        # pip --user is forbidden inside a virtual environment. Bootstrap pipx
+        # in its own user-owned venv so installations work from activated venvs too.
+        PIPX_BOOTSTRAP="$HOME/.local/share/poco/pipx-bootstrap"
+        "$PYTHON_BIN" -m venv "$PIPX_BOOTSTRAP"
+        PIPX_BOOTSTRAP_PYTHON="$PIPX_BOOTSTRAP/bin/python"
+        if [[ "$PLATFORM" == "windows-gitbash" ]]; then
+            PIPX_BOOTSTRAP_PYTHON="$PIPX_BOOTSTRAP/Scripts/python.exe"
+        fi
+        "$PIPX_BOOTSTRAP_PYTHON" -m pip install --upgrade pip pipx
+        PIPX_BIN="$PIPX_BOOTSTRAP_PYTHON"
+        PIPX_AS_MODULE=true
+    fi
+    run_pipx ensurepath
 fi
 ok "pipx rendben"
+
+# Make the just-installed pipx applications available to this script as well.
+if [[ "$PLATFORM" != "windows-gitbash" ]]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
 
 # =====================================================
 # Régi POCO eltávolítása
 # =====================================================
-pipx uninstall poco 2>/dev/null || true
+run_pipx uninstall poco 2>/dev/null || true
 
 # =====================================================
-# Telepítés pipx-szel (PyPI elsődleges – nincs GitHub API rate limit)
+# Telepítés pipx-szel (GitHub master elsődleges, hogy a curl one-liner
+# valóban a letöltött install.sh-hoz tartozó verziót telepítse)
 # =====================================================
-log "Telepítés PyPI-ról..."
-if pipx install poco --python "$PYTHON_BIN" --force; then
-    ok "poco telepítve PyPI-ról"
+TARBALL_URL="https://github.com/$REPO_OWNER/$REPO_NAME/archive/refs/heads/master.tar.gz"
+log "Telepítés GitHub master tarball-ból..."
+if run_pipx install "$TARBALL_URL" --python "$PYTHON_BIN" --force; then
+    ok "poco telepítve GitHub master tarball-ból"
 else
-    warn "PyPI telepítés sikertelen, fallback: GitHub master tarball..."
-    TARBALL_URL="https://github.com/$REPO_OWNER/$REPO_NAME/archive/refs/heads/master.tar.gz"
-    log "Fallback URL: $TARBALL_URL"
-    pipx install "$TARBALL_URL" --python "$PYTHON_BIN" --force
-    ok "poco telepítve GitHub tarball-ból (master)"
+    warn "GitHub telepítés sikertelen, fallback: PyPI..."
+    run_pipx install poco --python "$PYTHON_BIN" --force
+    ok "poco telepítve PyPI-ról"
 fi
 
 # =====================================================
