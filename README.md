@@ -38,7 +38,7 @@
 - `--offline` — Offline mode.
 - `--always-update` — Project repository handle by user.
 
-For `poco up` / `poco down`, a matrix-style effect runs by default; only the final result is shown. Set `POCO_MATRIX=0` to disable the effect, or use `-VV` / `--no-matrix` to disable it and see the full log.
+For `poco up` / `poco down`, the matrix-style effect is off until you enable it. The install script and the first interactive `poco` command ask whether to turn it on. The answer is saved in `~/.poco/settings.yml`. Change it later with `poco matrix on` or `poco matrix off`. `POCO_MATRIX=1` or `POCO_MATRIX=0` overrides the saved choice for that process. `-VV` / `--no-matrix` turns the effect off for one run and shows the full log.
 
 ## Documentation
 
@@ -51,7 +51,7 @@ All documentation is available on [getpoco.io](https://getpoco.io/)
 
 ## Requirements
 
-- **Python 3.12.3** or newer (supported version: **3.14.3**)
+- **Python 3.12.3** or newer (supported version: **3.14.10**)
 - Git or SVN
 - SSH
 - Docker (17.0.0 or higher version is recommended)
@@ -160,6 +160,7 @@ When a command can show a list, use `-i` to pick from a menu (or fzf if installe
 
 ## Security
 
+- **Python:** Supported runtime is **3.14.10** (released 2026-10-25), which includes interpreter security fixes. poco still runs on Python 3.12.3 or newer and prints a notice when the interpreter is older than 3.14.10.
 - **Dependencies:** We track known vulnerabilities and bump affected packages (e.g. GitPython ≥3.1.50 for CVE fixes). To audit your install: `pip install pip-audit && pip-audit` (or `pip-audit -r requirements.txt`).
 - **Build tools:** Keep setuptools and wheel up to date: `pip install -U setuptools wheel` to address CVEs in the toolchain.
 

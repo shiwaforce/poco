@@ -2,6 +2,16 @@
 
 All notable changes to poco are documented here.
 
+## [1.0.3] - 2026-10-29
+
+### Added
+
+- **Matrix effect opt-in** — The matrix rain during `poco up` / `poco down` is off until you enable it. `install.sh` and the first interactive `poco` command ask in English. The answer is saved in `~/.poco/settings.yml`. `poco matrix on` and `poco matrix off` change it later. `POCO_MATRIX` still overrides one process. `-VV` / `--no-matrix` still disable it for one run and show the full log.
+
+### Security
+
+- **Python 3.14.10** — Supported runtime is 3.14.10 (released 2026-10-25) for interpreter security fixes. poco still runs on Python 3.12.3 or newer and warns when the interpreter is older than 3.14.10. CI and the publish workflow pin 3.14.10.
+
 ## [1.0.2] - 2026-06-22
 
 ### Added

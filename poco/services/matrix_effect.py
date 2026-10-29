@@ -1,7 +1,9 @@
 """
 Matrix-style green "rain" effect for terminal.
 Shows falling green characters when running poco up / poco down.
-Disable with POCO_MATRIX=0 or use poco -VV / poco --no-matrix up (or down).
+Off until the user enables it (install prompt, first interactive command, or `poco matrix on`).
+The choice is stored in ~/.poco/settings.yml. POCO_MATRIX=0/1 overrides that for one process.
+poco -VV / poco --no-matrix disables it for one up/down and shows the full log.
 - Fixed height: max 20 lines, updated in place (no terminal scroll).
 - Width adapts to terminal size; full lines only, no half-filled rows.
 - Fixed duration: run_matrix_effect(seconds=5) or POCO_MATRIX_SECONDS.
@@ -11,6 +13,9 @@ import os
 import random
 import sys
 import time
+
+from .state import StateHolder
+from .yaml_utils import YamlUtils
 
 # Slightly slower refresh on Windows for smoother display (CON/console redraw)
 _MATRIX_SLEEP = 0.05 if sys.platform == "win32" else 0.035
@@ -40,8 +45,140 @@ def show_glitch_message(stream):
         pass
 
 
+_SKIP_MATRIX_PROMPT_COMMANDS = frozenset({"matrix", "help"})
+
+_MATRIX_PROMPT_BODY = (
+    "Enable the poco matrix effect?\n"
+    "\n"
+    "During poco up and poco down, poco can show a Matrix-style rain\n"
+    "and hide the live log. Only the final result is shown.\n"
+    "\n"
+    "You can change this later with: poco matrix on | poco matrix off"
+)
+
+
+def _settings_path():
+    base = StateHolder.home_dir
+    if not base:
+        base = os.path.join(os.path.expanduser("~"), ".poco")
+    return os.path.join(base, "settings.yml")
+
+
+def _coerce_matrix_bool(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() not in ("0", "false", "no", "off", "")
+    if isinstance(value, (int, float)):
+        return value != 0
+    return bool(value)
+
+
+def _env_matrix_override():
+    """Return True/False when POCO_MATRIX is set to a non-empty value, else None."""
+    env = os.environ.get("POCO_MATRIX")
+    if env is None or env.strip() == "":
+        return None
+    return env.strip().lower() not in ("0", "false", "no")
+
+
+def matrix_preference():
+    """Saved matrix choice: True, False, or None when the user has not answered yet."""
+    path = _settings_path()
+    if not os.path.exists(path):
+        return None
+    data = YamlUtils.read(path, fault_tolerant=True)
+    if not isinstance(data, dict) or "matrix" not in data or data.get("matrix") is None:
+        return None
+    return _coerce_matrix_bool(data.get("matrix"))
+
+
+def save_matrix_preference(enabled):
+    """Write matrix: true/false to ~/.poco/settings.yml, keeping any other keys."""
+    path = _settings_path()
+    base = os.path.dirname(path)
+    if base and not os.path.exists(base):
+        os.makedirs(base, mode=0o700)
+    data = {}
+    if os.path.exists(path):
+        existing = YamlUtils.read(path, fault_tolerant=True)
+        if isinstance(existing, dict):
+            data = existing
+    data["matrix"] = bool(enabled)
+    YamlUtils.write(path, data)
+
+
 def _matrix_enabled():
-    return os.environ.get("POCO_MATRIX", "1").strip().lower() not in ("0", "false", "no")
+    override = _env_matrix_override()
+    if override is not None:
+        return override
+    pref = matrix_preference()
+    if pref is None:
+        return False
+    return pref
+
+
+def _is_interactive_tty():
+    try:
+        return bool(sys.stdin.isatty() and sys.stdout.isatty())
+    except (AttributeError, ValueError, OSError):
+        return False
+
+
+def should_ask_matrix_preference(command=None):
+    """True when an interactive command should ask before it runs."""
+    if os.environ.get("PYTEST_CURRENT_TEST"):
+        return False
+    if command in _SKIP_MATRIX_PROMPT_COMMANDS:
+        return False
+    if not _is_interactive_tty():
+        return False
+    return matrix_preference() is None
+
+
+def matrix_command_should_ask():
+    """True when `poco matrix` with no argument should show the question."""
+    if os.environ.get("PYTEST_CURRENT_TEST"):
+        return False
+    if not _is_interactive_tty():
+        return False
+    return matrix_preference() is None
+
+
+def _boxed(text):
+    lines = text.split("\n")
+    width = max((len(line) for line in lines), default=0)
+    bar = "+" + ("-" * (width + 2)) + "+"
+    rows = [bar]
+    for line in lines:
+        rows.append("| " + line.ljust(width) + " |")
+    rows.append(bar)
+    return "\n".join(rows)
+
+
+def ask_matrix_preference():
+    """Ask in English whether to enable the matrix effect and save the answer.
+
+    Empty Enter, n, and no save False. y and yes save True.
+    Ctrl+C or EOF does not write the file.
+    """
+    print()
+    print(_boxed(_MATRIX_PROMPT_BODY))
+    while True:
+        try:
+            raw = input("Enable it? [y/N] ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            raise SystemExit(130)
+        if raw in ("y", "yes"):
+            enabled = True
+            break
+        if raw in ("n", "no", ""):
+            enabled = False
+            break
+        print("Please answer y or n.")
+    save_matrix_preference(enabled)
+    return enabled
 
 
 def _width(stream=None):
@@ -106,7 +243,7 @@ def _draw_lines(out, lines, prefix="  "):
 def run_matrix_effect(seconds=None):
     """
     Print Matrix-style green rain for a fixed duration (max 20 lines, in-place).
-    Disable with POCO_MATRIX=0. Duration: POCO_MATRIX_SECONDS (default 5).
+    Runs only when the effect is enabled. Duration: POCO_MATRIX_SECONDS (default 5).
     """
     if not _matrix_enabled():
         return

@@ -39,10 +39,10 @@ if sys.version_info < (3, 12, 3):
         "Current version: {0}.{1}.{2}".format(*sys.version_info[:3])
     )
 
-# Supported version is 3.14.3; notify when running on older
-if sys.version_info < (3, 14, 3):
+# Supported version is 3.14.10; notify when running on older
+if sys.version_info < (3, 14, 10):
     print(
-        "poco: supported Python version is 3.14.3 (you are running {0}.{1}.{2}).".format(
+        "poco: supported Python version is 3.14.10 (you are running {0}.{1}.{2}).".format(
             *sys.version_info[:3]
         ),
         file=sys.stderr,
@@ -59,7 +59,7 @@ from .services.state import StateHolder
 
 
 END_STRING = """See 'poco help <command>' for more information on a specific command."""
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 
 
 class Poco(object):
@@ -138,14 +138,32 @@ class Poco(object):
             StateHolder.args["--verbose"] = True
         command = StateHolder.args.get("<command>")
         if command is None and StateHolder.args.get("--interactive"):
+            self._ask_matrix_if_needed(None)
             from poco.services.interactive_menu import run_interactive_menu
             run_interactive_menu(self)
             return
         if command is None:
             docopt(self.get_full_doc() + "\n" + CTAUtils.get_cta(), argv=["-h"])
+        if self._is_known_command(command):
+            self._ask_matrix_if_needed(command)
         StateHolder.args.update(self.command_interpreter(command=command, argv=[] + (StateHolder.args.get("<args>") or [])))
         ColorPrint.set_log_level(StateHolder.args)
         ColorPrint.print_info('arguments:\n' + str(StateHolder.args), 1)
+
+    def _is_known_command(self, command):
+        if command in self.command_classes:
+            return True
+        for cls in self.command_classes.get(None) or []:
+            cmd = getattr(cls, "command")
+            names = cmd if isinstance(cmd, list) else [cmd]
+            if command in names:
+                return True
+        return False
+
+    def _ask_matrix_if_needed(self, command):
+        from poco.services.matrix_effect import ask_matrix_preference, should_ask_matrix_preference
+        if should_ask_matrix_preference(command):
+            ask_matrix_preference()
 
     def get_full_doc(self):
         doc = __doc__

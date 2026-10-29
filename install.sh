@@ -34,6 +34,10 @@ fi
 [ -n "$PYTHON_BIN" ] || die "Python nem található"
 PY_VERSION="$($PYTHON_BIN -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
 log "Python: $PYTHON_BIN ($PY_VERSION)"
+if ! "$PYTHON_BIN" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 14, 10) else 1)'; then
+    PY_FULL="$($PYTHON_BIN -c 'import sys; print("%d.%d.%d" % sys.version_info[:3])')"
+    warn "A támogatott Python a 3.14.10 (2026-10-25, sérülékenységi javítások). Jelenlegi: ${PY_FULL}."
+fi
 
 # =====================================================
 # RESET MODE
@@ -113,6 +117,13 @@ if [[ "${1:-}" == "--update" ]]; then
     chmod +x "$SELF_PATH"
     ok "Self-update kész, futtasd újra a scriptet."
     exit 0
+fi
+
+# Matrix effect is opt-in. Same prompt as `poco matrix` (English, saved to ~/.poco/settings.yml).
+if [ -t 0 ] && [ -t 1 ]; then
+    poco matrix
+else
+    echo "Matrix effect is off. Enable with: poco matrix on"
 fi
 
 echo ""
