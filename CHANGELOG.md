@@ -11,6 +11,7 @@ All notable changes to poco are documented here.
 ### Security
 
 - **Python 3.14.10** — Supported runtime is 3.14.10 (released 2026-10-25) for interpreter security fixes. poco still runs on Python 3.12.3 or newer and warns when the interpreter is older than 3.14.10. CI and the publish workflow pin 3.14.10.
+- **GitPython** — Bumped from 3.1.50 to 3.2.1. 3.1.50 is affected by the 2026 GitPython advisories; CVE-2026-114145 is fixed only in 3.2.1.
 
 ## [1.0.2] - 2026-06-22
 

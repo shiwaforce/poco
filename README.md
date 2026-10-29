@@ -161,7 +161,7 @@ When a command can show a list, use `-i` to pick from a menu (or fzf if installe
 ## Security
 
 - **Python:** Supported runtime is **3.14.10** (released 2026-10-25), which includes interpreter security fixes. poco still runs on Python 3.12.3 or newer and prints a notice when the interpreter is older than 3.14.10.
-- **Dependencies:** We track known vulnerabilities and bump affected packages (e.g. GitPython ≥3.1.50 for CVE fixes). To audit your install: `pip install pip-audit && pip-audit` (or `pip-audit -r requirements.txt`).
+- **Dependencies:** We track known vulnerabilities and bump affected packages (e.g. GitPython ≥3.2.1 for CVE fixes). To audit your install: `pip install pip-audit && pip-audit` (or `pip-audit -r requirements.txt`).
 - **Build tools:** Keep setuptools and wheel up to date: `pip install -U setuptools wheel` to address CVEs in the toolchain.
 
 ## Agent Skills
